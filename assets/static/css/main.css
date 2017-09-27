@@ -1,0 +1,59 @@
+.pagination {
+	display: inline-block;
+}
+
+.pagination li {
+	display: inline-block;
+}
+
+#google-signin {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+#google-signin img {
+	width: 1rem;
+	margin-right: 1rem;
+	margin-left: -1rem;
+}
+
+.thumb {
+	width: 150px;
+	height: 220px;
+	object-fit: cover;
+	display: block;
+}
+
+@media screen and (max-width: 840px) {
+	.thumb {
+		width: 110px;
+		height: 165px;
+	}
+}
+
+.disabled p, .disabled figure {
+	opacity: .5;
+}
+
+.disabled h2 {
+	color: #acb3c2;
+}
+
+a.tile, a.tile:hover {
+	text-decoration: inherit;
+	color: inherit;
+	box-shadow: 0px 2px 4px rgba(0,0,0,0.18);
+	margin: 2rem 0 2rem 0;
+	padding-left: 0;
+}
+
+a.tile figure {
+	margin: 0 4px 0 0;
+	box-shadow: 2px 0px 4px rgba(0,0,0,0.18);
+}
+
+a.tile:hover {
+	background-color: #F8F9FC;
+	box-shadow: 2px 4px 4px rgba(0,0,0,0.18);
+}

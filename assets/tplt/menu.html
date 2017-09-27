@@ -1,0 +1,15 @@
+{{block menu(active="index")}}
+<ul class="tab tab-block col-12">
+  <li class="tab-item{{if active == "index"}} active{{end}}">
+    <a href="/">Rulz!</a>
+  </li>
+  <li class="tab-item{{if active == "books"}} active{{end}}">
+    <a href="/books/">Books</a>
+  </li>
+  <li class="tab-item tab-action{{if active == "books"}} active{{end}}">
+    <a class="float-right" href="/users/">
+      <img src="/static/img/avatar-1.png" class="avatar avatar-sm ml-2 mr-2" style="margin-top:-.1rem; margin-bottom:-.2rem"/>
+    </a>
+  </li>
+</ul>
+{{end}}

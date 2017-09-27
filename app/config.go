@@ -14,7 +14,7 @@ type Configuration struct {
 	Port     int              `json:"port"`
 	Database db.Configuration `json:"database"`
 	Paths    struct {
-		Assets    string
+		Static    string
 		Thumbs    string
 		Templates string
 		Cert      string
@@ -42,7 +42,7 @@ func ParseConfig(filename string) (config Configuration, err error) {
 
 	// infer if we load from current path or from system dir
 	if config.Dev {
-		base = path.Join(".")
+		base = path.Join(".", "assets")
 	} else {
 		base = path.Join("/", "var", "lib", "rulzurlibrary")
 	}
@@ -51,6 +51,7 @@ func ParseConfig(filename string) (config Configuration, err error) {
 	config.Paths.Cert = path.Join(letsencrypt, "fullchain.pem")
 	config.Paths.Key = path.Join(letsencrypt, "privkey.pem")
 	config.Paths.Templates = path.Join(base, "tplt")
+	config.Paths.Static = path.Join(base, "static")
 
 	return
 }

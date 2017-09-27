@@ -53,6 +53,7 @@ func New(configPath string) *Application {
 	app.Web.Renderer = view.New(view.Configuration{
 		app.Configuration.Paths.Templates,
 		app.Configuration.Dev,
+		app.Web,
 	})
 	app.Database, err = db.New(app.Configuration.Database)
 

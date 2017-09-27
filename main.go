@@ -14,15 +14,21 @@ func main() {
 	app.Use(middleware.Logger())
 	app.Use(middleware.Recover())
 
+	/* --------------------------------- API --------------------------------- */
 	app.Api.Use(middleware.CORS())
 	app.Api.GET("/", func(c echo.Context) error {
 		return c.String(http.StatusOK, "Hello, World!")
 	})
+
+	/* --------------------------------- WEB --------------------------------- */
+	app.Web.Static("/static", app.Configuration.Paths.Static)
 
 	app.Web.GET("/", func(c echo.Context) error {
 		return c.Render(http.StatusOK, "index.html", map[string]interface{}{
 			"name": "Dolly!",
 		})
 	})
+
+	// Start application
 	app.Logger.Fatal(app.Start())
 }
