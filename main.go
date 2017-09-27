@@ -19,13 +19,16 @@ func main() {
 	rulz.Api.GET("/", func(c echo.Context) error {
 		return c.String(http.StatusOK, "Hello, World!")
 	})
-	rulz.Api.GET("/books/:isbn", rulz.Handler(func(c *app.Context) error {
-		book, err := app.BookGet(c)
-		if err == nil {
-			c.JSON(http.StatusOK, book.ToStructs())
-		}
-		return err
-	}))
+	rulz.Api.GET("/books/:isbn",
+		rulz.Handler(func(c *app.Context) error {
+			book, err := app.BookGet(c)
+			if err == nil {
+				c.JSON(http.StatusOK, book.ToStructs())
+			}
+			return err
+		}),
+		rulz.BasicAuth(false),
+	)
 
 	/* --------------------------------- WEB --------------------------------- */
 	rulz.Web.Static("/static", rulz.Configuration.Paths.Static)

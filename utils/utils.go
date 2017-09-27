@@ -3,6 +3,7 @@ package utils
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"math"
 	"net/url"
 	"strings"
@@ -44,4 +45,8 @@ func SanitizeIsbn(isbn string) string {
 		}
 		return -1
 	}, isbn)
+}
+
+func DecodeJSON(rc io.Reader, i interface{}) error {
+	return json.NewDecoder(rc).Decode(i)
 }
