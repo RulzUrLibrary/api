@@ -18,5 +18,11 @@ func main() {
 	app.Api.GET("/", func(c echo.Context) error {
 		return c.String(http.StatusOK, "Hello, World!")
 	})
+
+	app.Web.GET("/", func(c echo.Context) error {
+		return c.Render(http.StatusOK, "index.html", map[string]interface{}{
+			"name": "Dolly!",
+		})
+	})
 	app.Logger.Fatal(app.Start())
 }

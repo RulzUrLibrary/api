@@ -40,13 +40,17 @@ func ParseConfig(filename string) (config Configuration, err error) {
 		return
 	}
 
+	// infer if we load from current path or from system dir
 	if config.Dev {
-		base = path.Join(".", "static")
+		base = path.Join(".")
 	} else {
 		base = path.Join("/", "var", "lib", "rulzurlibrary")
 	}
+
+	// setup various paths
 	config.Paths.Cert = path.Join(letsencrypt, "fullchain.pem")
 	config.Paths.Key = path.Join(letsencrypt, "privkey.pem")
+	config.Paths.Templates = path.Join(base, "tplt")
 
 	return
 }

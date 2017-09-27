@@ -3,20 +3,12 @@ package app
 import (
 	"fmt"
 	"github.com/ixday/echo-hello/ext/db"
+	"github.com/ixday/echo-hello/ext/view"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
-	"html/template"
 	"net/http"
 	"strings"
 )
-
-type Template struct {
-	templates *template.Template
-}
-
-func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
-	return t.templates.ExecuteTemplate(w, name, data)
-}
 
 type Context struct {
 	echo.Context
@@ -26,7 +18,7 @@ type Context struct {
 type Application struct {
 	*echo.Echo
 	Api           *echo.Echo
-	Site          *echo.Echo
+	Web           *echo.Echo
 	Database      *db.DB
 	Configuration Configuration
 }
@@ -39,7 +31,7 @@ func (app *Application) Handler(h func(*Context) error) echo.HandlerFunc {
 
 func New(configPath string) *Application {
 	var err error
-	var app = &Application{Echo: echo.New(), Api: echo.New(), Site: echo.New()}
+	var app = &Application{Echo: echo.New(), Api: echo.New(), Web: echo.New()}
 
 	app.Any("/*", func(c echo.Context) (err error) {
 		req := c.Request()
@@ -47,7 +39,7 @@ func New(configPath string) *Application {
 		if strings.HasPrefix(req.Host, "api.") {
 			app.Api.ServeHTTP(res, req)
 		} else {
-			app.Site.ServeHTTP(res, req)
+			app.Web.ServeHTTP(res, req)
 		}
 		return
 	})
@@ -58,14 +50,17 @@ func New(configPath string) *Application {
 	}
 
 	app.Debug = app.Configuration.Debug
-
-	if !app.Configuration.Dev {
-		app.HideBanner = true
-	}
-
+	app.Web.Renderer = view.New(view.Configuration{
+		app.Configuration.Paths.Templates,
+		app.Configuration.Dev,
+	})
 	app.Database, err = db.New(app.Configuration.Database)
+
 	if err != nil {
 		app.Logger.Fatal(err)
+	}
+	if !app.Configuration.Dev {
+		app.HideBanner = true
 	}
 	return app
 }
@@ -86,6 +81,7 @@ func (app *Application) Start() error {
 		}()
 		return app.Echo.StartTLS(":443", key, cert)
 	} else {
+
 		return app.Echo.Start(fmt.Sprintf("%s:%d", host, port))
 	}
 }
