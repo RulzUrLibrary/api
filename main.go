@@ -23,7 +23,7 @@ func main() {
 		rulz.Handler(func(c *app.Context) error {
 			book, err := app.BookGet(c)
 			if err == nil {
-				c.JSON(http.StatusOK, book.ToStructs())
+				c.JSON(http.StatusOK, book)
 			}
 			return err
 		}),

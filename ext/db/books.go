@@ -8,9 +8,18 @@ import (
 const SelectBook = `
 SELECT b.id, b.isbn, b.title, b.description, b.price, b.num, s.name, a.id, a.name
 FROM books b
+INNER JOIN series s ON (b.fk_serie = s.id)
 LEFT OUTER JOIN book_authors ba ON (b.id = ba.fk_book)
 LEFT OUTER JOIN authors a ON (ba.fk_author = a.id)
-LEFT OUTER JOIN series s ON (b.fk_serie = s.id)
+WHERE b.isbn = $1`
+
+const SelectBookU = `
+SELECT b.id, b.isbn, b.title, b.description, b.price, b.num, s.name, a.id, a.name,
+	EXISTS(SELECT true FROM collections WHERE fk_book = b.id AND fk_user = $2)
+FROM books b
+INNER JOIN series s ON (b.fk_serie = s.id)
+LEFT OUTER JOIN book_authors ba ON (b.id = ba.fk_book)
+LEFT OUTER JOIN authors a ON (ba.fk_author = a.id)
 WHERE b.isbn = $1`
 
 const SelectBooks = `
@@ -90,9 +99,15 @@ LEFT OUTER JOIN authors a ON (ba.fk_author = a.id)
 LEFT OUTER JOIN series s ON (b.fk_serie = s.id)
 ORDER BY num NULLS FIRST`
 
-func dedup(db *DB, query string, args ...interface{}) (*Books, error) {
+type queryBook struct {
+	query   string
+	args    []interface{}
+	getArgs func(*Book, *Author) []interface{}
+}
+
+func dedup(db *DB, qb queryBook) (*Books, error) {
 	books := NewBooks()
-	rows, err := db.Query(query, args...)
+	rows, err := db.Query(qb.query, qb.args...)
 
 	if err != nil {
 		return nil, err
@@ -102,10 +117,7 @@ func dedup(db *DB, query string, args ...interface{}) (*Books, error) {
 		var book Book
 		var author Author
 
-		args := []interface{}{&book.Id, &book.Isbn, &book.title, &book.description,
-			&book.price, &book.number, &book.serie, &author.id, &author.name}
-
-		if err := rows.Scan(args...); err != nil {
+		if err := rows.Scan(qb.getArgs(&book, &author)...); err != nil {
 			return nil, err
 		}
 
@@ -119,8 +131,33 @@ func dedup(db *DB, query string, args ...interface{}) (*Books, error) {
 	return books, nil
 }
 
-func (db *DB) BookGet(id string) (*Book, error) {
-	books, err := dedup(db, SelectBook, id)
+func newBookQuery(id string, user int) (qb queryBook) {
+	if user == 0 {
+		qb = queryBook{
+			SelectBook, []interface{}{id},
+			func(b *Book, a *Author) []interface{} {
+				return []interface{}{
+					&b.Id, &b.Isbn, &b.title, &b.description, &b.price, &b.number,
+					&b.serie, &a.id, &a.name,
+				}
+			},
+		}
+	} else {
+		qb = queryBook{
+			SelectBookU, []interface{}{id, user},
+			func(b *Book, a *Author) []interface{} {
+				return []interface{}{
+					&b.Id, &b.Isbn, &b.title, &b.description, &b.price, &b.number,
+					&b.serie, &a.id, &a.name, &b.owned,
+				}
+			},
+		}
+	}
+	return
+}
+
+func (db *DB) BookGet(id string, user int) (*Book, error) {
+	books, err := dedup(db, newBookQuery(id, user))
 	if err != nil {
 		return nil, err
 	}
