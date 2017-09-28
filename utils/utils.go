@@ -40,7 +40,7 @@ func UrlQuery(path *url.URL, values ...interface{}) *url.URL {
 
 func SanitizeIsbn(isbn string) string {
 	return strings.Map(func(r rune) rune {
-		if r >= '0' && r <= '9' {
+		if (r >= '0' && r <= '9') || r == 'X' {
 			return r
 		}
 		return -1

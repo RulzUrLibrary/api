@@ -2,7 +2,6 @@ package app
 
 import (
 	"fmt"
-	"github.com/ixday/echo-hello/ext/scrapper"
 	"github.com/ixday/echo-hello/utils"
 	"github.com/labstack/echo"
 	"net/http"
@@ -36,11 +35,11 @@ func BookPost(c *Context, isbn string) (_ interface{}, ok bool, err error) {
 		return nil, ok, err
 	}
 	// request additional informations
-	var book scrapper.Book
-	switch book, err = scrapper.Amazon(isbn); err {
+	var book utils.Book
+	switch book, err = c.Scrapper.Amazon(isbn); err {
 	case nil:
-		err := c.DB.BookSave(book.Book)
-		return book.Book, ok, err
+		err := c.DB.BookSave(&book)
+		return book, ok, err
 	case utils.ErrCaptcha:
 		return nil, ok, echo.NewHTTPError(
 			http.StatusAccepted,
@@ -53,5 +52,4 @@ func BookPost(c *Context, isbn string) (_ interface{}, ok bool, err error) {
 		)
 	}
 	return nil, ok, err
-
 }

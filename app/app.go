@@ -3,6 +3,7 @@ package app
 import (
 	"fmt"
 	"github.com/ixday/echo-hello/ext/db"
+	"github.com/ixday/echo-hello/ext/scrapper"
 	"github.com/ixday/echo-hello/ext/view"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
@@ -13,6 +14,7 @@ import (
 type Context struct {
 	echo.Context
 	*db.DB
+	*scrapper.Scrapper
 }
 
 type Application struct {
@@ -20,12 +22,13 @@ type Application struct {
 	Api           *echo.Echo
 	Web           *echo.Echo
 	Database      *db.DB
+	Scrapper      *scrapper.Scrapper
 	Configuration Configuration
 }
 
 func (app *Application) Handler(h func(*Context) error) echo.HandlerFunc {
 	return func(original echo.Context) error {
-		return h(&Context{original, app.Database})
+		return h(&Context{original, app.Database, app.Scrapper})
 	}
 }
 
@@ -56,6 +59,7 @@ func New(configPath string) *Application {
 		app.Web,
 	})
 	app.Database, err = db.New(app.Configuration.Database)
+	app.Scrapper = scrapper.New(app.Logger, app.Configuration.Paths.Thumbs)
 
 	if err != nil {
 		app.Logger.Fatal(err)

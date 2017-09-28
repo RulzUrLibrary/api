@@ -118,10 +118,10 @@ func getDescription(node *html.Node) string {
 
 }
 
-func ParseIndex(_url string, isbn string) (string, error) {
+func (s *Scrapper) AmazonParseIndex(_url string, isbn string) (string, error) {
 	var form *html.Node
 
-	err := Parse(_url, parse(&form, matchIndexForm))
+	err := s.Parse(_url, parse(&form, matchIndexForm))
 	if err != nil {
 		return "", err
 	}
@@ -142,9 +142,9 @@ func ParseIndex(_url string, isbn string) (string, error) {
 	return base.String(), nil
 }
 
-func ParseSearch(_url string) (href string, err error) {
+func (s *Scrapper) AmazonParseSearch(_url string) (href string, err error) {
 
-	err = Parse(_url, func(doc *html.Node) error {
+	err = s.Parse(_url, func(doc *html.Node) error {
 		for _, link := range matchSearchLink.MatchAll(doc) {
 			href = getAttrs(link)["href"]
 			if strings.Contains(href, "ebook") {
@@ -157,7 +157,7 @@ func ParseSearch(_url string) (href string, err error) {
 	return
 }
 
-func ParseInfo(_url string, book *Book) error {
+func (s *Scrapper) AmazonParseInfo(_url string, book *utils.Book) error {
 	var title *html.Node
 	var price *html.Node
 	var description *html.Node
@@ -181,7 +181,7 @@ func ParseInfo(_url string, book *Book) error {
 		return nil
 	}
 
-	err := Parse(_url, parsingFn)
+	err := s.Parse(_url, parsingFn)
 	if err != nil {
 		return err
 	}
@@ -198,18 +198,18 @@ func ParseInfo(_url string, book *Book) error {
 		return utils.ErrParsingProduct
 	}
 
-	return book.DownloadAsset(getThumb(thumbnail))
+	return s.DownloadThumb(getThumb(thumbnail), book.Isbn)
 }
 
-func Amazon(isbn string) (book Book, err error) {
+func (s *Scrapper) Amazon(isbn string) (book utils.Book, err error) {
 	var url string
-	if url, err = ParseIndex(amazon, isbn); err != nil {
+	if url, err = s.AmazonParseIndex(amazon, isbn); err != nil {
 		return
 	}
-	if url, err = ParseSearch(url); err != nil {
+	if url, err = s.AmazonParseSearch(url); err != nil {
 		return
 	}
-	book = Book{&utils.Book{Isbn: isbn}}
-	err = ParseInfo(url, &book)
+	book.Isbn = isbn
+	err = s.AmazonParseInfo(url, &book)
 	return
 }

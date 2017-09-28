@@ -2,9 +2,9 @@ package google
 
 import (
 	"github.com/ixday/echo-hello/ext/db"
-	"github.com/ixday/echo-hello/ext/scrapper"
 	"github.com/ixday/echo-hello/utils"
 	"net/http"
+	"time"
 )
 
 const endpoint = "https://www.googleapis.com/oauth2/v3/tokeninfo"
@@ -18,7 +18,7 @@ func Auth(db *db.DB, name, token string) (u utils.User, _ error) {
 	var validation validationResp
 
 	url := utils.UrlQueryS(endpoint, "id_token", token)
-	resp, err := scrapper.Client.Get(url.String())
+	resp, err := (&http.Client{Timeout: 20 * time.Second}).Get(url.String())
 
 	if err != nil {
 		return u, err

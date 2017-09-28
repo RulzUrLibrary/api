@@ -52,6 +52,7 @@ func ParseConfig(filename string) (config Configuration, err error) {
 	config.Paths.Key = path.Join(letsencrypt, "privkey.pem")
 	config.Paths.Templates = path.Join(base, "tplt")
 	config.Paths.Static = path.Join(base, "static")
+	config.Paths.Thumbs = path.Join(base, "thumbs")
 
 	return
 }
