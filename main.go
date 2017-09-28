@@ -15,20 +15,10 @@ func main() {
 	rulz.Use(middleware.Recover())
 
 	/* --------------------------------- API --------------------------------- */
+	rulz.Api.Use(app.ContentType)
 	rulz.Api.Use(middleware.CORS())
-	rulz.Api.GET("/", func(c echo.Context) error {
-		return c.String(http.StatusOK, "Hello, World!")
-	})
-	rulz.Api.GET("/books/:isbn",
-		rulz.Handler(func(c *app.Context) error {
-			book, err := app.BookGet(c)
-			if err == nil {
-				c.JSON(http.StatusOK, book)
-			}
-			return err
-		}),
-		rulz.BasicAuth(false),
-	)
+	rulz.Api.GET("/books/:isbn", rulz.Handler(app.APIBookGet), rulz.BasicAuth(false))
+	rulz.Api.POST("/books/", rulz.Handler(app.APIBookPost))
 
 	/* --------------------------------- WEB --------------------------------- */
 	rulz.Web.Static("/static", rulz.Configuration.Paths.Static)

@@ -2,12 +2,12 @@ package scrapper
 
 import (
 	"encoding/base64"
-	"github.com/rulzurlibrary/api/ext/db"
-	"github.com/rulzurlibrary/api/utils"
+	//"github.com/ixday/echo-hello/ext/db"
+	"github.com/ixday/echo-hello/utils"
 	"io"
 	"net/http"
 	"os"
-	"path"
+	//"path"
 )
 
 const base64Header = "data:image/jpeg;base64,"
@@ -17,12 +17,13 @@ type Book struct {
 }
 
 func (b *Book) DownloadAsset(src string) error {
-	return DownloadAsset(src, path.Join(utils.Config.Paths.Thumbs, b.Isbn+".jpg"))
+	//return DownloadAsset(src, path.Join(utils.Config.Paths.Thumbs, b.Isbn+".jpg"))
+	return nil
 }
 
-func (b *Book) InCollection(u *utils.User) (bool, error) {
-	return db.InCollection(b.Id, u)
-}
+//func (b *Book) InCollection(u *utils.User) (bool, error) {
+//	return db.InCollection(b.Id, u)
+//}
 
 func DownloadAsset(src, dest string) error {
 	if src[:len(base64Header)] == base64Header {

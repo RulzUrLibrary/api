@@ -40,20 +40,6 @@ func (b Book) TitleDisplay() string {
 	return TitleDisplay(b.Title, b.Serie, b.Number)
 }
 
-func (b Book) ToArgs() []interface{} {
-	args := []interface{}{
-		b.Isbn, b.Title, b.Description, b.Price, b.Number, nil,
-	}
-
-	if b.Title == "" {
-		args[1] = nil
-	}
-	if b.Number == 0 {
-		args[4] = nil
-	}
-	return args
-}
-
 func TitleDisplay(title string, serie string, number int) string {
 	if serie == "" {
 		return title

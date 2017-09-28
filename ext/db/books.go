@@ -169,6 +169,36 @@ func (db *DB) BookGet(id string, user int) (*Book, error) {
 	return book, nil
 }
 
+func (db *DB) BookSave(book *utils.Book) error {
+	args := []interface{}{
+		book.Isbn, toInterfaceS(book.Title), book.Description, book.Price,
+		toInterfaceI(book.Number), nil,
+	}
+
+	return db.Transaction(func(tx *Tx) (err error) {
+		args[5], err = tx.Insert(InsertSerie, toInterfaceS(book.Serie))
+		if err != nil {
+			return
+		}
+
+		if book.Id, err = tx.Insert(InsertBook, args...); err != nil {
+			return
+		}
+
+		for _, author := range book.Authors {
+			id, err := tx.Insert(InsertAuthor, author.Name)
+			if err != nil {
+				return err
+			}
+			_, err = tx.Exec(InsertBookAuthor, book.Id, id)
+			if err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+}
+
 //func BookList(query string, args ...interface{}) ([]*utils.Book, error) {
 //	books, err := dedup(query, args...)
 //	if err != nil {

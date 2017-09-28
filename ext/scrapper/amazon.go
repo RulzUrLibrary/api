@@ -3,7 +3,7 @@ package scrapper
 import (
 	"github.com/andybalholm/cascadia"
 	"github.com/golang/glog"
-	"github.com/rulzurlibrary/api/utils"
+	"github.com/ixday/echo-hello/utils"
 	"golang.org/x/net/html"
 	"net/url"
 	"regexp"
@@ -15,7 +15,7 @@ const amazon = "http://amazon.fr"
 
 var (
 	matchIndexForm   = cascadia.MustCompile("form")
-	matchSearchLink  = cascadia.MustCompile("#result_0 a")
+	matchSearchLink  = cascadia.MustCompile("#result_0 a.s-access-detail-page")
 	matchTitle       = cascadia.MustCompile("#productTitle")
 	matchPrice       = cascadia.MustCompile(".swatchElement.selected .a-color-price")
 	matchDescription = cascadia.MustCompile("#bookDescription_feature_div noscript")
