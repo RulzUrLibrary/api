@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/ixday/echo-hello/app"
+	"github.com/paul-bismuth/library/app"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 	"net/http"
@@ -18,6 +18,7 @@ func main() {
 	rulz.Api.Use(app.ContentType)
 	rulz.Api.Use(middleware.CORS())
 	rulz.Api.GET("/books/:isbn", rulz.Handler(app.APIBookGet), rulz.BasicAuth(false))
+	rulz.Api.GET("/books/", rulz.Handler(app.APIBookList))
 	rulz.Api.POST("/books/", rulz.Handler(app.APIBookPost))
 
 	/* --------------------------------- WEB --------------------------------- */

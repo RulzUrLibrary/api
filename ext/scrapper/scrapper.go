@@ -2,7 +2,7 @@ package scrapper
 
 import (
 	"encoding/base64"
-	"github.com/ixday/echo-hello/utils"
+	"github.com/paul-bismuth/library/utils"
 	"github.com/labstack/echo"
 	"golang.org/x/net/html"
 	"io"

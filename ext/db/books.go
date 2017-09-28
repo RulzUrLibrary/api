@@ -2,7 +2,7 @@ package db
 
 import (
 	//"database/sql"
-	"github.com/ixday/echo-hello/utils"
+	"github.com/paul-bismuth/library/utils"
 )
 
 const SelectBook = `
@@ -199,13 +199,21 @@ func (db *DB) BookSave(book *utils.Book) error {
 	})
 }
 
-//func BookList(query string, args ...interface{}) ([]*utils.Book, error) {
-//	books, err := dedup(query, args...)
-//	if err != nil {
-//		return nil, err
-//	}
-//	return books.Gets(), nil
-//}
+func (db *DB) BookList(query string, args ...interface{}) ([]*utils.Book, error) {
+	books, err := dedup(db, queryBook{
+		SelectBooks, args, func(b *Book, a *Author) []interface{} {
+			return []interface{}{
+				&b.Id, &b.Isbn, &b.title, &b.description, &b.price, &b.number,
+				&b.serie, &a.id, &a.name,
+			}
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+	return books.Gets(), nil
+}
+
 //
 //func BookAdd(user int, isbn string) error {
 //	if len(isbn) == 0 {
@@ -223,40 +231,6 @@ func (db *DB) BookSave(book *utils.Book) error {
 //		return utils.ErrNoProduct
 //	}
 //	return err
-//}
-//
-//func BookSave(book *utils.Book) error {
-//	var args []interface{}
-//	var id int
-//
-//	return Transaction(func(tx *Tx) (err error) {
-//		args = book.ToArgs()
-//
-//		if book.Serie == "" {
-//			args[5], err = tx.Insert(InsertSerie, nil)
-//		} else {
-//			args[5], err = tx.Insert(InsertSerie, book.Serie)
-//		}
-//		if err != nil {
-//			return
-//		}
-//
-//		if book.Id, err = tx.Insert(InsertBook, args...); err != nil {
-//			return
-//		}
-//
-//		for _, author := range book.Authors {
-//			if id, err = tx.Insert(InsertAuthor, author.Name); err != nil {
-//				return
-//			}
-//			err = tx.QueryRow(InsertBookAuthor, book.Id, id).Scan()
-//			if err != nil && err != sql.ErrNoRows {
-//				return
-//			}
-//		}
-//
-//		return nil
-//	})
 //}
 //
 //func InCollection(book int, u *utils.User) (ok bool, err error) {

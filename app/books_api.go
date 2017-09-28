@@ -31,3 +31,17 @@ func APIBookPost(c *Context) error {
 	}
 	return nil
 }
+
+func APIBookList(c *Context) error {
+	p := NewPagination()
+	err := c.Bind(&p)
+	if err != nil {
+		return err
+	}
+	books, err := BookList(c, int(p.Limit), int(p.Offset))
+	if err != nil {
+		return err
+	}
+	c.JSON(http.StatusOK, books)
+	return nil
+}

@@ -1,8 +1,8 @@
 package app
 
 import (
-	"github.com/ixday/echo-hello/ext/google"
-	"github.com/ixday/echo-hello/utils"
+	"github.com/paul-bismuth/library/ext/google"
+	"github.com/paul-bismuth/library/utils"
 	"github.com/labstack/echo"
 	"net/http"
 	"strings"

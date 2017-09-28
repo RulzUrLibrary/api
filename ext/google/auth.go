@@ -1,8 +1,8 @@
 package google
 
 import (
-	"github.com/ixday/echo-hello/ext/db"
-	"github.com/ixday/echo-hello/utils"
+	"github.com/paul-bismuth/library/ext/db"
+	"github.com/paul-bismuth/library/utils"
 	"net/http"
 	"time"
 )

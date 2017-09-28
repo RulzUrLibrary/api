@@ -2,7 +2,7 @@ package db
 
 import (
 	"database/sql"
-	"github.com/ixday/echo-hello/utils"
+	"github.com/paul-bismuth/library/utils"
 )
 
 type Author struct {

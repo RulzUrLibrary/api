@@ -3,7 +3,7 @@ package db
 import (
 	"database/sql"
 	"encoding/json"
-	"github.com/ixday/echo-hello/utils"
+	"github.com/paul-bismuth/library/utils"
 )
 
 type Book struct {

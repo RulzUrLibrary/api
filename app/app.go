@@ -2,9 +2,9 @@ package app
 
 import (
 	"fmt"
-	"github.com/ixday/echo-hello/ext/db"
-	"github.com/ixday/echo-hello/ext/scrapper"
-	"github.com/ixday/echo-hello/ext/view"
+	"github.com/paul-bismuth/library/ext/db"
+	"github.com/paul-bismuth/library/ext/scrapper"
+	"github.com/paul-bismuth/library/ext/view"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 	"net/http"

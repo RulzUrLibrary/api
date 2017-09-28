@@ -2,8 +2,9 @@ package app
 
 import (
 	"fmt"
-	"github.com/ixday/echo-hello/utils"
 	"github.com/labstack/echo"
+	"github.com/paul-bismuth/library/ext/db"
+	"github.com/paul-bismuth/library/utils"
 	"net/http"
 )
 
@@ -52,4 +53,20 @@ func BookPost(c *Context, isbn string) (_ interface{}, ok bool, err error) {
 		)
 	}
 	return nil, ok, err
+}
+
+func BookList(c *Context, limit, offset int) (interface{}, error) {
+	count, err := c.DB.Count(db.CountBooks)
+	if err != nil {
+		return nil, err
+	}
+
+	books, err := c.DB.BookList(db.SelectBooks, limit, offset)
+	if err != nil {
+		return nil, err
+	}
+	return struct {
+		Meta  `json:"_meta"`
+		Books []*utils.Book `json:"books"`
+	}{Meta{limit, offset, count}, books}, nil
 }
