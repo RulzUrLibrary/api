@@ -105,7 +105,7 @@ type queryBook struct {
 	getArgs func(*Book, *Author) []interface{}
 }
 
-func dedup(db *DB, qb queryBook) (*Books, error) {
+func dedupBooks(db *DB, qb queryBook) (*Books, error) {
 	books := NewBooks()
 	rows, err := db.Query(qb.query, qb.args...)
 
@@ -157,7 +157,7 @@ func newBookQuery(id string, user int) (qb queryBook) {
 }
 
 func (db *DB) BookGet(id string, user int) (*Book, error) {
-	books, err := dedup(db, newBookQuery(id, user))
+	books, err := dedupBooks(db, newBookQuery(id, user))
 	if err != nil {
 		return nil, err
 	}
@@ -200,7 +200,7 @@ func (db *DB) BookSave(book *utils.Book) error {
 }
 
 func (db *DB) BookList(query string, args ...interface{}) ([]*utils.Book, error) {
-	books, err := dedup(db, queryBook{
+	books, err := dedupBooks(db, queryBook{
 		SelectBooks, args, func(b *Book, a *Author) []interface{} {
 			return []interface{}{
 				&b.Id, &b.Isbn, &b.title, &b.description, &b.price, &b.number,

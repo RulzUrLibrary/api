@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/paul-bismuth/library/app"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
+	"github.com/paul-bismuth/library/app"
 	"net/http"
 )
 
@@ -20,6 +20,8 @@ func main() {
 	rulz.Api.GET("/books/:isbn", rulz.Handler(app.APIBookGet), rulz.BasicAuth(false))
 	rulz.Api.GET("/books/", rulz.Handler(app.APIBookList))
 	rulz.Api.POST("/books/", rulz.Handler(app.APIBookPost))
+
+	rulz.Api.GET("/series/:id", rulz.Handler(app.APISerieGet), rulz.BasicAuth(false))
 
 	/* --------------------------------- WEB --------------------------------- */
 	rulz.Web.Static("/static", rulz.Configuration.Paths.Static)
