@@ -18,10 +18,6 @@ type Book struct {
 	authors     Authors
 }
 
-//func (b *Book) InCollection(u *utils.User) (bool, error) {
-//	return InCollection(b.Id, u)
-//}
-
 func (b *Book) Title() (title string) {
 	return b.title.String
 }
@@ -54,25 +50,37 @@ func (b *Book) Authors() utils.Authors {
 	return b.authors.ToStructs()
 }
 
-func (b *Book) ToStructs() *utils.Book {
+func (b *Book) ToBook() *utils.Book {
 	return &utils.Book{
 		Isbn:        b.Isbn,
 		Title:       b.Title(),
 		Description: b.Description(),
 		Thumbnail:   b.Thumbnail(),
 		Price:       b.Price(),
-		Authors:     b.authors.ToStructs(),
+		Authors:     b.Authors(),
 		Number:      b.Number(),
 		Serie:       b.Serie(),
 	}
 }
 
-func (b *Book) ToStructsS() *utils.BookScoped {
-	return &utils.BookScoped{*b.ToStructs(), b.owned}
+func (b *Book) ToBookScoped() *utils.BookScoped {
+	return &utils.BookScoped{*b.ToBook(), b.owned}
+}
+
+func (b *Book) ToVolume() *utils.Volume {
+	return &utils.Volume{
+		Isbn:   b.Isbn,
+		Number: b.Number(),
+		Title:  b.Title(),
+	}
+}
+
+func (b *Book) ToVolumeScoped() *utils.VolumeScoped {
+	return &utils.VolumeScoped{*b.ToVolume(), b.owned}
 }
 
 func (b *Book) MarshalJSON() ([]byte, error) {
-	return json.Marshal(b.ToStructs())
+	return json.Marshal(b.ToBook())
 }
 
 type Books struct {
@@ -102,16 +110,30 @@ func (b *Books) First() *Book {
 	return nil
 }
 
-func (b *Books) Gets() (books []*utils.Book) {
+func (b *Books) ToBooks() (books []*utils.Book) {
 	for _, id := range b.order {
-		books = append(books, b.books[id].ToStructs())
+		books = append(books, b.books[id].ToBook())
 	}
-	return books
+	return
 }
 
-func (b *Books) GetsS() (books []*utils.BookScoped) {
+func (b *Books) ToBooksScoped() (books []*utils.BookScoped) {
 	for _, id := range b.order {
-		books = append(books, b.books[id].ToStructsS())
+		books = append(books, b.books[id].ToBookScoped())
 	}
-	return books
+	return
+}
+
+func (b *Books) ToVolumes() (volumes utils.Volumes) {
+	for _, id := range b.order {
+		volumes = append(volumes, b.books[id].ToVolume())
+	}
+	return
+}
+
+func (b *Books) ToVolumesScoped() (volumes utils.VolumesScoped) {
+	for _, id := range b.order {
+		volumes = append(volumes, b.books[id].ToVolumeScoped())
+	}
+	return
 }

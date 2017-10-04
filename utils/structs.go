@@ -51,14 +51,20 @@ func TitleDisplay(title string, serie string, number int) string {
 }
 
 type Volume struct {
+	Title  string `json:"title,omitempty"`
 	Number int    `json:"number"`
 	Isbn   string `json:"isbn"`
-	Owned  bool   `json:"owned"`
 }
 
-type Volumes []Volume
+type VolumeScoped struct {
+	Volume
+	Owned bool `json:"owned"`
+}
 
-func (v Volumes) owned() (nb int) {
+type Volumes []*Volume
+type VolumesScoped []*VolumeScoped
+
+func (v VolumesScoped) owned() (nb int) {
 	for _, volume := range v {
 		if volume.Owned {
 			nb++
@@ -67,11 +73,11 @@ func (v Volumes) owned() (nb int) {
 	return
 }
 
-func (v Volumes) String() string {
+func (v VolumesScoped) String() string {
 	return fmt.Sprintf("%02d / %02d", v.owned(), len(v))
 }
 
-func (v Volumes) Ratio() float64 {
+func (v VolumesScoped) Ratio() float64 {
 	return float64(v.owned()) / float64(len(v))
 }
 
@@ -79,10 +85,27 @@ type Serie struct {
 	Id          int     `json:"id,omitempty"`
 	Name        string  `json:"name,omitempty"`
 	Description string  `json:"description,omitempty"`
+	Thumbnail   string  `json:"thumbnail,omitempty"`
 	Title       string  `json:"title,omitempty"`
 	Isbn        string  `json:"isbn,omitempty"`
+	Owned       *bool   `json:"owned,omitempty"` // tricking the json marshalling engine
 	Authors     Authors `json:"authors"`
 	Volumes     Volumes `json:"volumes,omitempty"`
+}
+
+type SerieScoped struct {
+	Serie
+	Volumes VolumesScoped `json:"volumes,omitempty"`
+}
+
+type SerieGet struct {
+	Serie
+	Volumes []*Book `json:"volumes,omitempty"`
+}
+
+type SerieGetScoped struct {
+	Serie
+	Volumes []*BookScoped `json:"volumes,omitempty"`
 }
 
 func (s Serie) IsSerie() bool {

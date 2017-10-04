@@ -1,38 +1,59 @@
 package app
 
 import (
-	"fmt"
 	"github.com/labstack/echo"
+	"github.com/paul-bismuth/library/ext/db"
 	"github.com/paul-bismuth/library/utils"
 	"net/http"
 	"strconv"
 )
 
-type Serie struct {
-	Name    string        `json:"name"`
-	Authors utils.Authors `json:"authors"`
-	Books   interface{}   `json:"volumes,omitempty"`
-}
-
 func SerieGet(c *Context) (interface{}, error) {
+	var serie *db.Serie
+
 	id, err := strconv.Atoi(c.Param("id"))
+	user, ok := c.Get("user").(utils.User)
 	if err != nil {
 		return nil, echo.NewHTTPError(
 			http.StatusBadRequest, "serie 'id' must be an integer",
 		)
 	}
-	user, ok := c.Get("user").(utils.User)
-	serie, books, err := c.DB.SerieGet(id, user.Id)
-	if err != nil && err == utils.ErrNotFound {
-		return nil, echo.NewHTTPError(
-			http.StatusNotFound, fmt.Sprintf("serie %d not found", id),
-		)
-	}
-	res := &Serie{Name: serie.Name, Authors: serie.Authors}
 	if ok {
-		res.Books = books.GetsS()
+		serie, err = c.DB.SerieGetU(id, user.Id)
+		if err == nil {
+			return serie.ToSerieGetScoped(), nil
+		}
 	} else {
-		res.Books = books.Gets()
+		serie, err = c.DB.SerieGet(id)
+		if err == nil {
+			return serie.ToSerieGet(), nil
+		}
 	}
-	return res, nil
+	if err == utils.ErrNotFound {
+		return nil, echo.NewHTTPError(http.StatusNotFound, "serie "+c.Param("id")+" not found")
+	}
+	return nil, err
+}
+
+func SerieList(c *Context, limit, offset int) (_ interface{}, err error) {
+	var series *db.Series
+
+	user, ok := c.Get("user").(utils.User)
+
+	res := struct {
+		Meta   `json:"_meta"`
+		Series interface{} `json:"series"`
+	}{Meta{limit, offset, 0}, nil}
+	if ok {
+		series, res.Meta.Count, err = c.DB.SerieListU(limit, offset, user.Id)
+		if err == nil {
+			res.Series = series.ToSeriesScoped()
+		}
+	} else {
+		series, res.Meta.Count, err = c.DB.SerieList(limit, offset)
+		if err == nil {
+			res.Series = series.ToSeries()
+		}
+	}
+	return res, err
 }

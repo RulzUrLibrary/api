@@ -32,16 +32,31 @@ func APIBookPost(c *Context) error {
 	return nil
 }
 
+type search struct {
+	Pattern string `query:"search"`
+	Pagination
+}
+
+func newSearch() search {
+	return search{Pagination: NewPagination()}
+}
+
 func APIBookList(c *Context) error {
-	p := NewPagination()
-	err := c.Bind(&p)
+	var res interface{}
+
+	s := newSearch()
+	err := c.Bind(&s)
 	if err != nil {
 		return err
 	}
-	books, err := BookList(c, int(p.Limit), int(p.Offset))
-	if err != nil {
-		return err
+	if s.Pattern == "" {
+		res, err = BookList(c, int(s.Limit), int(s.Offset))
+	} else {
+		res, err = BookSearch(c, s.Pattern, int(s.Limit), int(s.Offset))
 	}
-	c.JSON(http.StatusOK, books)
-	return nil
+
+	if err == nil {
+		c.JSON(http.StatusOK, res)
+	}
+	return err
 }

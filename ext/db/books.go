@@ -1,7 +1,6 @@
 package db
 
 import (
-	//"database/sql"
 	"github.com/paul-bismuth/library/utils"
 )
 
@@ -33,8 +32,24 @@ LEFT OUTER JOIN authors a ON (ba.fk_author = a.id)
 LEFT OUTER JOIN series s ON (b.fk_serie = s.id)
 ORDER BY b.id DESC`
 
+const SelectBooksU = `
+SELECT b.id, b.isbn, b.title, b.description, b.price, b.num, s.name, a.id, a.name
+FROM (
+	SELECT id, isbn, title, description, price, fk_serie, num
+	FROM books, collections
+	WHERE fk_book = id AND fk_user = $3
+	ORDER BY num ASC, id DESC LIMIT $1 OFFSET $2
+) b
+LEFT OUTER JOIN book_authors ba ON (b.id = ba.fk_book)
+LEFT OUTER JOIN authors a ON (ba.fk_author = a.id)
+LEFT OUTER JOIN series s ON (b.fk_serie = s.id)
+ORDER BY b.num ASC, b.id DESC`
+
 const CountBooks = `
 SELECT COUNT(*) FROM books`
+
+const CountBooksU = `
+SELECT COUNT(*) FROM books, collections WHERE fk_book = id AND fk_user = $1`
 
 const InsertBook = `
 INSERT INTO books (isbn, title, description, price, num, fk_serie)
@@ -105,6 +120,12 @@ type queryBook struct {
 	getArgs func(*Book, *Author) []interface{}
 }
 
+type queryBookList struct {
+	queryBook
+	queryList     string
+	queryListArgs []interface{}
+}
+
 func dedupBooks(db *DB, qb queryBook) (*Books, error) {
 	books := NewBooks()
 	rows, err := db.Query(qb.query, qb.args...)
@@ -131,33 +152,32 @@ func dedupBooks(db *DB, qb queryBook) (*Books, error) {
 	return books, nil
 }
 
-func newBookQuery(id string, user int) (qb queryBook) {
-	if user == 0 {
-		qb = queryBook{
-			SelectBook, []interface{}{id},
-			func(b *Book, a *Author) []interface{} {
-				return []interface{}{
-					&b.Id, &b.Isbn, &b.title, &b.description, &b.price, &b.number,
-					&b.serie, &a.id, &a.name,
-				}
-			},
-		}
-	} else {
-		qb = queryBook{
-			SelectBookU, []interface{}{id, user},
-			func(b *Book, a *Author) []interface{} {
-				return []interface{}{
-					&b.Id, &b.Isbn, &b.title, &b.description, &b.price, &b.number,
-					&b.serie, &a.id, &a.name, &b.owned,
-				}
-			},
-		}
-	}
-	return
+func (db *DB) BookGet(id string) (*Book, error) {
+	return db.bookGet(queryBook{
+		SelectBook, []interface{}{id},
+		func(b *Book, a *Author) []interface{} {
+			return []interface{}{
+				&b.Id, &b.Isbn, &b.title, &b.description, &b.price, &b.number,
+				&b.serie, &a.id, &a.name,
+			}
+		},
+	})
 }
 
-func (db *DB) BookGet(id string, user int) (*Book, error) {
-	books, err := dedupBooks(db, newBookQuery(id, user))
+func (db *DB) BookGetU(id string, user int) (*Book, error) {
+	return db.bookGet(queryBook{
+		SelectBookU, []interface{}{id, user},
+		func(b *Book, a *Author) []interface{} {
+			return []interface{}{
+				&b.Id, &b.Isbn, &b.title, &b.description, &b.price, &b.number,
+				&b.serie, &a.id, &a.name, &b.owned,
+			}
+		},
+	})
+}
+
+func (db *DB) bookGet(qb queryBook) (*Book, error) {
+	books, err := dedupBooks(db, qb)
 	if err != nil {
 		return nil, err
 	}
@@ -199,9 +219,40 @@ func (db *DB) BookSave(book *utils.Book) error {
 	})
 }
 
-func (db *DB) BookList(query string, args ...interface{}) ([]*utils.Book, error) {
+func (db *DB) BookList(limit, offset int) ([]*utils.Book, int, error) {
+	return db.bookList(queryBookList{
+		queryBook{
+			SelectBooks, []interface{}{limit, offset},
+			func(b *Book, a *Author) []interface{} {
+				return []interface{}{
+					&b.Id, &b.Isbn, &b.title, &b.description, &b.price, &b.number,
+					&b.serie, &a.id, &a.name,
+				}
+			},
+		},
+		CountBooks, []interface{}{},
+	})
+}
+
+func (db *DB) BookListU(limit, offset, user int) ([]*utils.Book, int, error) {
+	return db.bookList(queryBookList{
+		queryBook{
+			SelectBooksU, []interface{}{limit, offset, user},
+			func(b *Book, a *Author) []interface{} {
+				return []interface{}{
+					&b.Id, &b.Isbn, &b.title, &b.description, &b.price, &b.number,
+					&b.serie, &a.id, &a.name,
+				}
+			},
+		},
+		CountBooksU, []interface{}{user},
+	})
+}
+
+func (db *DB) BookSearch(pattern string, limit, offset int) ([]*utils.Book, error) {
 	books, err := dedupBooks(db, queryBook{
-		SelectBooks, args, func(b *Book, a *Author) []interface{} {
+		SearchBooks, []interface{}{limit, offset, pattern},
+		func(b *Book, a *Author) []interface{} {
 			return []interface{}{
 				&b.Id, &b.Isbn, &b.title, &b.description, &b.price, &b.number,
 				&b.serie, &a.id, &a.name,
@@ -211,7 +262,19 @@ func (db *DB) BookList(query string, args ...interface{}) ([]*utils.Book, error)
 	if err != nil {
 		return nil, err
 	}
-	return books.Gets(), nil
+	return books.ToBooks(), nil
+}
+
+func (db *DB) bookList(qbl queryBookList) ([]*utils.Book, int, error) {
+	count, err := db.Count(qbl.queryList, qbl.queryListArgs...)
+	if err != nil {
+		return nil, 0, err
+	}
+	books, err := dedupBooks(db, qbl.queryBook)
+	if err != nil {
+		return nil, 0, err
+	}
+	return books.ToBooks(), count, nil
 }
 
 //

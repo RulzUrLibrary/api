@@ -18,10 +18,11 @@ func main() {
 	rulz.Api.Use(app.ContentType)
 	rulz.Api.Use(middleware.CORS())
 	rulz.Api.GET("/books/:isbn", rulz.Handler(app.APIBookGet), rulz.BasicAuth(false))
-	rulz.Api.GET("/books/", rulz.Handler(app.APIBookList))
+	rulz.Api.GET("/books/", rulz.Handler(app.APIBookList), rulz.BasicAuth(false))
 	rulz.Api.POST("/books/", rulz.Handler(app.APIBookPost))
 
 	rulz.Api.GET("/series/:id", rulz.Handler(app.APISerieGet), rulz.BasicAuth(false))
+	rulz.Api.GET("/series/", rulz.Handler(app.APISerieList), rulz.BasicAuth(false))
 
 	/* --------------------------------- WEB --------------------------------- */
 	rulz.Web.Static("/static", rulz.Configuration.Paths.Static)
