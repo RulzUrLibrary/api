@@ -32,13 +32,13 @@ func APIBookPost(c *Context) error {
 	return nil
 }
 
-type search struct {
+type APISearch struct {
 	Pattern string `query:"search"`
 	Pagination
 }
 
-func newSearch() search {
-	return search{Pagination: NewPagination()}
+func newSearch() APISearch {
+	return APISearch{Pagination: NewPagination()}
 }
 
 func APIBookList(c *Context) error {

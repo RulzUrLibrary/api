@@ -18,12 +18,14 @@ type View struct {
 }
 
 func (v *View) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
+	vars := jet.VarMap{}
 	tplt, err := v.GetTemplate(name)
 	if err != nil {
 		// template could not be loaded
 		return err
 	}
-	return tplt.Execute(w, nil, data)
+	vars.Set("context", c)
+	return tplt.Execute(w, vars, data)
 }
 
 func New(config Configuration) *View {

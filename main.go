@@ -1,10 +1,8 @@
 package main
 
 import (
-	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 	"github.com/paul-bismuth/library/app"
-	"net/http"
 )
 
 func main() {
@@ -17,8 +15,10 @@ func main() {
 	/* --------------------------------- API --------------------------------- */
 	rulz.Api.Use(app.ContentType)
 	rulz.Api.Use(middleware.CORS())
+
 	rulz.Api.GET("/books/:isbn", rulz.Handler(app.APIBookGet), rulz.BasicAuth(false))
 	rulz.Api.GET("/books/", rulz.Handler(app.APIBookList), rulz.BasicAuth(false))
+
 	rulz.Api.POST("/books/", rulz.Handler(app.APIBookPost))
 
 	rulz.Api.GET("/series/:id", rulz.Handler(app.APISerieGet), rulz.BasicAuth(false))
@@ -26,12 +26,9 @@ func main() {
 
 	/* --------------------------------- WEB --------------------------------- */
 	rulz.Web.Static("/static", rulz.Configuration.Paths.Static)
+	rulz.Web.Static("/thumbs", rulz.Configuration.Paths.Thumbs)
 
-	rulz.Web.GET("/", func(c echo.Context) error {
-		return c.Render(http.StatusOK, "index.html", map[string]interface{}{
-			"name": "Dolly!",
-		})
-	})
+	rulz.Web.GET("/", rulz.Handler(app.WEBIndex))
 
 	// Start application
 	rulz.Logger.Fatal(rulz.Start())

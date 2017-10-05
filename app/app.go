@@ -2,11 +2,11 @@ package app
 
 import (
 	"fmt"
+	"github.com/labstack/echo"
+	"github.com/labstack/echo/middleware"
 	"github.com/paul-bismuth/library/ext/db"
 	"github.com/paul-bismuth/library/ext/scrapper"
 	"github.com/paul-bismuth/library/ext/view"
-	"github.com/labstack/echo"
-	"github.com/labstack/echo/middleware"
 	"net/http"
 	"strings"
 )
