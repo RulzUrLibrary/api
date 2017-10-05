@@ -29,6 +29,7 @@ func main() {
 	rulz.Web.Static("/thumbs", rulz.Configuration.Paths.Thumbs)
 
 	rulz.Web.GET("/", rulz.Handler(app.WEBIndex))
+	rulz.Web.GET("/books/:isbn", rulz.Handler(app.WEBBookGet)).Name = "books"
 
 	// Start application
 	rulz.Logger.Fatal(rulz.Start())

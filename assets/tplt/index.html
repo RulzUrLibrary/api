@@ -27,7 +27,7 @@
     <h2 class="mt-2">Search results:</h2>
     {{end}}
     {{range book := .books}}
-<a class="tile column col-12 rounded" href="">
+    <a class="tile column col-12 rounded" href="{{url("books", book.Isbn)}}">
       <div class="tile-icon">
         <figure class="figure">
           <img class="thumb" src="{{book.Thumbnail}}" alt="book cover">
@@ -42,7 +42,6 @@
       </div>
     </a>
     {{end}}
-
   </div>
 </div>
 {{end}}
