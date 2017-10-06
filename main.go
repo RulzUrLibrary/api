@@ -20,6 +20,8 @@ func main() {
 	rulz.Api.GET("/books/", rulz.Handler(app.APIBookList), rulz.BasicAuth(false))
 
 	rulz.Api.POST("/books/", rulz.Handler(app.APIBookPost))
+	rulz.Api.PUT("/books/", rulz.Handler(app.APIBookPut), rulz.BasicAuth(true))
+	rulz.Api.DELETE("/books/", rulz.Handler(app.APIBookDelete), rulz.BasicAuth(true))
 
 	rulz.Api.GET("/series/:id", rulz.Handler(app.APISerieGet), rulz.BasicAuth(false))
 	rulz.Api.GET("/series/", rulz.Handler(app.APISerieList), rulz.BasicAuth(false))

@@ -9,7 +9,7 @@ func ContentType(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		req := c.Request()
 
-		if req.Method != echo.POST || req.Method != echo.PUT {
+		if req.Method == echo.GET {
 			return next(c)
 		}
 		ct := req.Header.Get(echo.HeaderContentType)

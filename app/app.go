@@ -13,8 +13,9 @@ import (
 
 type Context struct {
 	echo.Context
-	*db.DB
-	*scrapper.Scrapper
+	DB       *db.DB
+	Logger   echo.Logger
+	Scrapper *scrapper.Scrapper
 }
 
 type Application struct {
@@ -28,7 +29,7 @@ type Application struct {
 
 func (app *Application) Handler(h func(*Context) error) echo.HandlerFunc {
 	return func(original echo.Context) error {
-		return h(&Context{original, app.Database, app.Scrapper})
+		return h(&Context{original, app.Database, app.Logger, app.Scrapper})
 	}
 }
 
@@ -58,7 +59,7 @@ func New(configPath string) *Application {
 		app.Configuration.Dev,
 		app.Web,
 	})
-	app.Database, err = db.New(app.Configuration.Database)
+	app.Database, err = db.New(app.Logger, app.Configuration.Database)
 	app.Scrapper = scrapper.New(app.Logger, app.Configuration.Paths.Thumbs)
 
 	if err != nil {

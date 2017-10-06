@@ -1,7 +1,9 @@
 package db
 
 import (
+	"fmt"
 	"github.com/paul-bismuth/library/utils"
+	"strings"
 )
 
 const SelectBook = `
@@ -113,6 +115,14 @@ LEFT OUTER JOIN book_authors ba ON (b.id = ba.fk_book)
 LEFT OUTER JOIN authors a ON (ba.fk_author = a.id)
 LEFT OUTER JOIN series s ON (b.fk_serie = s.id)
 ORDER BY num NULLS FIRST`
+
+const InsertCollection = `
+INSERT INTO collections ("fk_book", "fk_user")
+SELECT id, $1 FROM books WHERE %s ON CONFLICT DO NOTHING`
+
+const DeleteCollection = `
+DELETE FROM collections USING books b
+WHERE fk_user = $1 AND b.id = fk_book AND (%s)`
 
 type queryBook struct {
 	query   string
@@ -277,29 +287,28 @@ func (db *DB) bookList(qbl queryBookList) ([]*utils.Book, int, error) {
 	return books.ToBooks(), count, nil
 }
 
-//
-//func BookAdd(user int, isbn string) error {
-//	if len(isbn) == 0 {
-//		return utils.ErrInvalidIsbn
-//	}
-//	result, err := Client.Exec(AddBook, isbn, user)
-//	if err != nil {
-//		return nil
-//	}
-//	count, err := result.RowsAffected()
-//	if err != nil {
-//		return err
-//	}
-//	if int(count) == 0 {
-//		return utils.ErrNoProduct
-//	}
-//	return err
-//}
-//
-//func InCollection(book int, u *utils.User) (ok bool, err error) {
-//	if u == nil {
-//		return
-//	}
-//	err = Client.QueryRow(inCollection, u.Id, book).Scan(&ok)
-//	return
-//}
+func (db *DB) BookDelete(books []string, user int) (int, error) {
+	var args = []interface{}{user}
+	if len(books) == 0 {
+		return 0, nil
+	}
+
+	for i, isbn := range books {
+		books[i] = fmt.Sprintf("b.isbn = $%d", i+2)
+		args = append(args, isbn)
+	}
+
+	return db.Exec(fmt.Sprintf(DeleteCollection, strings.Join(books, " OR ")), args...)
+}
+
+func (db *DB) BookPut(books []string, user int) (int, error) {
+	var args = []interface{}{user}
+	if len(books) == 0 {
+		return 0, nil
+	}
+	for i, isbn := range books {
+		books[i] = fmt.Sprintf("isbn = $%d", i+2)
+		args = append(args, isbn)
+	}
+	return db.Exec(fmt.Sprintf(InsertCollection, strings.Join(books, " OR ")), args...)
+}

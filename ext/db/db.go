@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"github.com/labstack/echo"
 	_ "github.com/lib/pq"
 )
 
@@ -34,11 +35,12 @@ func (c Configuration) MarshalJSON() ([]byte, error) {
 
 type DB struct {
 	*sql.DB
+	Logger echo.Logger
 }
 
-func New(c Configuration) (*DB, error) {
+func New(l echo.Logger, c Configuration) (*DB, error) {
 	db, err := sql.Open("postgres", c.String())
-	return &DB{db}, err
+	return &DB{db, l}, err
 }
 
 func (db *DB) Exists(from, where string, args ...interface{}) (ok bool, err error) {
@@ -50,6 +52,19 @@ func (db *DB) Exists(from, where string, args ...interface{}) (ok bool, err erro
 func (db *DB) Count(query string, args ...interface{}) (count int, err error) {
 	err = db.QueryRow(query, args...).Scan(&count)
 	return
+}
+
+func (db *DB) Exec(query string, args ...interface{}) (int, error) {
+	db.Logger.Debug(query)
+	res, err := db.DB.Exec(query, args...)
+	if err != nil {
+		return 0, err
+	}
+	count, err := res.RowsAffected()
+	if err != nil {
+		return 0, err
+	}
+	return int(count), nil
 }
 
 func toInterfaceS(s string) interface{} {

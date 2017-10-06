@@ -24,7 +24,6 @@ func WEBIndex(c *Context) (err error) {
 	if err != nil {
 		return
 	}
-	c.Logger().Error(books)
 	return c.Render(http.StatusOK, "index.html", map[string]interface{}{
 		"books": books,
 	})
