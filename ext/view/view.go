@@ -2,9 +2,11 @@ package view
 
 import (
 	"github.com/CloudyKit/jet"
+	"github.com/gorilla/sessions"
 	"github.com/labstack/echo"
 	"io"
 	"reflect"
+	"strings"
 )
 
 type Configuration struct {
@@ -24,7 +26,13 @@ func (v *View) Render(w io.Writer, name string, data interface{}, c echo.Context
 		// template could not be loaded
 		return err
 	}
+	session, _ := c.Get("session").(*sessions.Session)
+	flashes := session.Flashes()
+	if len(flashes) > 0 {
+		session.Save(c.Request(), c.Response())
+	}
 	vars.Set("context", c)
+	vars.Set("flashes", flashes)
 	return tplt.Execute(w, vars, data)
 }
 
@@ -47,5 +55,27 @@ func New(config Configuration) *View {
 		}
 		return reflect.ValueOf(url)
 	})
+	view.AddGlobalFunc("title", func(a jet.Arguments) reflect.Value {
+		a.RequireNumOfArguments("title", 1, 1)
+		s := a.Get(0).String()
+		return reflect.ValueOf(strings.Title(s))
+	})
+	view.AddGlobalFunc("capitalize", func(a jet.Arguments) reflect.Value {
+		a.RequireNumOfArguments("capitalize", 1, 1)
+		s := a.Get(0).String()
+		if len(s) > 0 {
+			s = strings.ToUpper(s[:1]) + s[1:]
+		}
+		return reflect.ValueOf(s)
+	})
+	view.AddGlobalFunc("valid", func(a jet.Arguments) reflect.Value {
+		a.RequireNumOfArguments("valid", 1, 1)
+		if a.Get(0).IsNil() {
+			return reflect.ValueOf(false)
+		} else {
+			return reflect.ValueOf(true)
+		}
+	})
+
 	return view
 }

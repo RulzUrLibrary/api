@@ -91,5 +91,5 @@ func BookSearch(c *Context, pattern string, limit, offset int) (interface{}, err
 	return struct {
 		Meta  `json:"_meta"`
 		Books []*utils.Book `json:"books"`
-	}{Meta{limit, offset, 0}, books}, nil
+	}{Meta{limit, offset, -1}, books}, nil
 }

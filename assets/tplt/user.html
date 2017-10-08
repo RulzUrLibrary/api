@@ -1,0 +1,23 @@
+{{extends "base.html"}}
+{{import "menu.html"}}
+{{block header()}}
+{{yield menu(active="user")}}
+{{end}}
+{{block page_title()}}Your profile{{end}}
+
+{{block body()}}
+<div class="column col-12">
+  <div class="tile">
+    <div class="tile-icon">
+      <figure class="avatar">
+        <img src="/static/img/avatar-4.png" alt="Avatar">
+      </figure>
+    </div>
+    <div class="tile-content">
+      <p class="tile-title">{{.user.Name}}</p>
+      <p class="tile-subtitle">Earth's Mightiest Heroes joined forces to take on threats that were too big for any one hero to tackle...</p>
+    </div>
+  </div>
+  <a href="{{url("logout")}}" class="btn">Logout</a>
+</div>
+{{end}}

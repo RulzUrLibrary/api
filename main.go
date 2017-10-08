@@ -27,11 +27,20 @@ func main() {
 	rulz.Api.GET("/series/", rulz.Handler(app.APISerieList), rulz.BasicAuth(false))
 
 	/* --------------------------------- WEB --------------------------------- */
+	rulz.Web.Use(app.CookieAuth(rulz.Configuration.Dev))
+
 	rulz.Web.Static("/static", rulz.Configuration.Paths.Static)
 	rulz.Web.Static("/thumbs", rulz.Configuration.Paths.Thumbs)
 
-	rulz.Web.GET("/", rulz.Handler(app.WEBIndex))
-	rulz.Web.GET("/books/:isbn", rulz.Handler(app.WEBBookGet)).Name = "books"
+	rulz.Web.GET("/", rulz.Handler(app.WEBIndex)).Name = "index"
+	rulz.Web.GET("/user", rulz.Handler(app.WEBUserGet), app.Protected).Name = "user"
+	rulz.Web.GET("/user/logout", rulz.Handler(app.WEBUserLogout), app.Protected).Name = "logout"
+
+	rulz.Web.GET("/books/", rulz.Handler(app.WEBBookList), app.Protected).Name = "books"
+	rulz.Web.GET("/books/:isbn", rulz.Handler(app.WEBBookGet)).Name = "book"
+
+	rulz.Web.GET("/auth", rulz.Handler(app.WEBAuthGet)).Name = "auth"
+	rulz.Web.POST("/auth", rulz.Handler(app.WEBAuthPost))
 
 	// Start application
 	rulz.Logger.Fatal(rulz.Start())

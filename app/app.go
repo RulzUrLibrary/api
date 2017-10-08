@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
+	"github.com/paul-bismuth/library/ext/auth"
 	"github.com/paul-bismuth/library/ext/db"
 	"github.com/paul-bismuth/library/ext/scrapper"
 	"github.com/paul-bismuth/library/ext/view"
@@ -14,6 +15,7 @@ import (
 type Context struct {
 	echo.Context
 	DB       *db.DB
+	Auth     *auth.Auth
 	Logger   echo.Logger
 	Scrapper *scrapper.Scrapper
 }
@@ -24,12 +26,13 @@ type Application struct {
 	Web           *echo.Echo
 	Database      *db.DB
 	Scrapper      *scrapper.Scrapper
+	Auth          *auth.Auth
 	Configuration Configuration
 }
 
 func (app *Application) Handler(h func(*Context) error) echo.HandlerFunc {
 	return func(original echo.Context) error {
-		return h(&Context{original, app.Database, app.Logger, app.Scrapper})
+		return h(&Context{original, app.Database, app.Auth, app.Logger, app.Scrapper})
 	}
 }
 
@@ -59,12 +62,10 @@ func New(configPath string) *Application {
 		app.Configuration.Dev,
 		app.Web,
 	})
-	app.Database, err = db.New(app.Logger, app.Configuration.Database)
 	app.Scrapper = scrapper.New(app.Logger, app.Configuration.Paths.Thumbs)
+	app.Database = db.New(app.Logger, app.Configuration.Database)
+	app.Auth = auth.New(app.Logger, app.Database)
 
-	if err != nil {
-		app.Logger.Fatal(err)
-	}
 	if !app.Configuration.Dev {
 		app.HideBanner = true
 	}

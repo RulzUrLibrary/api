@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"encoding/gob"
 	"encoding/json"
 	"fmt"
 	"strings"
@@ -135,4 +136,8 @@ func (a Authors) String() string {
 		names = append(names, author.Name)
 	}
 	return strings.Join(names, ", ")
+}
+
+func init() {
+	gob.Register(&User{})
 }

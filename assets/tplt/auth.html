@@ -1,0 +1,97 @@
+{{extends "base.html"}}
+{{import "menu.html"}}
+
+{{block header()}} {{yield menu()}} {{end}}
+{{block page_title()}}{{end}}
+
+{{block script()}}
+<script src="https://apis.google.com/js/api:client.js"></script>
+<script src="/static/js/auth.js"></script>
+<script> startApp(); </script>
+{{end}}
+
+{{block body()}}
+{*
+{{define "user"}}
+<h1 class="text-center column col-12">Successfully Logged!</h1>
+{{end}}
+{{define "login"}}
+*}
+
+{{next := context.Request().URL.Query().Get("next")}}
+{{if next != ""}}
+<div class="column col-12 mt-2 text-center mb-2">
+  <h5 class="text-error">
+    <i class="icon icon-stop mr-2" style="margin-top:-0.1rem"></i>
+    <span>To access the resource you need to be logged first.</span>
+  </h5>
+</div>
+{{end}}
+
+<div class="column col-md-12">
+  <h2 class="text-center column col-12">Login</h2>
+  <form method="POST" id="login">
+    <div class="form-group">
+      <label class="form-label" for="user">User</label>
+      <input class="form-input" name="user" type="text" id="user" placeholder="User" autocomplete="off" >
+    </div>
+      <div class="form-group">
+        <label class="form-label" for="password">Password</label>
+        <input class="form-input"
+               name="password"
+               type="password"
+               id="password"
+               placeholder="Password"
+               autocomplete="off" />
+      </div>
+      <input name="token" type="hidden" id="token"/>
+      {{if error, ok := .["error"]; ok}}
+      <div class="text-error mb-2">
+        {{capitalize(error.Error())}}
+      </div>
+      {{end}}
+      <div class="form-group">
+        <button class="btn btn-primary col-3 col-md-12 mt-1" type="submit">
+          Submit
+        </button>
+        <button class="btn btn-default col-3 col-md-12 mt-1" type="reset">
+          Cancel
+        </button>
+      </div>
+  </form>
+  <div class="divider col-12 text-center" data-content="OR"></div>
+  <button class="btn btn-block" id="google-signin">
+    <img src="/static/img/google_logo.svg" />
+    Login with Google
+  </button>
+</div>
+<div class="divider-vert hide-md" data-content="OR"></div>
+<div class="divider col-md-12 text-center show-md" data-content="OR"></div>
+
+<div class="column col-md-12">
+  <h2 class="text-center column col-12">Signup</h2>
+  <form method="GET" action="/auth/new">
+    <div class="form-group">
+      <label class="form-label" for="create">User</label>
+      <input class="form-input" type="text" id="create" placeholder="Your username" name="user">
+    </div>
+    <div class="form-group">
+      <button class="btn btn-primary col-3 col-md-12 mt-10">Sign up</button>
+      <button class="btn btn-link col-3 col-md-12 mt-10">Learn more</button>
+    </div>
+  </form>
+</div>
+{{end}}
+
+
+{*
+{{define "content"}}
+<div class="columns">
+  {{if .Context.User}}
+  {{template "user" .Context.User}}
+  {{else}}
+  {{template "login" .}}
+  {{end}}
+</div>
+{{end}}
+*}

@@ -25,9 +25,20 @@
           <header class="navbar mb-2">
             {{yield header()}}
           </header>
+          <div class="columns">
+            <h1 class="column col-12 text-center">{{yield page_title()}}</h1>
+            {{range flash := flashes}}
+            <div class="column col-12 mt-2 text-center mb-2">
+              <h5 class="text-success">
+                <i class="icon icon-check mr-2" style="margin-top:-0.1rem"></i>
+                <span>{{flash}}</span>
+              </h5>
+            </div>
+          {{end}}
           {{yield body()}}
         </div>
       </div>
+    </div>
     </div>
     <script src="/static/js/main.js"></script>
     {{block script()}}{{end}}

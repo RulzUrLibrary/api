@@ -3,45 +3,43 @@
 {{block header()}}
 {{yield menu()}}
 {{end}}
+{{block page_title()}}RulzUrLibrary!{{end}}
 
 {{block body()}}
 {{pattern := context.Request().URL.Query().Get("search")}}
-<div class="columns">
-  <h1 class="column col-12 text-center">RulzUrLibrary!</h1>
-  <div class="column col-12 mb-2">
-    <div class="empty">
-      <h2 class="empty-icon"><i class="icon icon-search"></i></h2>
-      <h4 class="empty-title">Search a book...</h4>
-      <form class="column col-12" method="GET">
-        <div class="form-group">
-          <input class="form-input" name="search" type="text" id="search" placeholder="Enter title, author, ISBN..." value="{{pattern}}"/>
-        </div>
-        <div class="form-group text-left">
-          <button class="btn btn-primary col-3 col-xs-12" type="submit">Submit</button>
-        </div>
-      </form>
-    </div>
-    {{if pattern == ""}}
-    <h2 class="mt-2">Last added books:</h2>
-    {{else}}
-    <h2 class="mt-2">Search results:</h2>
-    {{end}}
-    {{range book := .books}}
-    <a class="tile column col-12 rounded" href="{{url("books", book.Isbn)}}">
-      <div class="tile-icon">
-        <figure class="figure">
-          <img class="thumb" src="{{book.Thumbnail}}" alt="book cover">
-        </figure>
+<div class="column col-12 mb-2">
+  <div class="empty">
+    <h2 class="empty-icon"><i class="icon icon-search"></i></h2>
+    <h4 class="empty-title">Search a book...</h4>
+    <form class="column col-12" method="GET">
+      <div class="form-group">
+        <input class="form-input" name="search" type="text" id="search" placeholder="Enter title, author, ISBN..." value="{{pattern}}"/>
       </div>
-      <div class="tile-content">
-        <div class="column col-12 ml-2 mt-2">
-          <h2>{{book.TitleDisplay()}}</h2>
-          <p class="text-gray">{{book.Authors}}</p>
-          <p>{{book.Description}}</p>
-        </div>
+      <div class="form-group text-left">
+        <button class="btn btn-primary col-3 col-xs-12" type="submit">Submit</button>
       </div>
-    </a>
-    {{end}}
+    </form>
   </div>
+  {{if pattern == ""}}
+  <h2 class="mt-2">Last added books:</h2>
+  {{else}}
+  <h2 class="mt-2">Search results:</h2>
+  {{end}}
+  {{range book := .books}}
+  <a class="tile column col-12 rounded" href="{{url("book", book.Isbn)}}">
+    <div class="tile-icon">
+      <figure class="figure">
+        <img class="thumb" src="{{book.Thumbnail}}" alt="book cover">
+      </figure>
+    </div>
+    <div class="tile-content">
+      <div class="column col-12 ml-2 mt-2">
+        <h2>{{book.TitleDisplay()}}</h2>
+        <p class="text-gray">{{book.Authors}}</p>
+        <p>{{book.Description}}</p>
+      </div>
+    </div>
+  </a>
+  {{end}}
 </div>
 {{end}}

@@ -50,3 +50,12 @@ func SanitizeIsbn(isbn string) string {
 func DecodeJSON(rc io.Reader, i interface{}) error {
 	return json.NewDecoder(rc).Decode(i)
 }
+
+func DefaultS(s ...string) string {
+	for _, s := range s {
+		if s != "" {
+			return s
+		}
+	}
+	return ""
+}

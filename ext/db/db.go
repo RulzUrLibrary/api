@@ -38,9 +38,12 @@ type DB struct {
 	Logger echo.Logger
 }
 
-func New(l echo.Logger, c Configuration) (*DB, error) {
+func New(l echo.Logger, c Configuration) *DB {
 	db, err := sql.Open("postgres", c.String())
-	return &DB{db, l}, err
+	if err != nil {
+		l.Fatal(err)
+	}
+	return &DB{db, l}
 }
 
 func (db *DB) Exists(from, where string, args ...interface{}) (ok bool, err error) {
