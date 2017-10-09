@@ -75,6 +75,11 @@ func Protected(next echo.HandlerFunc) echo.HandlerFunc {
 			return err
 		}
 		u.RawQuery = v.Encode()
+		session, _ := c.Get("session").(*sessions.Session)
+		session.AddFlash(utils.Flash{
+			utils.FlashError, "to access the resource you need to be logged first",
+		})
+		session.Save(c.Request(), c.Response())
 		return c.Redirect(http.StatusSeeOther, u.String())
 	}
 }

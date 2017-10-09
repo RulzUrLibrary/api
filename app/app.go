@@ -2,12 +2,14 @@ package app
 
 import (
 	"fmt"
+	"github.com/gorilla/sessions"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 	"github.com/paul-bismuth/library/ext/auth"
 	"github.com/paul-bismuth/library/ext/db"
 	"github.com/paul-bismuth/library/ext/scrapper"
 	"github.com/paul-bismuth/library/ext/view"
+	"github.com/paul-bismuth/library/utils"
 	"net/http"
 	"strings"
 )
@@ -18,6 +20,20 @@ type Context struct {
 	Auth     *auth.Auth
 	Logger   echo.Logger
 	Scrapper *scrapper.Scrapper
+}
+
+func (c *Context) SaveUser(user *utils.User, flashes ...utils.Flash) error {
+	session, _ := c.Get("session").(*sessions.Session)
+	if user == nil {
+		session.Values["user"] = nil
+	} else {
+		session.Values["user"] = user
+	}
+	c.Set("user", user)
+	for _, flash := range flashes {
+		session.AddFlash(flash)
+	}
+	return session.Save(c.Request(), c.Response())
 }
 
 type Application struct {

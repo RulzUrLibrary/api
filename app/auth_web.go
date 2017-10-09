@@ -1,7 +1,6 @@
 package app
 
 import (
-	"github.com/gorilla/sessions"
 	"github.com/paul-bismuth/library/utils"
 	"net/http"
 )
@@ -13,14 +12,54 @@ func WEBUserGet(c *Context) error {
 }
 
 func WEBUserLogout(c *Context) error {
-	session, _ := c.Get("session").(*sessions.Session)
-	session.Values["user"] = nil
-	session.AddFlash("you have been successfully logged out!")
-	c.Set("user", nil)
-	if err := session.Save(c.Request(), c.Response()); err != nil {
+	flash := utils.Flash{utils.FlashSuccess, "you have been successfully logged out!"}
+	if err := c.SaveUser(nil, flash); err != nil {
 		return err
 	}
 	return c.Redirect(http.StatusSeeOther, c.Echo().Reverse("index"))
+}
+
+func WEBUserNewGet(c *Context) error {
+	return c.Render(http.StatusOK, "new.html", map[string]interface{}{})
+}
+
+func WEBUserNewPost(c *Context) error {
+	badRequest := func(msg string) error {
+		return c.Render(http.StatusBadRequest, "new.html", map[string]interface{}{
+			"error": msg,
+		})
+	}
+	creds := struct {
+		User         string `form:"user"`
+		Password     string `form:"password"`
+		Confirmation string `form:"confirmation"`
+	}{}
+
+	if err := c.Bind(&creds); err != nil {
+		return badRequest(err.Error())
+	}
+	if creds.Confirmation != creds.Password {
+		return badRequest("passwords don't match")
+	}
+	if len(creds.Password) < 2 {
+		return badRequest("user password must be at least 8 characters long")
+	}
+	switch suffix := utils.MailAddress(creds.User); suffix {
+	case "@gmail.com":
+		return badRequest("username should not be from gmail, signin directly if you want to use it")
+	}
+	user, err := c.DB.NewUser(creds.User, creds.Password)
+	switch err {
+	case nil:
+		flash := utils.Flash{utils.FlashSuccess, "welcome to rulz!"}
+		if err := c.SaveUser(&user, flash); err != nil {
+			return err
+		}
+		return c.Redirect(http.StatusSeeOther, c.Echo().Reverse("books"))
+	case utils.ErrUserExists:
+		return badRequest(err.Error())
+	}
+	return err
 }
 
 func WEBAuthGet(c *Context) error {
@@ -44,10 +83,7 @@ func WEBAuthPost(c *Context) error {
 			"error": err,
 		})
 	}
-	session, _ := c.Get("session").(*sessions.Session)
-	session.Values["user"] = &user
-	c.Set("user", &user)
-	if err := session.Save(c.Request(), c.Response()); err != nil {
+	if err := c.SaveUser(&user); err != nil {
 		return err
 	}
 	return c.Redirect(http.StatusSeeOther, creds.Next)

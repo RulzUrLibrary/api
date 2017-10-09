@@ -42,6 +42,9 @@ func main() {
 	rulz.Web.GET("/auth", rulz.Handler(app.WEBAuthGet)).Name = "auth"
 	rulz.Web.POST("/auth", rulz.Handler(app.WEBAuthPost))
 
+	rulz.Web.GET("/auth/new", rulz.Handler(app.WEBUserNewGet)).Name = "new"
+	rulz.Web.POST("/auth/new", rulz.Handler(app.WEBUserNewPost))
+
 	// Start application
 	rulz.Logger.Fatal(rulz.Start())
 }

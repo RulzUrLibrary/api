@@ -5,7 +5,6 @@ import (
 	"github.com/paul-bismuth/library/ext/db"
 	"github.com/paul-bismuth/library/ext/google"
 	"github.com/paul-bismuth/library/utils"
-	"strings"
 )
 
 type Auth struct {
@@ -25,9 +24,8 @@ func (auth *Auth) Login(username, password string) (user utils.User, err error) 
 		auth.Logger.Infof("using cache on user: %+v", user)
 		return user, nil
 	}
-	suffix := strings.TrimLeftFunc(username, func(r rune) bool { return r != '@' })
 
-	switch suffix {
+	switch suffix := utils.MailAddress(username); suffix {
 	case "@gmail.com":
 		user, err = google.Auth(auth.DB, username, password)
 	default:

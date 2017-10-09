@@ -1,0 +1,49 @@
+{{extends "base.html"}}
+{{import "menu.html"}}
+{{block header()}}
+{{yield menu(active="user")}}
+{{end}}
+{{block page_title()}}Register{{end}}
+
+{{block body()}}
+{{user := context.Request().URL.Query().Get("user")}}
+<div class="column col-6 col-mx-auto">
+  <form method="POST" action="{{url("new")}}">
+    <div class="form-group">
+      <label class="form-label" for="user">User</label>
+      <input class="form-input" name="user" type="text" id="user" placeholder="User" autocomplete="off" value="{{user}}">
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="password">Password</label>
+      <input class="form-input"
+             name="password"
+             type="password"
+             id="password"
+             placeholder="Password"
+             autocomplete="off" />
+      <label class="form-label" for="confirmation">
+        Confirm password
+      </label>
+      <input class="form-input"
+             name="confirmation"
+             type="password"
+             id="confirmation"
+             placeholder="Password"
+             autocomplete="off" />
+    </div>
+    {{if error, ok := .["error"]; ok}}
+    <div class="text-error mb-2">
+      {{error|capitalize}}
+    </div>
+    {{end}}
+    <div class="form-group text-right">
+      <button class="btn btn-primary col-3 col-md-12 mt-1" type="submit">
+        Submit
+      </button>
+      <button class="btn btn-default col-3 col-md-12 mt-1" type="reset">
+        Cancel
+      </button>
+    </div>
+  </form>
+</div>
+{{end}}

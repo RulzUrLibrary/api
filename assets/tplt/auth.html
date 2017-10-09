@@ -1,7 +1,7 @@
 {{extends "base.html"}}
 {{import "menu.html"}}
 
-{{block header()}} {{yield menu()}} {{end}}
+{{block header()}} {{yield menu(active="user")}} {{end}}
 {{block page_title()}}{{end}}
 
 {{block script()}}
@@ -17,16 +17,6 @@
 {{end}}
 {{define "login"}}
 *}
-
-{{next := context.Request().URL.Query().Get("next")}}
-{{if next != ""}}
-<div class="column col-12 mt-2 text-center mb-2">
-  <h5 class="text-error">
-    <i class="icon icon-stop mr-2" style="margin-top:-0.1rem"></i>
-    <span>To access the resource you need to be logged first.</span>
-  </h5>
-</div>
-{{end}}
 
 <div class="column col-md-12">
   <h2 class="text-center column col-12">Login</h2>

@@ -7,6 +7,44 @@ import (
 	"strings"
 )
 
+type flash int
+
+const (
+	FlashSuccess flash = iota
+	FlashWarning
+	FlashError
+)
+
+type Flash struct {
+	Type flash
+	Msg  string
+}
+
+// this should not be here
+func (f Flash) Class() string {
+	switch f.Type {
+	case FlashSuccess:
+		return "text-success"
+	case FlashWarning:
+		return "text-warning"
+	case FlashError:
+		return "text-error"
+	}
+	return ""
+}
+
+func (f Flash) Icon() string {
+	switch f.Type {
+	case FlashSuccess:
+		return "icon-check"
+	case FlashWarning:
+		return "icon-time"
+	case FlashError:
+		return "icon-stop"
+	}
+	return ""
+}
+
 type User struct {
 	Id   int
 	Name string
@@ -140,4 +178,5 @@ func (a Authors) String() string {
 
 func init() {
 	gob.Register(&User{})
+	gob.Register(Flash{})
 }

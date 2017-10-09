@@ -33,6 +33,7 @@ func (v *View) Render(w io.Writer, name string, data interface{}, c echo.Context
 	}
 	vars.Set("context", c)
 	vars.Set("flashes", flashes)
+	vars.Set("user", c.Get("user"))
 	return tplt.Execute(w, vars, data)
 }
 
@@ -57,25 +58,16 @@ func New(config Configuration) *View {
 	})
 	view.AddGlobalFunc("title", func(a jet.Arguments) reflect.Value {
 		a.RequireNumOfArguments("title", 1, 1)
-		s := a.Get(0).String()
+		s, _ := a.Get(0).Interface().(string)
 		return reflect.ValueOf(strings.Title(s))
 	})
 	view.AddGlobalFunc("capitalize", func(a jet.Arguments) reflect.Value {
 		a.RequireNumOfArguments("capitalize", 1, 1)
-		s := a.Get(0).String()
+		s, _ := a.Get(0).Interface().(string)
 		if len(s) > 0 {
 			s = strings.ToUpper(s[:1]) + s[1:]
 		}
 		return reflect.ValueOf(s)
 	})
-	view.AddGlobalFunc("valid", func(a jet.Arguments) reflect.Value {
-		a.RequireNumOfArguments("valid", 1, 1)
-		if a.Get(0).IsNil() {
-			return reflect.ValueOf(false)
-		} else {
-			return reflect.ValueOf(true)
-		}
-	})
-
 	return view
 }

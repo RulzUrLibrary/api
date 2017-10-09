@@ -59,3 +59,7 @@ func DefaultS(s ...string) string {
 	}
 	return ""
 }
+
+func MailAddress(s string) string {
+	return strings.TrimLeftFunc(s, func(r rune) bool { return r != '@' })
+}

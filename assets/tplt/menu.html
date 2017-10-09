@@ -1,5 +1,4 @@
 {{block menu(active="index")}}
-{{user := context.Get("user")}}
 <ul class="tab tab-block col-12">
   <li class="tab-item{{if active == "index"}} active{{end}}">
     <a href="{{url("index")}}">Rulz!</a>
@@ -8,7 +7,7 @@
     <a href="{{url("books")}}">Books</a>
   </li>
   <li class="tab-item tab-action{{if active == "user"}} active{{end}}">
-    {{if valid(user) }}
+    {{if isset(user)}}
      <a class="float-right" href="{{url("user")}}">
       <img src="/static/img/avatar-1.png" class="avatar avatar-sm ml-2 mr-2" style="margin-top:-.1rem; margin-bottom:-.2rem"/>
     </a>
