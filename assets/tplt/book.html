@@ -3,42 +3,40 @@
 {{block header()}}
 {{yield menu(active="books")}}
 {{end}}
+{{block page_title()}}{{.book.TitleDisplay()}}{{end}}
 
 {{block body()}}
-<div class="columns">
-  <h1 class="column text-center">{{.book.TitleDisplay()}}</h1>
-  <div class="column col-12">
-    <div class="divider"></div>
-  </div>
-  {{range author := .book.Authors}}
-  <div class="column col-6">
-    <div class="tile">
-      <div class="tile-content">
-        <p class="tile-title">{{author.Name}}</p>
-        <p class="tile-subtitle">Some bio stuff maybe...</p>
-        <p>
-        <button class="btn btn-primary btn-sm">Details</button>
-        </p>
-      </div>
-
-    </div>
-  </div>
-  {{end}}
-  <div class="column col-12">
-    <div class="divider"></div>
-  </div>
-  <div class="column col-12">
-    <p class="text-justify"> {{.book.Description}} </p>
-  </div>
-  {* <form class="column col-2 col-lg-4 col-md-6 col-sm-12" action="/books/">
-    <input type="hidden" name="isbn" value="{{.Entity.Isbn}}"/>
-    {{if $.Entity.InCollection .Context.User}}
-    <input class="btn btn-primary btn-block disabled"
-           type="submit" tabindex="-1" value="In collection" />
-    {{else}}
-    <input type="submit" class="btn btn-primary btn-block" value="Add to collection"/>
-    {{end}}
-  </form> *}
+<div class="column col-12">
+  <div class="divider"></div>
 </div>
+{{range author := .book.Authors}}
+<div class="column col-6">
+  <div class="tile">
+    <div class="tile-content">
+      <p class="tile-title">{{author.Name}}</p>
+      <p class="tile-subtitle">Some bio stuff maybe...</p>
+      <p>
+      <button class="btn btn-primary btn-sm">Details</button>
+      </p>
+    </div>
+
+  </div>
+</div>
+{{end}}
+<div class="column col-12">
+  <div class="divider"></div>
+</div>
+<div class="column col-12">
+  <p class="text-justify"> {{.book.Description}} </p>
+</div>
+{* <form class="column col-2 col-lg-4 col-md-6 col-sm-12" action="/books/">
+  <input type="hidden" name="isbn" value="{{.Entity.Isbn}}"/>
+  {{if $.Entity.InCollection .Context.User}}
+  <input class="btn btn-primary btn-block disabled"
+         type="submit" tabindex="-1" value="In collection" />
+  {{else}}
+  <input type="submit" class="btn btn-primary btn-block" value="Add to collection"/>
+  {{end}}
+</form> *}
 
 {{end}}
