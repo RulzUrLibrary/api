@@ -61,6 +61,22 @@ func (app *Application) Handler(h func(*Context) error) echo.HandlerFunc {
 	}
 }
 
+func HTTPErrorHandler(err error, c echo.Context) {
+	code := http.StatusInternalServerError
+	data := map[string]interface{}{"error": err, "msg": "Internal server error"}
+
+	if httpErr, ok := err.(*echo.HTTPError); ok {
+		code = httpErr.Code
+		data["err"] = httpErr.Inner
+		data["msg"] = httpErr.Message
+	}
+	data["code"] = code
+	err = c.Render(code, "error.html", data)
+	if err != nil {
+		c.Logger().Error(err)
+	}
+}
+
 func New(configPath string) *Application {
 	var err error
 	var app = &Application{Echo: echo.New(), Api: echo.New(), Web: echo.New()}
@@ -81,15 +97,19 @@ func New(configPath string) *Application {
 		app.Logger.Fatal(err)
 	}
 
-	app.Debug = app.Configuration.Debug
-
+	app.Api.Debug = app.Configuration.Debug
 	app.Api.Validator = validator.New()
+
+	app.Web.Debug = app.Configuration.Debug
 	app.Web.Validator = validator.New()
+	app.Web.HTTPErrorHandler = HTTPErrorHandler
 	app.Web.Renderer = view.New(view.Configuration{
 		app.Configuration.Paths.Templates,
 		app.Configuration.Dev,
 		app.Web,
 	})
+
+	app.Debug = app.Configuration.Debug
 	app.Scrapper = scrapper.New(app.Logger, app.Configuration.Paths.Thumbs)
 	app.Database = db.New(app.Logger, app.Configuration.Database)
 	app.Auth = auth.New(app.Logger, app.Database)

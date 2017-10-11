@@ -14,8 +14,9 @@ type Validator struct {
 }
 
 var errors = map[string]string{
-	"gt":  "%s value must be greater than %s, got '%d'",
-	"lte": "%s value must be lower or equal to %s, got '%d'",
+	"gt":  "value must be greater than %s, got '%d'",
+	"gte": "value must be greater or equal to %s, got '%d'",
+	"lte": "value must be lower or equal to %s, got '%d'",
 }
 
 func (v *Validator) Validate(i interface{}) error {
@@ -31,7 +32,7 @@ func (v *Validator) Validate(i interface{}) error {
 		if old, ok := payload[fe.Field()]; ok {
 			msgs = old
 		}
-		msg := fmt.Sprintf(errors[fe.Tag()], fe.Field(), fe.Param(), fe.Value())
+		msg := fmt.Sprintf(errors[fe.Tag()], fe.Param(), fe.Value())
 		payload[fe.Field()] = append(msgs, msg)
 	}
 	return echo.NewHTTPError(http.StatusBadRequest, payload)
@@ -40,7 +41,7 @@ func (v *Validator) Validate(i interface{}) error {
 func New() *Validator {
 	validator := &Validator{validate.New()}
 	validator.validator.RegisterTagNameFunc(func(fld reflect.StructField) string {
-		name := strings.SplitN(fld.Tag.Get("json"), ",", 2)[0]
+		name := strings.SplitN(fld.Tag.Get("query"), ",", 2)[0]
 
 		if name == "-" {
 			return ""

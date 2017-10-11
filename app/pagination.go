@@ -8,7 +8,7 @@ const DEFAULT_LIMIT = 10
 
 type Meta struct {
 	Limit  int `query:"limit" json:"limit" validate:"gt=0,lte=50"`
-	Offset int `query:"offset" json:"offset" validate:"gt=0"`
+	Offset int `query:"offset" json:"offset" validate:"gte=0"`
 	Count  int `json:"count,omitempty"`
 }
 
