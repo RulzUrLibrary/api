@@ -2,50 +2,18 @@ package app
 
 import (
 	"github.com/paul-bismuth/library/utils"
-	"strconv"
 )
 
+const DEFAULT_LIMIT = 10
+
 type Meta struct {
-	Limit  int `json:"limit"`
-	Offset int `json:"offset"`
+	Limit  int `query:"limit" json:"limit" validate:"gt=0,lte=50"`
+	Offset int `query:"offset" json:"offset" validate:"gt=0"`
 	Count  int `json:"count,omitempty"`
 }
 
-type Pagination struct {
-	Limit  limit  `query:"limit"`
-	Offset offset `query:"offset"`
-}
-
-type offset int
-type limit int
-
-func (o *offset) UnmarshalParam(param string) error {
-	i, err := strconv.Atoi(param)
-	if err != nil {
-		return err
-	}
-	if i < 0 {
-		return utils.ErrOffset
-	}
-	*o = offset(i)
-	return nil
-}
-
-func (l *limit) UnmarshalParam(param string) error {
-	i, err := strconv.Atoi(param)
-	if err != nil {
-		return err
-	}
-	if i < 0 || i > 50 {
-		return utils.ErrLimit
-	}
-
-	*l = limit(i)
-	return nil
-}
-
-func NewPagination() Pagination {
-	return Pagination{Limit: 10}
+func NewMeta() Meta {
+	return Meta{Limit: DEFAULT_LIMIT, Count: -1}
 }
 
 func (m Meta) First() bool {

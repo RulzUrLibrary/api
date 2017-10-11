@@ -1,6 +1,7 @@
 package app
 
 import (
+	"github.com/paul-bismuth/library/utils"
 	"net/http"
 )
 
@@ -31,37 +32,31 @@ func APIBookPost(c *Context) error {
 	}
 }
 
-type APISearch struct {
-	Pattern string `query:"search"`
-	Pagination
-}
+func APIBookList(c *Context) (err error) {
+	var books []*utils.Book
+	var s = struct {
+		Pattern string `query:"search"`
+		Meta
+	}{"", NewMeta()}
 
-func newSearch() APISearch {
-	return APISearch{Pagination: NewPagination()}
-}
-
-func APIBookList(c *Context) error {
-	s := newSearch()
-
-	if err := c.Bind(&s); err != nil {
-		return err
+	if err = c.Bind(&s); err != nil {
+		return
+	}
+	if err = c.Validate(&s); err != nil {
+		return
 	}
 	if s.Pattern == "" {
-		books, count, err := BookList(c, int(s.Limit), int(s.Offset))
+		books, s.Count, err = BookList(c, s.Limit, s.Offset)
 		if err != nil {
 			return err
 		}
-		return c.JSON(http.StatusOK, map[string]interface{}{
-			"_meta": Meta{int(s.Limit), int(s.Offset), count}, "books": books,
-		})
+		return c.JSON(http.StatusOK, map[string]interface{}{"_meta": s.Meta, "books": books})
 	} else {
-		books, err := c.DB.BookSearch(s.Pattern, int(s.Limit), int(s.Offset))
+		books, err = c.DB.BookSearch(s.Pattern, s.Limit, s.Offset)
 		if err != nil {
 			return err
 		}
-		return c.JSON(http.StatusOK, map[string]interface{}{
-			"_meta": Meta{int(s.Limit), int(s.Offset), -1}, "books": books,
-		})
+		return c.JSON(http.StatusOK, map[string]interface{}{"_meta": s.Meta, "books": books})
 	}
 }
 

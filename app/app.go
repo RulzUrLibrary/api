@@ -8,6 +8,7 @@ import (
 	"github.com/paul-bismuth/library/ext/auth"
 	"github.com/paul-bismuth/library/ext/db"
 	"github.com/paul-bismuth/library/ext/scrapper"
+	"github.com/paul-bismuth/library/ext/validator"
 	"github.com/paul-bismuth/library/ext/view"
 	"github.com/paul-bismuth/library/utils"
 	"net/http"
@@ -81,6 +82,9 @@ func New(configPath string) *Application {
 	}
 
 	app.Debug = app.Configuration.Debug
+
+	app.Api.Validator = validator.New()
+	app.Web.Validator = validator.New()
 	app.Web.Renderer = view.New(view.Configuration{
 		app.Configuration.Paths.Templates,
 		app.Configuration.Dev,

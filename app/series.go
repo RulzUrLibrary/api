@@ -32,21 +32,12 @@ func SerieGet(c *Context) (*utils.Serie, error) {
 	return nil, err
 }
 
-func SerieList(c *Context, limit, offset int) (_ map[string]interface{}, err error) {
-	var series *db.Series
-	var count int
-
+func SerieList(c *Context, limit, offset int) (*db.Series, int, error) {
 	user, ok := c.Get("user").(*utils.User)
 
 	if ok {
-		series, count, err = c.DB.SerieListU(limit, offset, user.Id)
+		return c.DB.SerieListU(limit, offset, user.Id)
 	} else {
-		series, count, err = c.DB.SerieList(limit, offset)
+		return c.DB.SerieList(limit, offset)
 	}
-	if err != nil {
-		return nil, err
-	}
-	return map[string]interface{}{
-		"_meta": Meta{limit, offset, count}, "series": series.ToStructs(true),
-	}, nil
 }

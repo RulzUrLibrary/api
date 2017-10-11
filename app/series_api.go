@@ -1,6 +1,7 @@
 package app
 
 import (
+	"github.com/paul-bismuth/library/ext/db"
 	"net/http"
 )
 
@@ -12,16 +13,21 @@ func APISerieGet(c *Context) error {
 	return err
 }
 
-func APISerieList(c *Context) error {
-	p := NewPagination()
-	err := c.Bind(&p)
+func APISerieList(c *Context) (err error) {
+	var series *db.Series
+	var meta = NewMeta()
+
+	if err = c.Bind(&meta); err != nil {
+		return
+	}
+	if err = c.Validate(&meta); err != nil {
+		return
+	}
+	series, meta.Count, err = SerieList(c, meta.Limit, meta.Offset)
 	if err != nil {
 		return err
 	}
-	series, err := SerieList(c, int(p.Limit), int(p.Offset))
-	if err != nil {
-		return err
-	}
-	c.JSON(http.StatusOK, series)
-	return nil
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"_meta": meta, "series": series.ToStructs(true),
+	})
 }

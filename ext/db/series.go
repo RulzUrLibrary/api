@@ -18,7 +18,7 @@ SELECT b.id, title, num, isbn, s.id, s.name, a.id, a.name,
 FROM (
     SELECT s.id FROM books b, collections, series s
     WHERE fk_user = $3 AND fk_book = b.id AND fk_serie = s.id
-    GROUP BY s.id ORDER BY s.name DESC NULLS LAST LIMIT $1 OFFSET $2
+    GROUP BY s.id ORDER BY s.name NULLS LAST LIMIT $1 OFFSET $2
 ) r, books b
 INNER JOIN series s ON (fk_serie = s.id)
 LEFT OUTER JOIN book_authors ba ON (b.id = fk_book)
