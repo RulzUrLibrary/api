@@ -41,22 +41,28 @@ func newSearch() APISearch {
 }
 
 func APIBookList(c *Context) error {
-	var res interface{}
-
 	s := newSearch()
-	err := c.Bind(&s)
-	if err != nil {
+
+	if err := c.Bind(&s); err != nil {
 		return err
 	}
 	if s.Pattern == "" {
-		res, err = BookList(c, int(s.Limit), int(s.Offset))
+		books, count, err := BookList(c, int(s.Limit), int(s.Offset))
+		if err != nil {
+			return err
+		}
+		return c.JSON(http.StatusOK, map[string]interface{}{
+			"_meta": Meta{int(s.Limit), int(s.Offset), count}, "books": books,
+		})
 	} else {
-		res, err = BookSearch(c, s.Pattern, int(s.Limit), int(s.Offset))
+		books, err := c.DB.BookSearch(s.Pattern, int(s.Limit), int(s.Offset))
+		if err != nil {
+			return err
+		}
+		return c.JSON(http.StatusOK, map[string]interface{}{
+			"_meta": Meta{int(s.Limit), int(s.Offset), -1}, "books": books,
+		})
 	}
-	if err != nil {
-		return err
-	}
-	return c.JSON(http.StatusOK, res)
 }
 
 func APIBookPut(c *Context) error {

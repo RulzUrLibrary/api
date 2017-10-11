@@ -23,66 +23,49 @@ func BookGet(c *Context) (_ *utils.Book, err error) {
 	return book.ToStructs(false), err
 }
 
-func BookPost(c *Context, isbn string) (_ interface{}, ok bool, err error) {
+func BookPost(c *Context, isbn string) (book utils.Book, ok bool, err error) {
+	fn := func(book *db.Book, err error) (utils.Book, error) {
+		if err != nil {
+			return utils.Book{}, err
+		}
+		return *book.ToStructs(false), err
+	}
+
 	isbn = utils.SanitizeIsbn(isbn)
 	if len(isbn) == 0 {
-		return nil, ok, echo.NewHTTPError(
-			http.StatusBadRequest, "you provided an empty isbn",
-		)
+		err = echo.NewHTTPError(http.StatusBadRequest, "you provided an empty isbn")
+		return
 	}
 	// check if book exists in database and return it if so
-	if book, err := c.DB.BookGet(isbn); err == nil {
-		return book.ToStructs(false), true, nil
+	if book, err = fn(c.DB.BookGet(isbn)); err == nil {
+		return book, true, nil
 	} else if err != utils.ErrNotFound {
-		return nil, ok, err
+		return
 	}
 	// request additional informations
-	var book utils.Book
 	switch book, err = c.Scrapper.Amazon(isbn); err {
 	case nil:
-		err := c.DB.BookSave(&book)
-		return book, ok, err
+		err = c.DB.BookSave(&book)
+		return
 	case utils.ErrCaptcha:
-		return nil, ok, echo.NewHTTPError(
-			http.StatusAccepted,
-			"request correctly received but unable to be processed currently.",
-		)
+		err = echo.NewHTTPError(http.StatusAccepted,
+			"request correctly received but unable to be processed currently.")
+		return
 	case utils.ErrNoProduct:
-		return nil, ok, echo.NewHTTPError(
-			http.StatusNotFound,
-			fmt.Sprintf("product with isbn: '%s' not found", isbn),
-		)
+		err = echo.NewHTTPError(http.StatusNotFound,
+			fmt.Sprintf("product with isbn: '%s' not found", isbn))
+		return
 	}
-	return nil, ok, err
+	return
 }
 
-func BookList(c *Context, limit, offset int) (_ map[string]interface{}, err error) {
-	var books utils.Books
-	var count int
-
+func BookList(c *Context, limit, offset int) ([]*utils.Book, int, error) {
 	user, ok := c.Get("user").(*utils.User)
 	if ok {
-		books, count, err = c.DB.BookListU(limit, offset, user.Id)
+		return c.DB.BookListU(limit, offset, user.Id)
 	} else {
-		books, count, err = c.DB.BookList(limit, offset)
+		return c.DB.BookList(limit, offset)
 	}
-	if err != nil {
-		return nil, err
-	}
-
-	return map[string]interface{}{
-		"_meta": Meta{limit, offset, count}, "books": books,
-	}, nil
-}
-
-func BookSearch(c *Context, pattern string, limit, offset int) (map[string]interface{}, error) {
-	books, err := c.DB.BookSearch(pattern, limit, offset)
-	if err != nil {
-		return nil, err
-	}
-	return map[string]interface{}{
-		"_meta": Meta{limit, offset, -1}, "books": books,
-	}, nil
 }
 
 func change(c *Context, fn func([]string, int) (int, error)) (int, error) {

@@ -3,6 +3,7 @@ package app
 import (
 	"github.com/paul-bismuth/library/utils"
 	"net/http"
+	"strings"
 )
 
 type WEBSearch struct {
@@ -12,14 +13,24 @@ type WEBSearch struct {
 func WEBIndex(c *Context) (err error) {
 	var search WEBSearch
 	var books []*utils.Book
+	var pattern string
 
 	if err = c.Bind(&search); err != nil {
 		return
 	}
-	if search.Pattern == "" {
+	pattern = strings.TrimSpace(search.Pattern)
+	if utils.IsIsbn10(pattern) || utils.IsIsbn13(pattern) {
+		book, _, err := BookPost(c, pattern)
+		if err != nil {
+			return err
+		}
+		return c.Render(http.StatusOK, "book.html", map[string]interface{}{
+			"book": book,
+		})
+	} else if pattern == "" {
 		books, _, err = c.DB.BookList(10, 0)
 	} else {
-		books, err = c.DB.BookSearch(search.Pattern, 10, 0)
+		books, err = c.DB.BookSearch(pattern, 10, 0)
 	}
 	if err != nil {
 		return
