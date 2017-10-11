@@ -14,23 +14,23 @@ type validationResp struct {
 	AUD string `json:"aud"`
 }
 
-func Auth(db *db.DB, name, token string) (u utils.User, _ error) {
+func Auth(db *db.DB, name, token string) (*utils.User, error) {
 	var validation validationResp
 
 	url := utils.UrlQueryS(endpoint, "id_token", token)
 	resp, err := (&http.Client{Timeout: 20 * time.Second}).Get(url.String())
 
 	if err != nil {
-		return u, err
+		return nil, err
 	}
 	if resp.StatusCode != http.StatusOK {
-		return u, utils.ErrGoogleAuth
+		return nil, utils.ErrGoogleAuth
 	}
 	if err := utils.DecodeJSON(resp.Body, &validation); err != nil {
-		return u, err
+		return nil, err
 	}
 	if validation.AUD != aud {
-		return u, utils.ErrGoogleAuth
+		return nil, utils.ErrGoogleAuth
 	}
 
 	return db.AuthGoogle(name)

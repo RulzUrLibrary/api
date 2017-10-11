@@ -52,7 +52,7 @@ func WEBUserNewPost(c *Context) error {
 	switch err {
 	case nil:
 		flash := utils.Flash{utils.FlashSuccess, "welcome to rulz!"}
-		if err := c.SaveUser(&user, flash); err != nil {
+		if err := c.SaveUser(user, flash); err != nil {
 			return err
 		}
 		return c.Redirect(http.StatusSeeOther, c.Echo().Reverse("books"))
@@ -71,7 +71,7 @@ func WEBAuthPost(c *Context) error {
 		User     string `form:"user"`
 		Password string `form:"password"`
 		Token    string `form:"token"`
-		Next     string `query:"next"`
+		Next     string `form:"next"`
 	}{Next: c.Echo().Reverse("books")}
 
 	if err := c.Bind(&creds); err != nil {
@@ -83,7 +83,7 @@ func WEBAuthPost(c *Context) error {
 			"error": err,
 		})
 	}
-	if err := c.SaveUser(&user); err != nil {
+	if err := c.SaveUser(user); err != nil {
 		return err
 	}
 	return c.Redirect(http.StatusSeeOther, creds.Next)

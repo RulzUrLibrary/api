@@ -15,64 +15,23 @@ type Serie struct {
 	authors     Authors
 }
 
-func (s Serie) base() *utils.Serie {
-	return &utils.Serie{
-		s.id, s.name.String, s.description.String, s.title.String, "", "", nil,
-		s.authors.ToStructs(), nil,
+func (s Serie) ToStructs(partial bool) *utils.Serie {
+	serie := &utils.Serie{
+		Id: s.id, Description: s.description.String,
+		Authors: s.authors.ToStructs(), Volumes: s.volumes.ToStructs(partial),
 	}
-}
-
-func (s Serie) ToSerie() (serie *utils.Serie) {
-	serie = s.base()
-	serie.Volumes = s.volumes.ToVolumes()
 	if len(serie.Volumes) > 0 && serie.Volumes[0].Number == 0 {
 		book := serie.Volumes[0]
-		serie.Isbn = book.Isbn
+		serie.Id = 0
 		serie.Title = book.Title
-		serie.Volumes = nil
-	}
-	return
-}
-
-func (s Serie) ToSerieScoped() (serie *utils.SerieScoped) {
-	serie = &utils.SerieScoped{Serie: *s.base()}
-	serie.Volumes = s.volumes.ToVolumesScoped()
-	if len(serie.Volumes) > 0 && serie.Volumes[0].Number == 0 {
-		book := serie.Volumes[0]
 		serie.Isbn = book.Isbn
-		serie.Title = book.Title
-		serie.Volumes = nil
-	}
-	return
-}
-
-func (s Serie) ToSerieGet() (serie *utils.SerieGet) {
-	serie = &utils.SerieGet{Serie: *s.base()}
-	serie.Volumes = s.volumes.ToBooks()
-	if len(serie.Volumes) > 0 && serie.Volumes[0].Number == 0 {
-		book := serie.Volumes[0]
-		serie.Isbn = book.Isbn
-		serie.Title = book.Title
 		serie.Thumbnail = book.Thumbnail
-		serie.Description = book.Description
+		serie.Owned = book.Owned
 		serie.Volumes = nil
+	} else {
+		serie.Name = s.name.String
 	}
-	return
-}
-
-func (s Serie) ToSerieGetScoped() (serie *utils.SerieGetScoped) {
-	serie = &utils.SerieGetScoped{Serie: *s.base()}
-	serie.Volumes = s.volumes.ToBooksScoped()
-	if len(serie.Volumes) > 0 && serie.Volumes[0].Number == 0 {
-		book := serie.Volumes[0]
-		serie.Isbn = book.Isbn
-		serie.Title = book.Title
-		serie.Thumbnail = book.Thumbnail
-		serie.Description = book.Description
-		serie.Owned = &book.Owned
-		serie.Volumes = nil
-	}
-	return
+	return serie
 }
 
 type Series struct {
@@ -102,29 +61,9 @@ func (s *Series) First() *Serie {
 	return nil
 }
 
-func (s *Series) ToSeries() (series []*utils.Serie) {
+func (s *Series) ToStructs(partial bool) (series []*utils.Serie) {
 	for _, id := range s.order {
-		series = append(series, s.series[id].ToSerie())
-	}
-	return
-}
-
-func (s *Series) ToSeriesScoped() (series []*utils.SerieScoped) {
-	for _, id := range s.order {
-		series = append(series, s.series[id].ToSerieScoped())
-	}
-	return
-}
-func (s *Series) ToSeriesGet() (series []*utils.SerieGet) {
-	for _, id := range s.order {
-		series = append(series, s.series[id].ToSerieGet())
-	}
-	return
-}
-
-func (s *Series) ToSeriesGetScoped() (series []*utils.SerieGetScoped) {
-	for _, id := range s.order {
-		series = append(series, s.series[id].ToSerieGetScoped())
+		series = append(series, s.series[id].ToStructs(partial))
 	}
 	return
 }

@@ -8,26 +8,19 @@ import (
 	"net/http"
 )
 
-func BookGet(c *Context) (_ interface{}, err error) {
+func BookGet(c *Context) (_ *utils.Book, err error) {
 	var book *db.Book
 	isbn := c.Param("isbn")
-	user, ok := c.Get("user").(utils.User)
-
+	user, ok := c.Get("user").(*utils.User)
 	if ok {
 		book, err = c.DB.BookGetU(isbn, user.Id)
-		if err == nil {
-			return book.ToBookScoped(), nil
-		}
 	} else {
 		book, err = c.DB.BookGet(isbn)
-		if err == nil {
-			return book.ToBook(), nil
-		}
 	}
 	if err == utils.ErrNotFound {
 		return nil, echo.NewHTTPError(http.StatusNotFound, "book "+isbn+" not found")
 	}
-	return nil, err
+	return book.ToStructs(false), err
 }
 
 func BookPost(c *Context, isbn string) (_ interface{}, ok bool, err error) {
@@ -39,7 +32,7 @@ func BookPost(c *Context, isbn string) (_ interface{}, ok bool, err error) {
 	}
 	// check if book exists in database and return it if so
 	if book, err := c.DB.BookGet(isbn); err == nil {
-		return book.ToBook(), true, nil
+		return book.ToStructs(false), true, nil
 	} else if err != utils.ErrNotFound {
 		return nil, ok, err
 	}
@@ -63,11 +56,11 @@ func BookPost(c *Context, isbn string) (_ interface{}, ok bool, err error) {
 	return nil, ok, err
 }
 
-func BookList(c *Context, limit, offset int) (_ interface{}, err error) {
-	var books []*utils.Book
+func BookList(c *Context, limit, offset int) (_ map[string]interface{}, err error) {
+	var books utils.Books
 	var count int
 
-	user, ok := c.Get("user").(utils.User)
+	user, ok := c.Get("user").(*utils.User)
 	if ok {
 		books, count, err = c.DB.BookListU(limit, offset, user.Id)
 	} else {
@@ -77,19 +70,33 @@ func BookList(c *Context, limit, offset int) (_ interface{}, err error) {
 		return nil, err
 	}
 
-	return struct {
-		Meta  `json:"_meta"`
-		Books []*utils.Book `json:"books"`
-	}{Meta{limit, offset, count}, books}, nil
+	return map[string]interface{}{
+		"_meta": Meta{limit, offset, count}, "books": books,
+	}, nil
 }
 
-func BookSearch(c *Context, pattern string, limit, offset int) (interface{}, error) {
+func BookSearch(c *Context, pattern string, limit, offset int) (map[string]interface{}, error) {
 	books, err := c.DB.BookSearch(pattern, limit, offset)
 	if err != nil {
 		return nil, err
 	}
-	return struct {
-		Meta  `json:"_meta"`
-		Books []*utils.Book `json:"books"`
-	}{Meta{limit, offset, -1}, books}, nil
+	return map[string]interface{}{
+		"_meta": Meta{limit, offset, -1}, "books": books,
+	}, nil
+}
+
+func change(c *Context, fn func([]string, int) (int, error)) (int, error) {
+	var user = c.Get("user").(*utils.User)
+	var books struct {
+		Isbns []string `json:"isbns" query:"isbn"`
+	}
+
+	if err := c.Bind(&books); err != nil {
+		return 0, err
+	}
+	if len(books.Isbns) == 0 {
+		return 0, nil
+	}
+	c.Logger.Debug(books)
+	return fn(books.Isbns, user.Id)
 }

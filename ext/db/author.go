@@ -11,7 +11,7 @@ type Author struct {
 }
 type Authors []Author
 
-func (a Authors) ToStructs() utils.Authors {
+func (a Authors) ToStructs() *utils.Authors {
 	authors := utils.Authors{}
 	ids := map[int64]bool{}
 
@@ -21,5 +21,5 @@ func (a Authors) ToStructs() utils.Authors {
 			authors = append(authors, &utils.Author{Name: author.name.String})
 		}
 	}
-	return authors
+	return &authors
 }

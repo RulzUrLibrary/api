@@ -1,7 +1,6 @@
 package app
 
 import (
-	"github.com/paul-bismuth/library/utils"
 	"net/http"
 )
 
@@ -58,19 +57,6 @@ func APIBookList(c *Context) error {
 		return err
 	}
 	return c.JSON(http.StatusOK, res)
-}
-
-func change(c *Context, fn func([]string, int) (int, error)) (int, error) {
-	var user = c.Get("user").(utils.User)
-	var books struct {
-		Isbns []string `json:"isbns"`
-	}
-
-	if err := c.Bind(&books); err != nil {
-		return 0, err
-	}
-	c.Logger.Debug(books)
-	return fn(books.Isbns, user.Id)
 }
 
 func APIBookPut(c *Context) error {

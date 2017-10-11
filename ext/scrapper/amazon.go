@@ -118,6 +118,14 @@ func getDescription(node *html.Node) string {
 
 }
 
+func getAuthors(authors []*html.Node) *utils.Authors {
+	authorList := utils.Authors{}
+	for _, author := range authors {
+		authorList = append(authorList, &utils.Author{Name: getAuthor(getText(author))})
+	}
+	return &authorList
+}
+
 func (s *Scrapper) AmazonParseIndex(_url string, isbn string) (string, error) {
 	var form *html.Node
 
@@ -157,7 +165,7 @@ func (s *Scrapper) AmazonParseSearch(_url string) (href string, err error) {
 	return
 }
 
-func (s *Scrapper) AmazonParseInfo(_url string, book *utils.Book) error {
+func (s *Scrapper) AmazonParseInfo(_url string, isbn string) (book utils.Book, err error) {
 	var title *html.Node
 	var price *html.Node
 	var description *html.Node
@@ -181,27 +189,25 @@ func (s *Scrapper) AmazonParseInfo(_url string, book *utils.Book) error {
 		return nil
 	}
 
-	err := s.Parse(_url, parsingFn)
+	err = s.Parse(_url, parsingFn)
 	if err != nil {
-		return err
+		return
 	}
 
-	book.Title = getText(title)
-	book.Title, book.Serie, book.Number = getTitle(book.Title)
+	book.Isbn = isbn
+	book.Title, book.Serie, book.Number = getTitle(getText(title))
 	book.Price = getPrice(price)
 	book.Description = getDescription(description)
+	book.Authors = getAuthors(authors)
 
-	for _, author := range authors {
-		book.Authors = append(book.Authors, &utils.Author{Name: getAuthor(getText(author))})
-	}
 	if book.Title == "" && book.Serie == "" {
-		return utils.ErrParsingProduct
+		return book, utils.ErrParsingProduct
 	}
 
-	return s.DownloadThumb(getThumb(thumbnail), book.Isbn)
+	return book, s.DownloadThumb(getThumb(thumbnail), isbn)
 }
 
-func (s *Scrapper) Amazon(isbn string) (book utils.Book, err error) {
+func (s *Scrapper) Amazon(isbn string) (_ utils.Book, err error) {
 	var url string
 	if url, err = s.AmazonParseIndex(amazon, isbn); err != nil {
 		return
@@ -209,7 +215,5 @@ func (s *Scrapper) Amazon(isbn string) (book utils.Book, err error) {
 	if url, err = s.AmazonParseSearch(url); err != nil {
 		return
 	}
-	book.Isbn = isbn
-	err = s.AmazonParseInfo(url, &book)
-	return
+	return s.AmazonParseInfo(url, isbn)
 }

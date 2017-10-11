@@ -26,36 +26,31 @@ WITH s AS (
 )
 SELECT id, bool FROM i UNION ALL SELECT id, bool FROM s`
 
-func (db *DB) Auth(name, password string) (u utils.User, err error) {
+func (db *DB) Auth(name, password string) (*utils.User, error) {
 	var ok bool
+	var user = &utils.User{Name: name}
 
-	if err = db.QueryRow(authUser, name, password).Scan(&ok, &u.Id); err == nil {
-		if ok {
-			u.Name = name
-		} else {
-			err = utils.ErrUserAuth
-		}
-	} else {
-		if err == sql.ErrNoRows {
-			err = utils.ErrUserAuth
-		}
+	err := db.QueryRow(authUser, name, password).Scan(&ok, &user.Id)
 
+	if err != nil && err == sql.ErrNoRows || !ok {
+		return nil, utils.ErrUserAuth
 	}
-	return
+	return user, err
 }
 
-func (db *DB) AuthGoogle(name string) (user utils.User, err error) {
-	user.Name = name
-	err = db.QueryRow(authGoogle, name).Scan(&user.Id)
-	return
+func (db *DB) AuthGoogle(name string) (*utils.User, error) {
+	user := &utils.User{Name: name}
+	return user, db.QueryRow(authGoogle, name).Scan(&user.Id)
 }
 
-func (db *DB) NewUser(name, password string) (user utils.User, err error) {
+func (db *DB) NewUser(name, password string) (*utils.User, error) {
 	var ok bool
-	user.Name = name
-	err = db.QueryRow(newUser, name, password).Scan(&user.Id, &ok)
-	if !ok {
-		return user, utils.ErrUserExists
+	var user = &utils.User{Name: name}
+
+	err := db.QueryRow(newUser, name, password).Scan(&user.Id, &ok)
+
+	if err == nil && !ok {
+		return nil, utils.ErrUserExists
 	}
-	return
+	return user, err
 }

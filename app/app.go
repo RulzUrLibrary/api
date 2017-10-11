@@ -22,6 +22,14 @@ type Context struct {
 	Scrapper *scrapper.Scrapper
 }
 
+func (c *Context) Flashes(flashes ...utils.Flash) error {
+	session, _ := c.Get("session").(*sessions.Session)
+	for _, flash := range flashes {
+		session.AddFlash(flash)
+	}
+	return session.Save(c.Request(), c.Response())
+}
+
 func (c *Context) SaveUser(user *utils.User, flashes ...utils.Flash) error {
 	session, _ := c.Get("session").(*sessions.Session)
 	if user == nil {

@@ -17,7 +17,7 @@
 {{end}}
 {{define "login"}}
 *}
-
+{{next := context.Request().URL.Query().Get("next")}}
 <div class="column col-md-12">
   <h2 class="text-center column col-12">Login</h2>
   <form method="POST" id="login">
@@ -35,6 +35,7 @@
                autocomplete="off" />
       </div>
       <input name="token" type="hidden" id="token"/>
+      <input name="next" type="hidden" id="next" value="{{next}}"/>
       {{if error, ok := .["error"]; ok}}
       <div class="text-error mb-2">
         {{capitalize(error.Error())}}

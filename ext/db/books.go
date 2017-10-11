@@ -206,26 +206,26 @@ func (db *DB) BookSave(book *utils.Book) error {
 	}
 
 	return db.Transaction(func(tx *Tx) (err error) {
+		var idBook, idAuthor int
 		args[5], err = tx.Insert(InsertSerie, toInterfaceS(book.Serie))
 		if err != nil {
 			return
 		}
 
-		if book.Id, err = tx.Insert(InsertBook, args...); err != nil {
+		if idBook, err = tx.Insert(InsertBook, args...); err != nil {
 			return
 		}
 
-		for _, author := range book.Authors {
-			id, err := tx.Insert(InsertAuthor, author.Name)
-			if err != nil {
-				return err
+		for _, author := range *book.Authors {
+			if idAuthor, err = tx.Insert(InsertAuthor, author.Name); err != nil {
+				return
 			}
-			_, err = tx.Exec(InsertBookAuthor, book.Id, id)
-			if err != nil {
-				return err
+
+			if _, err = tx.Exec(InsertBookAuthor, idBook, idAuthor); err != nil {
+				return
 			}
 		}
-		return nil
+		return
 	})
 }
 
@@ -272,7 +272,7 @@ func (db *DB) BookSearch(pattern string, limit, offset int) ([]*utils.Book, erro
 	if err != nil {
 		return nil, err
 	}
-	return books.ToBooks(), nil
+	return books.ToStructs(false), nil
 }
 
 func (db *DB) bookList(qbl queryBookList) ([]*utils.Book, int, error) {
@@ -284,31 +284,28 @@ func (db *DB) bookList(qbl queryBookList) ([]*utils.Book, int, error) {
 	if err != nil {
 		return nil, 0, err
 	}
-	return books.ToBooks(), count, nil
+	return books.ToStructs(false), count, nil
 }
 
 func (db *DB) BookDelete(books []string, user int) (int, error) {
 	var args = []interface{}{user}
-	if len(books) == 0 {
-		return 0, nil
-	}
+	var where = []string{}
 
 	for i, isbn := range books {
-		books[i] = fmt.Sprintf("b.isbn = $%d", i+2)
+		where = append(where, fmt.Sprintf("b.isbn = $%d", i+2))
 		args = append(args, isbn)
 	}
 
-	return db.Exec(fmt.Sprintf(DeleteCollection, strings.Join(books, " OR ")), args...)
+	return db.Exec(fmt.Sprintf(DeleteCollection, strings.Join(where, " OR ")), args...)
 }
 
 func (db *DB) BookPut(books []string, user int) (int, error) {
 	var args = []interface{}{user}
-	if len(books) == 0 {
-		return 0, nil
-	}
+	var where = []string{}
+
 	for i, isbn := range books {
-		books[i] = fmt.Sprintf("isbn = $%d", i+2)
+		where = append(where, fmt.Sprintf("isbn = $%d", i+2))
 		args = append(args, isbn)
 	}
-	return db.Exec(fmt.Sprintf(InsertCollection, strings.Join(books, " OR ")), args...)
+	return db.Exec(fmt.Sprintf(InsertCollection, strings.Join(where, " OR ")), args...)
 }

@@ -29,14 +29,14 @@
 <div class="column col-12">
   <p class="text-justify"> {{.book.Description}} </p>
 </div>
-{* <form class="column col-2 col-lg-4 col-md-6 col-sm-12" action="/books/">
-  <input type="hidden" name="isbn" value="{{.Entity.Isbn}}"/>
-  {{if $.Entity.InCollection .Context.User}}
+<form class="column col-2 col-lg-4 col-md-6 col-sm-12" action="{{url("books")}}">
+  <input type="hidden" name="isbn" value="{{.book.Isbn}}"/>
+  {{if .book.InCollection()}}
   <input class="btn btn-primary btn-block disabled"
          type="submit" tabindex="-1" value="In collection" />
   {{else}}
   <input type="submit" class="btn btn-primary btn-block" value="Add to collection"/>
   {{end}}
-</form> *}
+</form>
 
 {{end}}

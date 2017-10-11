@@ -2,7 +2,6 @@ package utils
 
 import (
 	"encoding/gob"
-	"encoding/json"
 	"fmt"
 	"strings"
 )
@@ -51,114 +50,60 @@ type User struct {
 }
 
 type Book struct {
-	Id          int     `json:"-"`
-	Isbn        string  `json:"isbn"`
-	Title       string  `json:"title,omitempty"`
-	Description string  `json:"description"`
-	Thumbnail   string  `json:"thumbnail"`
-	Price       float32 `json:"price,omitempty"`
-	Authors     Authors `json:"authors"`
-	Number      int     `json:"number,omitempty"`
-	Serie       string  `json:"serie,omitempty"`
-}
-
-type BookScoped struct {
-	Book
-	Owned bool `json:"owned"`
-}
-
-func (b Book) String() string {
-	marshaled, err := json.Marshal(b)
-	if err != nil {
-		return fmt.Sprintf("error marshaling book: %s", err)
-	}
-	return string(marshaled)
+	Isbn        string   `json:"isbn"`
+	Thumbnail   string   `json:"thumbnail,omitempty"`
+	Title       string   `json:"title,omitempty"`
+	Description string   `json:"description,omitempty"`
+	Price       float32  `json:"price,omitempty"`
+	Number      int      `json:"number,omitempty"`
+	Serie       string   `json:"serie,omitempty"`
+	Owned       *bool    `json:"owned,omitempty"` // tricking golang json encoding
+	Authors     *Authors `json:"authors,omitempty"`
 }
 
 func (b Book) TitleDisplay() string {
-	return TitleDisplay(b.Title, b.Serie, b.Number)
-}
-
-func TitleDisplay(title string, serie string, number int) string {
-	if serie == "" {
-		return title
-	} else if title == "" {
-		return fmt.Sprintf("%s - %d", serie, number)
+	if b.Serie == "" {
+		return b.Title
+	} else if b.Title == "" {
+		return fmt.Sprintf("%s - %d", b.Serie, b.Number)
 	} else {
-		return fmt.Sprintf("%s - %d: %s", serie, number, title)
+		return fmt.Sprintf("%s - %d: %s", b.Serie, b.Number, b.Title)
 	}
 }
 
-type Volume struct {
-	Title  string `json:"title,omitempty"`
-	Number int    `json:"number"`
-	Isbn   string `json:"isbn"`
+func (b Book) InCollection() bool {
+	return b.Owned != nil && *b.Owned
 }
 
-type VolumeScoped struct {
-	Volume
-	Owned bool `json:"owned"`
-}
+type Books []*Book
 
-type Volumes []*Volume
-type VolumesScoped []*VolumeScoped
-
-func (v VolumesScoped) owned() (nb int) {
-	for _, volume := range v {
-		if volume.Owned {
+func (b Books) owned() (nb int) {
+	for _, book := range b {
+		if book.Owned != nil && *book.Owned {
 			nb++
 		}
 	}
 	return
 }
 
-func (v VolumesScoped) String() string {
-	return fmt.Sprintf("%02d / %02d", v.owned(), len(v))
+func (b Books) Owned() string {
+	return fmt.Sprintf("%02d / %02d", b.owned(), len(b))
 }
 
-func (v VolumesScoped) Ratio() float64 {
-	return float64(v.owned()) / float64(len(v))
+func (b Books) Ratio() float64 {
+	return float64(b.owned()) / float64(len(b))
 }
 
 type Serie struct {
-	Id          int     `json:"id,omitempty"`
-	Name        string  `json:"name,omitempty"`
-	Description string  `json:"description,omitempty"`
-	Thumbnail   string  `json:"thumbnail,omitempty"`
-	Title       string  `json:"title,omitempty"`
-	Isbn        string  `json:"isbn,omitempty"`
-	Owned       *bool   `json:"owned,omitempty"` // tricking the json marshalling engine
-	Authors     Authors `json:"authors"`
-	Volumes     Volumes `json:"volumes,omitempty"`
-}
-
-type SerieScoped struct {
-	Serie
-	Volumes VolumesScoped `json:"volumes,omitempty"`
-}
-
-type SerieGet struct {
-	Serie
-	Volumes []*Book `json:"volumes,omitempty"`
-}
-
-type SerieGetScoped struct {
-	Serie
-	Volumes []*BookScoped `json:"volumes,omitempty"`
-}
-
-func (s Serie) IsSerie() bool {
-	return s.Isbn == ""
-}
-
-func (s Serie) Thumb() string {
-	isbn := s.Isbn
-
-	if s.IsSerie() {
-		isbn = s.Volumes[0].Isbn
-	}
-
-	return "/thumbs/" + isbn + ".jpg"
+	Id          int      `json:"id,omitempty"`
+	Name        string   `json:"name,omitempty"`
+	Description string   `json:"description,omitempty"`
+	Thumbnail   string   `json:"thumbnail,omitempty"`
+	Title       string   `json:"title,omitempty"`
+	Isbn        string   `json:"isbn,omitempty"`
+	Owned       *bool    `json:"owned,omitempty"`
+	Authors     *Authors `json:"authors,omitempty"`
+	Volumes     Books    `json:"volumes,omitempty"`
 }
 
 type Author struct {
