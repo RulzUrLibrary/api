@@ -8,14 +8,18 @@ import (
 
 type WEBSearch struct {
 	Pattern string `query:"search"`
+	Pagination
 }
 
 func WEBIndex(c *Context) (err error) {
-	var search WEBSearch
 	var books []*utils.Book
 	var pattern string
+	var search = WEBSearch{"", NewPagination()}
 
 	if err = c.Bind(&search); err != nil {
+		return
+	}
+	if err = c.Validate(&search); err != nil {
 		return
 	}
 	pattern = strings.TrimSpace(search.Pattern)
@@ -28,14 +32,15 @@ func WEBIndex(c *Context) (err error) {
 			"book": book,
 		})
 	} else if pattern == "" {
-		books, _, err = c.DB.BookList(10, 0)
+		books, search.Count, err = c.DB.BookList(search.Limit(), search.Offset())
 	} else {
-		books, err = c.DB.BookSearch(pattern, 10, 0)
+		books, err = c.DB.BookSearch(pattern, search.Limit(), search.Offset())
 	}
 	if err != nil {
 		return
 	}
 	return c.Render(http.StatusOK, "index.html", map[string]interface{}{
-		"books": books,
+		"books":      books,
+		"pagination": search.Pagination,
 	})
 }

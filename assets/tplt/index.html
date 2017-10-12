@@ -1,5 +1,6 @@
 {{extends "base.html"}}
 {{import "menu.html"}}
+{{import "pagination.html"}}
 {{block header()}}
 {{yield menu()}}
 {{end}}
@@ -25,6 +26,9 @@
   {{else}}
   <h2 class="mt-2">Search results:</h2>
   {{end}}
+
+  {{yield pagination(obj=.pagination)}}
+
   {{range book := .books}}
   <a class="tile column col-12 rounded" href="{{url("book", book.Isbn)}}">
     <div class="tile-icon">

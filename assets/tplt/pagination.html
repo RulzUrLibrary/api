@@ -1,0 +1,21 @@
+{{block pagination(obj)}}
+<ul class="pagination">
+  <li class="page-item{{if obj.Page == 1}} disabled{{end}}">
+    <a href="?page={{obj.Page - 1}}"{{if obj.Page == 1}} tabindex="-1"{{end}}>Prev</a>
+  </li>
+  {{range value := obj.Pages()}}
+  {{if value == "..."}}
+  <li class="page-item">
+    <span>...</span>
+  </li>
+  {{else}}
+  <li class="page-item{{if obj.Current() == value}} active{{end}}">
+    <a href="?page={{value}}">{{value}}</a>
+  </li>
+  {{end}}
+  {{end}}
+  <li class="page-item{{if obj.Last()}} disabled{{end}}">
+    <a href="?page={{obj.Page + 1}}"{{if obj.Last()}} tabindex="-1"{{end}}>Next</a>
+  </li>
+</ul>
+{{end}}

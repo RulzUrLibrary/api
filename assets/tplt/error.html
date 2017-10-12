@@ -1,0 +1,15 @@
+{{extends "base.html"}}
+{{import "menu.html"}}
+{{block header()}}
+{{yield menu()}}
+{{end}}
+{{block page_title()}}
+<div style="padding: 200px 0 200px 0">{{.code}}: {{.msg}}</div>
+{{end}}
+
+{{block body()}}
+<div class="column col-12 mb-2">
+  {{if context.Echo().Debug}}{{.error}}{{end}}
+</div>
+{{end}}
+

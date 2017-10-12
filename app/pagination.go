@@ -2,6 +2,7 @@ package app
 
 import (
 	"github.com/paul-bismuth/library/utils"
+	"strconv"
 )
 
 const DEFAULT_LIMIT = 10
@@ -12,36 +13,53 @@ type Meta struct {
 	Count  int `json:"count,omitempty"`
 }
 
+type Pagination struct {
+	Page  int `query:"page" validate:"gt=0"`
+	Count int `query:"-"`
+}
+
 func NewMeta() Meta {
-	return Meta{Limit: DEFAULT_LIMIT, Count: -1}
+	return Meta{DEFAULT_LIMIT, 0, -1}
 }
 
-func (m Meta) First() bool {
-	return m.Offset == 0
+func NewPagination() Pagination {
+	return Pagination{1, -1}
 }
 
-func (m Meta) Last() bool {
-	return m.Count <= m.Limit || m.Offset == (utils.Ceil(m.Count, m.Limit)-1)*m.Limit
+func (p Pagination) Offset() int {
+	return (p.Page - 1) * p.Limit()
 }
 
-func (m Meta) Current() int {
-	if m.Limit == 0 {
-		return 1
+func (p Pagination) Limit() int {
+	return DEFAULT_LIMIT
+}
+
+func (p Pagination) Last() bool {
+	return p.Count != -1 && p.Page == utils.Ceil(p.Count, p.Limit())
+}
+
+func (p Pagination) Current() string {
+	return strconv.Itoa(p.Page)
+}
+
+func (p Pagination) Pages() []string {
+	page := p.Page
+	pages := []string{
+		"...", strconv.Itoa(page - 2), strconv.Itoa(page - 1),
+		strconv.Itoa(page), strconv.Itoa(page + 1),
+		strconv.Itoa(page + 2), "...",
 	}
-	return (m.Offset / m.Limit) + 1
-}
-
-func (m Meta) Previous() int {
-	return m.Current() - 1
-}
-
-func (m Meta) Next() int {
-	return m.Current() + 1
-}
-
-func (m Meta) Pages() (pages []int) {
-	for i := 0; i < utils.Ceil(m.Count, m.Limit); i++ {
-		pages = append(pages, i+1)
+	if page < 5 {
+		pages = pages[5-page:]
 	}
-	return
+	pages = append([]string{"1"}, pages...)
+
+	if p.Count != -1 {
+		last := utils.Ceil(p.Count, p.Limit())
+		if page > last-5 {
+			pages = pages[:len(pages)-4+last-page]
+		}
+		pages = append(pages, strconv.Itoa(last))
+	}
+	return pages
 }
