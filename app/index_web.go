@@ -6,23 +6,21 @@ import (
 	"strings"
 )
 
-type WEBSearch struct {
-	Pattern string `query:"search"`
-	Pagination
-}
-
 func WEBIndex(c *Context) (err error) {
 	var books []*utils.Book
 	var pattern string
-	var search = WEBSearch{"", NewPagination()}
+	var query = struct {
+		Pattern string `query:"search"`
+		Pagination
+	}{"", NewPagination()}
 
-	if err = c.Bind(&search); err != nil {
+	if err = c.Bind(&query); err != nil {
 		return
 	}
-	if err = c.Validate(&search); err != nil {
+	if err = c.Validate(&query); err != nil {
 		return
 	}
-	pattern = strings.TrimSpace(search.Pattern)
+	pattern = strings.TrimSpace(query.Pattern)
 	if utils.IsIsbn10(pattern) || utils.IsIsbn13(pattern) {
 		book, _, err := BookPost(c, pattern)
 		if err != nil {
@@ -32,15 +30,15 @@ func WEBIndex(c *Context) (err error) {
 			"book": book,
 		})
 	} else if pattern == "" {
-		books, search.Count, err = c.DB.BookList(search.Limit(), search.Offset())
+		books, query.Count, err = c.DB.BookList(query.Limit(), query.Offset())
 	} else {
-		books, err = c.DB.BookSearch(pattern, search.Limit(), search.Offset())
+		books, err = c.DB.BookSearch(pattern, query.Limit(), query.Offset())
 	}
 	if err != nil {
 		return
 	}
 	return c.Render(http.StatusOK, "index.html", map[string]interface{}{
 		"books":      books,
-		"pagination": search.Pagination,
+		"pagination": query.Pagination,
 	})
 }

@@ -71,7 +71,7 @@ func BookList(c *Context, limit, offset int) ([]*utils.Book, int, error) {
 func change(c *Context, fn func([]string, int) (int, error)) (int, error) {
 	var user = c.Get("user").(*utils.User)
 	var books struct {
-		Isbns []string `json:"isbns" query:"isbn"`
+		Isbns []string `json:"isbns"`
 	}
 
 	if err := c.Bind(&books); err != nil {

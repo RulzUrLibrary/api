@@ -39,6 +39,9 @@ func main() {
 	rulz.Web.GET("/books/", rulz.Handler(app.WEBBookList), app.Protected).Name = "books"
 	rulz.Web.GET("/books/:isbn", rulz.Handler(app.WEBBookGet)).Name = "book"
 
+	// beurk!
+	rulz.Web.GET("/series/:id", rulz.Handler(app.WEBSerieGet), app.Protected).Name = "serie"
+
 	rulz.Web.GET("/auth", rulz.Handler(app.WEBAuthGet)).Name = "auth"
 	rulz.Web.POST("/auth", rulz.Handler(app.WEBAuthPost))
 

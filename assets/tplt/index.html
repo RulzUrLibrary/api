@@ -14,7 +14,8 @@
     <h4 class="empty-title">Search a book...</h4>
     <form class="column col-12" method="GET">
       <div class="form-group">
-        <input class="form-input" name="search" type="text" id="search" placeholder="Enter title, author, ISBN..." value="{{pattern}}"/>
+        <input placeholder="Enter title, author, ISBN..."
+               class="form-input" name="search" type="text" id="search" value="{{pattern}}"/>
       </div>
       <div class="form-group text-left">
         <button class="btn btn-primary col-3 col-xs-12" type="submit">Submit</button>
@@ -28,7 +29,6 @@
   {{end}}
 
   {{yield pagination(obj=.pagination)}}
-
   {{range book := .books}}
   <a class="tile column col-12 rounded" href="{{url("book", book.Isbn)}}">
     <div class="tile-icon">
@@ -45,5 +45,6 @@
     </div>
   </a>
   {{end}}
+  {{yield pagination(obj=.pagination)}}
 </div>
 {{end}}

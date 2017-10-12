@@ -79,7 +79,7 @@ type Books []*Book
 
 func (b Books) owned() (nb int) {
 	for _, book := range b {
-		if book.Owned != nil && *book.Owned {
+		if book.InCollection() {
 			nb++
 		}
 	}
@@ -104,6 +104,14 @@ type Serie struct {
 	Owned       *bool    `json:"owned,omitempty"`
 	Authors     *Authors `json:"authors,omitempty"`
 	Volumes     Books    `json:"volumes,omitempty"`
+}
+
+func (s Serie) Thumb() string {
+	if len(s.Volumes) > 0 {
+		return "/thumbs/" + s.Volumes[0].Isbn + ".jpg"
+	} else {
+		return "/thumbs/" + s.Isbn + ".jpg"
+	}
 }
 
 type Author struct {

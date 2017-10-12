@@ -1,41 +1,47 @@
 package app
 
 import (
-	"fmt"
+	"github.com/paul-bismuth/library/ext/db"
 	"github.com/paul-bismuth/library/utils"
 	"net/http"
 )
 
-func WEBBookList(c *Context) error {
-	var isbns []string
+func WEBBookList(c *Context) (err error) {
+	var series *db.Series
+	var user = c.Get("user").(*utils.User)
+	var query = struct {
+		Isbn string `query:"isbn"`
+		Pagination
+	}{"", NewPagination()}
 
-	_, err := change(c, func(added []string, i int) (int, error) {
-		isbns = added
-		return c.DB.BookPut(isbns, i)
-	})
+	if err = c.Bind(&query); err != nil {
+		return
+	}
+
+	if err = c.Validate(&query); err != nil {
+		return
+	}
+
+	if query.Isbn != "" {
+		_, err = c.DB.BookPut([]string{query.Isbn}, user.Id)
+		if err != nil {
+			return
+		}
+		err = c.Flashes(utils.Flash{utils.FlashSuccess, "book added to collection!"})
+		if err != nil {
+			return
+		}
+		return c.Redirect(http.StatusSeeOther, c.Echo().Reverse("book", query.Isbn))
+	}
+
+	series, query.Count, err = c.DB.SerieListU(query.Limit(), query.Offset(), user.Id)
 	if err != nil {
-		return nil
+		return
 	}
-	switch len(isbns) {
-	case 0:
-	case 1:
-		flash := utils.Flash{utils.FlashSuccess, "book added to collection!"}
-		if err := c.Flashes(flash); err != nil {
-			return err
-		}
-		return c.Redirect(http.StatusSeeOther, c.Echo().Reverse("book", isbns[0]))
-	default:
-		flashes := []utils.Flash{}
-		for _, isbn := range isbns {
-			msg := fmt.Sprintf("book with isbn: %s, added to collection", isbn)
-			flashes = append(flashes, utils.Flash{utils.FlashSuccess, msg})
-		}
-		if err := c.Flashes(flashes...); err != nil {
-			return err
-		}
-	}
+
 	return c.Render(http.StatusOK, "books.html", map[string]interface{}{
-		"books": nil,
+		"series":     series.ToStructs(true),
+		"pagination": query.Pagination,
 	})
 }
 
@@ -45,4 +51,12 @@ func WEBBookGet(c *Context) error {
 		return err
 	}
 	return c.Render(http.StatusOK, "book.html", map[string]interface{}{"book": book})
+}
+
+func WEBSerieGet(c *Context) error {
+	serie, err := SerieGet(c)
+	if err != nil {
+		return err
+	}
+	return c.Render(http.StatusOK, "serie.html", map[string]interface{}{"serie": serie})
 }

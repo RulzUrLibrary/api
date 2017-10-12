@@ -1,6 +1,7 @@
 package view
 
 import (
+	"fmt"
 	"github.com/CloudyKit/jet"
 	"github.com/gorilla/sessions"
 	"github.com/labstack/echo"
@@ -69,5 +70,11 @@ func New(config Configuration) *View {
 		}
 		return reflect.ValueOf(s)
 	})
+	if config.Development {
+		view.AddGlobalFunc("debug", func(a jet.Arguments) reflect.Value {
+			a.RequireNumOfArguments("debug", 1, 1)
+			return reflect.ValueOf(fmt.Sprintf("%#v", a.Get(0)))
+		})
+	}
 	return view
 }

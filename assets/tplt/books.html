@@ -1,8 +1,41 @@
 {{extends "base.html"}}
 {{import "menu.html"}}
+{{import "pagination.html"}}
 
 {{block header()}} {{yield menu(active="books")}} {{end}}
-{{block page_title()}}{{end}}
+{{block page_title()}}My collection!{{end}}
 
 {{block body()}}
+<div class="column col-12 mb-2">
+{{yield pagination(obj=.pagination)}}
+{{range serie := .series}}
+{{link := serie.Isbn == "" ? url("serie", serie.Id) : url("book", serie.Isbn)}}
+<a class="tile column col-12 rounded" href="{{link}}">
+  <div class="tile-icon">
+    <figure class="figure">
+      <img class="thumb" src="{{serie.Thumb()}}" alt="book cover">
+    </figure>
+  </div>
+  <div class="tile-content">
+    <div class="column col-12 ml-2 mt-2">
+      <div class="float-right">
+        {{if len(serie.Volumes) > 0}}
+        <small class="toast {{if serie.Volumes.Ratio() == 1.0}}toast-success{{else}}toast-primary{{end}}">
+          {{serie.Volumes.Owned()}}
+        </small>
+        {{else}}
+        <small class="toast toast-success">
+          <i class="icon icon-check"></i>
+        </small>
+        {{end}}
+      </div>
+      <h2>{{serie.Name}}{{serie.Title}}</h2>
+      <p class="text-gray">{{serie.Authors}}</p>
+      <p>{{serie.Description}}</p>
+    </div>
+  </div>
+</a>
+{{end}}
+{{yield pagination(obj=.pagination)}}
+</div>
 {{end}}
