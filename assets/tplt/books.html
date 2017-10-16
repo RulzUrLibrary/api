@@ -7,7 +7,7 @@
 
 {{block body()}}
 <div class="column col-12 mb-2">
-{{yield pagination(obj=.pagination)}}
+{{yield pagination(obj=.pagination,base=context.Request().URL)}}
 {{range serie := .series}}
 {{link := serie.Isbn == "" ? url("serie", serie.Id) : url("book", serie.Isbn)}}
 <a class="tile column col-12 rounded" href="{{link}}">
@@ -36,6 +36,6 @@
   </div>
 </a>
 {{end}}
-{{yield pagination(obj=.pagination)}}
+{{yield pagination(obj=.pagination,base=context.Request().URL)}}
 </div>
 {{end}}

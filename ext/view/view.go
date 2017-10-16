@@ -6,6 +6,7 @@ import (
 	"github.com/gorilla/sessions"
 	"github.com/labstack/echo"
 	"io"
+	"net/url"
 	"reflect"
 	"strings"
 )
@@ -69,6 +70,14 @@ func New(config Configuration) *View {
 			s = strings.ToUpper(s[:1]) + s[1:]
 		}
 		return reflect.ValueOf(s)
+	})
+	view.AddGlobalFunc("query", func(a jet.Arguments) reflect.Value {
+		a.RequireNumOfArguments("query", 3, 3)
+		u, _ := a.Get(0).Interface().(*url.URL)
+		v := u.Query()
+		v.Set(a.Get(1).Interface().(string), fmt.Sprint(a.Get(2)))
+		u.RawQuery = v.Encode()
+		return reflect.ValueOf(u)
 	})
 	if config.Development {
 		view.AddGlobalFunc("debug", func(a jet.Arguments) reflect.Value {

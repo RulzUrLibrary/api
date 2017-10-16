@@ -54,9 +54,19 @@ func WEBBookGet(c *Context) error {
 }
 
 func WEBSerieGet(c *Context) error {
+	isbn := c.QueryParam("isbn")
+
+	if isbn != "" {
+		var user = c.Get("user").(*utils.User)
+		if _, err := c.DB.BookPut([]string{isbn}, user.Id); err != nil {
+			return err
+		}
+	}
+
 	serie, err := SerieGet(c)
 	if err != nil {
 		return err
 	}
+
 	return c.Render(http.StatusOK, "serie.html", map[string]interface{}{"serie": serie})
 }

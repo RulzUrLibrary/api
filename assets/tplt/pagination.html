@@ -1,8 +1,8 @@
-{{block pagination(obj)}}
+{{block pagination(obj,base)}}
 {{if obj.Count == -1 || obj.Limit() <= obj.Count}}
 <ul class="pagination">
   <li class="page-item{{if obj.Page == 1}} disabled{{end}}">
-    <a href="?page={{obj.Page - 1}}"{{if obj.Page == 1}} tabindex="-1"{{end}}>Prev</a>
+    <a href="{{query(base,"page",obj.Page - 1)}}"{{if obj.Page == 1}} tabindex="-1"{{end}}>Prev</a>
   </li>
   {{range value := obj.Pages()}}
   {{if value == "..."}}
@@ -11,12 +11,12 @@
   </li>
   {{else}}
   <li class="page-item{{if obj.Current() == value}} active{{end}}">
-    <a href="?page={{value}}">{{value}}</a>
+    <a href="{{query(base,"page",value)}}">{{value}}</a>
   </li>
   {{end}}
   {{end}}
   <li class="page-item{{if obj.Last()}} disabled{{end}}">
-    <a href="?page={{obj.Page + 1}}"{{if obj.Last()}} tabindex="-1"{{end}}>Next</a>
+    <a href="{{query(base,"page",obj.Page + 1)}}"{{if obj.Last()}} tabindex="-1"{{end}}>Next</a>
   </li>
 </ul>
 {{end}}
