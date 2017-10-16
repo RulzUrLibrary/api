@@ -6,7 +6,7 @@ import (
 )
 
 func main() {
-	rulz := app.New("./config/api.toml")
+	rulz := app.New()
 
 	// Middleware
 	rulz.Use(middleware.Logger())

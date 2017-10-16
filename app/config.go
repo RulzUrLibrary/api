@@ -3,9 +3,12 @@ package app
 import (
 	"github.com/BurntSushi/toml"
 	"github.com/rulzurlibrary/api/ext/db"
+	"os"
 	"path"
 	"path/filepath"
 )
+
+const CONFIG_ENV = "RULZURLIBRARY_CONFIG"
 
 type Configuration struct {
 	Debug    bool             `json:"debug"`
@@ -23,13 +26,13 @@ type Configuration struct {
 	}
 }
 
-func ParseConfig(filename string) (config Configuration, err error) {
+func ParseConfig() (config Configuration, err error) {
 	var base string
 	var letsencrypt = path.Join("/", "etc", "letsencrypt", "live", "rulz.xyz")
 
 	// get the abs
 	// which will try to find the 'filename' from current workind dir too.
-	filename, err = filepath.Abs(filename)
+	filename, err := filepath.Abs(os.Getenv(CONFIG_ENV))
 	if err != nil {
 		return
 	}

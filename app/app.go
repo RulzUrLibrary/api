@@ -77,7 +77,7 @@ func HTTPErrorHandler(err error, c echo.Context) {
 	}
 }
 
-func New(configPath string) *Application {
+func New() *Application {
 	var err error
 	var app = &Application{Echo: echo.New(), Api: echo.New(), Web: echo.New()}
 
@@ -92,7 +92,7 @@ func New(configPath string) *Application {
 		return
 	})
 
-	app.Configuration, err = ParseConfig(configPath)
+	app.Configuration, err = ParseConfig()
 	if err != nil {
 		app.Logger.Fatal(err)
 	}
@@ -134,7 +134,7 @@ func (app *Application) Start() error {
 			}))
 			e.Start(":80")
 		}()
-		return app.Echo.StartTLS(":443", key, cert)
+		return app.Echo.StartTLS(":443", cert, key)
 	} else {
 
 		return app.Echo.Start(fmt.Sprintf("%s:%d", host, port))
