@@ -2,7 +2,7 @@ package db
 
 import (
 	"fmt"
-	"github.com/paul-bismuth/library/utils"
+	"github.com/rulzurlibrary/api/utils"
 	"strings"
 )
 

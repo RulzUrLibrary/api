@@ -3,7 +3,7 @@ package scrapper
 import (
 	"github.com/andybalholm/cascadia"
 	"github.com/golang/glog"
-	"github.com/paul-bismuth/library/utils"
+	"github.com/rulzurlibrary/api/utils"
 	"golang.org/x/net/html"
 	"net/url"
 	"regexp"

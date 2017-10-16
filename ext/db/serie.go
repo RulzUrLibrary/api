@@ -2,7 +2,7 @@ package db
 
 import (
 	"database/sql"
-	"github.com/paul-bismuth/library/utils"
+	"github.com/rulzurlibrary/api/utils"
 )
 
 type Serie struct {

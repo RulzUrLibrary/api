@@ -3,8 +3,8 @@ package app
 import (
 	"fmt"
 	"github.com/labstack/echo"
-	"github.com/paul-bismuth/library/ext/db"
-	"github.com/paul-bismuth/library/utils"
+	"github.com/rulzurlibrary/api/ext/db"
+	"github.com/rulzurlibrary/api/utils"
 	"net/http"
 )
 

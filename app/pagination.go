@@ -1,7 +1,7 @@
 package app
 
 import (
-	"github.com/paul-bismuth/library/utils"
+	"github.com/rulzurlibrary/api/utils"
 	"strconv"
 )
 

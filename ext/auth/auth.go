@@ -2,9 +2,9 @@ package auth
 
 import (
 	"github.com/labstack/echo"
-	"github.com/paul-bismuth/library/ext/db"
-	"github.com/paul-bismuth/library/ext/google"
-	"github.com/paul-bismuth/library/utils"
+	"github.com/rulzurlibrary/api/ext/db"
+	"github.com/rulzurlibrary/api/ext/google"
+	"github.com/rulzurlibrary/api/utils"
 )
 
 type Auth struct {

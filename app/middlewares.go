@@ -4,7 +4,7 @@ import (
 	"github.com/gorilla/securecookie"
 	"github.com/gorilla/sessions"
 	"github.com/labstack/echo"
-	"github.com/paul-bismuth/library/utils"
+	"github.com/rulzurlibrary/api/utils"
 	"net/http"
 	"net/url"
 )

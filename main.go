@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/labstack/echo/middleware"
-	"github.com/paul-bismuth/library/app"
+	"github.com/rulzurlibrary/api/app"
 )
 
 func main() {

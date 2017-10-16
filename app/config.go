@@ -2,7 +2,7 @@ package app
 
 import (
 	"github.com/BurntSushi/toml"
-	"github.com/paul-bismuth/library/ext/db"
+	"github.com/rulzurlibrary/api/ext/db"
 	"path"
 	"path/filepath"
 )
