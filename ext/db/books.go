@@ -287,7 +287,7 @@ func (db *DB) bookList(qbl queryBookList) ([]*utils.Book, int, error) {
 	return books.ToStructs(false), count, nil
 }
 
-func (db *DB) BookDelete(books []string, user int) (int, error) {
+func (db *DB) BookDelete(user int, books ...string) (int, error) {
 	var args = []interface{}{user}
 	var where = []string{}
 
@@ -299,7 +299,7 @@ func (db *DB) BookDelete(books []string, user int) (int, error) {
 	return db.Exec(fmt.Sprintf(DeleteCollection, strings.Join(where, " OR ")), args...)
 }
 
-func (db *DB) BookPut(books []string, user int) (int, error) {
+func (db *DB) BookPut(user int, books ...string) (int, error) {
 	var args = []interface{}{user}
 	var where = []string{}
 

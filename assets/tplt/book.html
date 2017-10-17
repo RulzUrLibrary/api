@@ -29,8 +29,9 @@
 <div class="column col-12">
   <p class="text-justify"> {{.book.Description}} </p>
 </div>
-<form class="column col-2 col-lg-4 col-md-6 col-sm-12" action="{{url("books")}}">
-  <input type="hidden" name="isbn" value="{{.book.Isbn}}"/>
+<form class="column col-2 col-lg-4 col-md-6 col-sm-12" method="POST">
+
+  <input name="X-CSRF-Token" type="hidden" value="{{context.Get("csrf")}}"/>
   {{if .book.InCollection()}}
   <input class="btn btn-primary btn-block disabled"
          type="submit" tabindex="-1" value="In collection" />

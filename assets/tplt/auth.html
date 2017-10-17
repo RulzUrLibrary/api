@@ -34,6 +34,7 @@
                placeholder="Password"
                autocomplete="off" />
       </div>
+      <input name="X-CSRF-Token" type="hidden" value="{{context.Get("csrf")}}"/>
       <input name="token" type="hidden" id="token"/>
       <input name="next" type="hidden" id="next" value="{{next}}"/>
       {{if error, ok := .["error"]; ok}}

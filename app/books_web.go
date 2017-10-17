@@ -9,10 +9,7 @@ import (
 func WEBBookList(c *Context) (err error) {
 	var series *db.Series
 	var user = c.Get("user").(*utils.User)
-	var query = struct {
-		Isbn string `query:"isbn"`
-		Pagination
-	}{"", NewPagination()}
+	var query = NewPagination()
 
 	if err = c.Bind(&query); err != nil {
 		return
@@ -22,18 +19,6 @@ func WEBBookList(c *Context) (err error) {
 		return
 	}
 
-	if query.Isbn != "" {
-		_, err = c.DB.BookPut([]string{query.Isbn}, user.Id)
-		if err != nil {
-			return
-		}
-		err = c.Flashes(utils.Flash{utils.FlashSuccess, "book added to collection!"})
-		if err != nil {
-			return
-		}
-		return c.Redirect(http.StatusSeeOther, c.Echo().Reverse("book", query.Isbn))
-	}
-
 	series, query.Count, err = c.DB.SerieListU(query.Limit(), query.Offset(), user.Id)
 	if err != nil {
 		return
@@ -41,32 +26,35 @@ func WEBBookList(c *Context) (err error) {
 
 	return c.Render(http.StatusOK, "books.html", map[string]interface{}{
 		"series":     series.ToStructs(true),
-		"pagination": query.Pagination,
+		"pagination": query,
 	})
 }
 
 func WEBBookGet(c *Context) error {
-	book, err := BookGet(c)
-	if err != nil {
+	if book, err := BookGet(c); err != nil {
 		return err
+	} else {
+		return c.Render(http.StatusOK, "book.html", map[string]interface{}{"book": book})
 	}
-	return c.Render(http.StatusOK, "book.html", map[string]interface{}{"book": book})
 }
 
-func WEBSerieGet(c *Context) error {
-	isbn := c.QueryParam("isbn")
+func WEBBookPost(c *Context) (err error) {
+	var count int
+	var user = c.Get("user").(*utils.User)
 
-	if isbn != "" {
-		var user = c.Get("user").(*utils.User)
-		if _, err := c.DB.BookPut([]string{isbn}, user.Id); err != nil {
-			return err
+	if isbn := c.Param("isbn"); isbn != "" {
+		count, err = c.DB.BookPut(user.Id, isbn)
+		if err != nil {
+			return
+		}
+		if count == 0 {
+			err = c.Flashes(utils.Flash{utils.FlashWarning, "book already in collection!"})
+		} else {
+			err = c.Flashes(utils.Flash{utils.FlashSuccess, "book added to collection!"})
+		}
+		if err != nil {
+			return
 		}
 	}
-
-	serie, err := SerieGet(c)
-	if err != nil {
-		return err
-	}
-
-	return c.Render(http.StatusOK, "serie.html", map[string]interface{}{"serie": serie})
+	return WEBBookGet(c)
 }

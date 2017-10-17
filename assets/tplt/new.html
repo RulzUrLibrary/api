@@ -30,6 +30,7 @@
              id="confirmation"
              placeholder="Password"
              autocomplete="off" />
+      <input name="X-CSRF-Token" type="hidden" value="{{context.Get("csrf")}}"/>
     </div>
     {{if error, ok := .["error"]; ok}}
     <div class="text-error mb-2">

@@ -68,7 +68,7 @@ func BookList(c *Context, limit, offset int) ([]*utils.Book, int, error) {
 	}
 }
 
-func change(c *Context, fn func([]string, int) (int, error)) (int, error) {
+func change(c *Context, fn func(int, ...string) (int, error)) (int, error) {
 	var user = c.Get("user").(*utils.User)
 	var books struct {
 		Isbns []string `json:"isbns"`
@@ -81,5 +81,5 @@ func change(c *Context, fn func([]string, int) (int, error)) (int, error) {
 		return 0, nil
 	}
 	c.Logger.Debug(books)
-	return fn(books.Isbns, user.Id)
+	return fn(user.Id, books.Isbns...)
 }

@@ -11,6 +11,7 @@ func main() {
 	// Middleware
 	rulz.Use(middleware.Logger())
 	rulz.Use(middleware.Recover())
+	rulz.Use(middleware.Secure())
 
 	/* --------------------------------- API --------------------------------- */
 	rulz.Api.Use(app.ContentType)
@@ -28,6 +29,9 @@ func main() {
 
 	/* --------------------------------- WEB --------------------------------- */
 	rulz.Web.Use(app.CookieAuth(rulz.Configuration.Dev))
+	rulz.Web.Use(middleware.CSRFWithConfig(middleware.CSRFConfig{
+		TokenLookup: "form:X-CSRF-Token",
+	}))
 
 	rulz.Web.Static("/static", rulz.Configuration.Paths.Static)
 	rulz.Web.Static("/thumbs", rulz.Configuration.Paths.Thumbs)
@@ -37,10 +41,13 @@ func main() {
 	rulz.Web.GET("/user/logout", rulz.Handler(app.WEBUserLogout), app.Protected).Name = "logout"
 
 	rulz.Web.GET("/books/", rulz.Handler(app.WEBBookList), app.Protected).Name = "books"
-	rulz.Web.GET("/books/:isbn", rulz.Handler(app.WEBBookGet)).Name = "book"
 
-	// beurk!
+	rulz.Web.GET("/books/:isbn", rulz.Handler(app.WEBBookGet)).Name = "book"
+	rulz.Web.POST("/books/:isbn", rulz.Handler(app.WEBBookPost))
+
+	// TODO: find a better way to identify series
 	rulz.Web.GET("/series/:id", rulz.Handler(app.WEBSerieGet), app.Protected).Name = "serie"
+	rulz.Web.POST("/series/:id", rulz.Handler(app.WEBSeriePost), app.Protected)
 
 	rulz.Web.GET("/auth", rulz.Handler(app.WEBAuthGet)).Name = "auth"
 	rulz.Web.POST("/auth", rulz.Handler(app.WEBAuthPost))

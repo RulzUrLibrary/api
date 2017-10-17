@@ -72,7 +72,7 @@ func WEBAuthPost(c *Context) error {
 		Password string `form:"password"`
 		Token    string `form:"token"`
 		Next     string `form:"next"`
-	}{Next: c.Echo().Reverse("books")}
+	}{}
 
 	if err := c.Bind(&creds); err != nil {
 		return err
@@ -86,5 +86,5 @@ func WEBAuthPost(c *Context) error {
 	if err := c.SaveUser(user); err != nil {
 		return err
 	}
-	return c.Redirect(http.StatusSeeOther, creds.Next)
+	return c.Redirect(http.StatusSeeOther, utils.DefaultS(creds.Next, c.Echo().Reverse("books")))
 }

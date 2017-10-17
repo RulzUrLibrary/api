@@ -6,7 +6,6 @@
 {{block page_title()}}{{.serie.Name}}{{end}}
 
 {{block body()}}
-{{isbn := context.Request().URL.Query().Get("isbn")}}
 <div class="column col-12 text-center mb-2">
   <h3 class="text-gray">{{.serie.Authors}}</h3>
 </div>
@@ -27,11 +26,12 @@
       <div class="float-right">
         {{if volume.InCollection()}}
         <small class="toast toast-success">
-          <i class="icon icon-check"></i> {{if isbn == volume.Isbn}}Book added to collection!{{end}}
+          <i class="icon icon-check"></i>
         </small>
         {{else}}
-        <form action="{{context.Request().URL}}#{{volume.Number}}">
+        <form action="{{context.Request().URL}}#{{volume.Number}}" method="POST">
           <input type="hidden" value="{{volume.Isbn}}" name="isbn"/>
+          <input name="X-CSRF-Token" type="hidden" value="{{context.Get("csrf")}}"/>
           <button type="Submit" class="btn btn-primary">
             <small>add to collection</small>
           </button>
