@@ -48,8 +48,10 @@ func BookPost(c *Context, isbn string) (book utils.Book, ok bool, err error) {
 		err = c.DB.BookSave(&book)
 		return
 	case utils.ErrCaptcha:
-		err = echo.NewHTTPError(http.StatusAccepted,
-			"request correctly received but unable to be processed currently.")
+		if _, err = c.DB.CaptchaAdd(isbn); err == nil {
+			err = echo.NewHTTPError(http.StatusAccepted,
+				"request correctly received but unable to be processed currently.")
+		}
 		return
 	case utils.ErrNoProduct:
 		err = echo.NewHTTPError(http.StatusNotFound,

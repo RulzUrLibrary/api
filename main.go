@@ -37,8 +37,12 @@ func main() {
 	rulz.Web.Static("/thumbs", rulz.Configuration.Paths.Thumbs)
 
 	rulz.Web.GET("/", rulz.Handler(app.WEBIndex)).Name = "index"
+
 	rulz.Web.GET("/user", rulz.Handler(app.WEBUserGet), app.Protected).Name = "user"
-	rulz.Web.GET("/user/logout", rulz.Handler(app.WEBUserLogout), app.Protected).Name = "logout"
+	rulz.Web.GET("/user/reset", rulz.Handler(app.WEBUserReset), app.Protected).Name = "reset"
+
+	rulz.Web.POST("/user/password", rulz.Handler(app.WEBUserPassword), app.Protected).Name = "password"
+	rulz.Web.POST("/user/logout", rulz.Handler(app.WEBUserLogout), app.Protected).Name = "logout"
 
 	rulz.Web.GET("/books/", rulz.Handler(app.WEBBookList), app.Protected).Name = "books"
 

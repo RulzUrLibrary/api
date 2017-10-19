@@ -6,6 +6,7 @@ import (
 	"strings"
 )
 
+type Dict map[string]interface{}
 type flash int
 
 const (

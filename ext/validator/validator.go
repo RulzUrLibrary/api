@@ -1,10 +1,8 @@
 package validator
 
 import (
-	"fmt"
-	"github.com/labstack/echo"
+	"github.com/rulzurlibrary/api/utils"
 	validate "gopkg.in/go-playground/validator.v9"
-	"net/http"
 	"reflect"
 	"strings"
 )
@@ -13,35 +11,35 @@ type Validator struct {
 	validator *validate.Validate
 }
 
-var errors = map[string]string{
-	"gt":  "value must be greater than %s, got '%d'",
-	"gte": "value must be greater or equal to %s, got '%d'",
-	"lte": "value must be lower or equal to %s, got '%d'",
+func (v *Validator) Validate(i interface{}) error {
+	return v.validator.Struct(i)
 }
 
-func (v *Validator) Validate(i interface{}) error {
-	err := v.validator.Struct(i)
-	if err == nil {
-		return err
+func Dump(err error, msgs map[string]map[string]string) utils.Dict {
+	ve, ok := err.(validate.ValidationErrors)
+	if !ok {
+		panic("dumping error failed")
 	}
-	payload := make(map[string][]string)
-	ve, _ := err.(validate.ValidationErrors)
+	payload := utils.Dict{}
 	for _, fe := range ve {
-		msgs := []string{}
-
-		if old, ok := payload[fe.Field()]; ok {
-			msgs = old
-		}
-		msg := fmt.Sprintf(errors[fe.Tag()], fe.Param(), fe.Value())
-		payload[fe.Field()] = append(msgs, msg)
+		payload[fe.Field()] = msgs[fe.Field()][fe.Tag()]
 	}
-	return echo.NewHTTPError(http.StatusBadRequest, payload)
+	return payload
+}
+
+func validatorGmail(fl validate.FieldLevel) bool {
+	return utils.MailAddress(fl.Field().String()) != "@gmail.com"
 }
 
 func New() *Validator {
 	validator := &Validator{validate.New()}
+	validator.validator.RegisterValidation("gmail", validatorGmail)
 	validator.validator.RegisterTagNameFunc(func(fld reflect.StructField) string {
 		name := strings.SplitN(fld.Tag.Get("query"), ",", 2)[0]
+
+		if name == "" {
+			name = strings.SplitN(fld.Tag.Get("form"), ",", 2)[0]
+		}
 
 		if name == "-" {
 			return ""
