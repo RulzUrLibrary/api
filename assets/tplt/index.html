@@ -8,42 +8,44 @@
 
 {{block body()}}
 {{pattern := context.Request().URL.Query().Get("search")}}
-<div class="column col-12 mb-2">
-  <div class="empty">
-    <h2 class="empty-icon"><i class="icon icon-search"></i></h2>
-    <h4 class="empty-title">{{T("index_search")}}</h4>
-    <form class="column col-12" method="GET">
-      <div class="form-group">
-        <input placeholder="{{T("index_search_placeholder")}}"
-               class="form-input" name="search" type="text" id="search" value="{{pattern}}"/>
+<div class="columns">
+  <div class="column col-12 mb-2">
+    <div class="empty">
+      <h2 class="empty-icon"><i class="icon icon-search"></i></h2>
+      <h4 class="empty-title">{{T("index_search")}}</h4>
+      <form class="column col-12" method="GET">
+        <div class="form-group">
+          <input placeholder="{{T("index_search_placeholder")}}"
+                 class="form-input" name="search" type="text" id="search" value="{{pattern}}"/>
+        </div>
+        <div class="form-group text-left">
+          <button class="btn btn-primary col-3 col-xs-12" type="submit">{{T("index_search_submit")}}</button>
+        </div>
+      </form>
+    </div>
+
+    <h2 class="mt-2 pt-2">
+      {{if pattern == ""}}{{T("index_added_books")}}{{else}}{{T("index_search_results")}}{{end}}:
+    </h2>
+
+    {{yield pagination(obj=.pagination,base=context.Request().URL)}}
+    {{range book := .books}}
+    <a class="tile column col-12 rounded" href="{{url("book", book.Isbn)}}">
+      <div class="tile-icon">
+        <figure class="figure">
+          <img class="thumb" src="{{book.Thumbnail}}" alt="book cover">
+        </figure>
       </div>
-      <div class="form-group text-left">
-        <button class="btn btn-primary col-3 col-xs-12" type="submit">{{T("index_search_submit")}}</button>
+      <div class="tile-content">
+        <div class="column col-12 ml-2 mt-2">
+          <h2>{{book.TitleDisplay()}}</h2>
+          <p class="text-gray">{{book.Authors}}</p>
+          <p>{{book.Description}}</p>
+        </div>
       </div>
-    </form>
+    </a>
+    {{end}}
+    {{yield pagination(obj=.pagination,base=context.Request().URL)}}
   </div>
-
-  <h2 class="mt-2 pt-2">
-    {{if pattern == ""}}{{T("index_added_books")}}{{else}}{{T("index_search_results")}}{{end}}:
-  </h2>
-
-  {{yield pagination(obj=.pagination,base=context.Request().URL)}}
-  {{range book := .books}}
-  <a class="tile column col-12 rounded" href="{{url("book", book.Isbn)}}">
-    <div class="tile-icon">
-      <figure class="figure">
-        <img class="thumb" src="{{book.Thumbnail}}" alt="book cover">
-      </figure>
-    </div>
-    <div class="tile-content">
-      <div class="column col-12 ml-2 mt-2">
-        <h2>{{book.TitleDisplay()}}</h2>
-        <p class="text-gray">{{book.Authors}}</p>
-        <p>{{book.Description}}</p>
-      </div>
-    </div>
-  </a>
-  {{end}}
-  {{yield pagination(obj=.pagination,base=context.Request().URL)}}
 </div>
 {{end}}

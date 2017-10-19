@@ -17,8 +17,17 @@
   "auth_form_password_placeholder": {
     "other": "Mot de passe"
   },
+  "book_details": {
+    "other": "Détails"
+  },
   "cancel": {
     "other": "Annuler"
+  },
+  "collection_add": {
+    "other": "ajouter à ma collection"
+  },
+  "collection_in": {
+    "other": "Dans ma collection"
   },
   "confirm_password": {
     "other": "Confirmation du mot de passe"
@@ -34,6 +43,12 @@
   },
   "email_required": {
     "other": "vous devez saisir une adresse email"
+  },
+  "flash_logout": {
+    "other": "vous êtes maintenant déconnecté !"
+  },
+  "flash_welcome": {
+    "other": "bienvenue sur notre site !"
   },
   "forgot_password": {
     "other": "Mot de passe oublié ?"
@@ -59,6 +74,9 @@
   "login": {
     "other": "Connexion"
   },
+  "logout": {
+    "other": "Déconnexion"
+  },
   "menu_books": {
     "other": "Livres"
   },
@@ -82,5 +100,26 @@
   },
   "signup": {
     "other": "S'inscrire"
+  },
+  "title_books": {
+    "other": "Ma collection"
+  },
+  "title_user": {
+    "other": "Mon compte"
+  },
+  "user_password_change": {
+    "other": "Changer de mot de passe"
+  },
+  "user_password_change_confirmation": {
+    "other": "Confirmation du nouveau mot de passe"
+  },
+  "user_password_change_current": {
+    "other": "Mot de passe actuel"
+  },
+  "user_password_change_new": {
+    "other": "Nouveau mot de passe"
+  },
+  "user_password_change_submit": {
+    "other": "Confirmer"
   }
 }

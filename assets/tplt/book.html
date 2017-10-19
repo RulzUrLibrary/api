@@ -6,6 +6,8 @@
 {{block page_title()}}{{.book.TitleDisplay()}}{{end}}
 
 {{block body()}}
+
+<div class="columns">
 <div class="column col-12">
   <div class="divider"></div>
 </div>
@@ -16,7 +18,7 @@
       <p class="tile-title">{{author.Name}}</p>
       <p class="tile-subtitle">Some bio stuff maybe...</p>
       <p>
-      <button class="btn btn-primary btn-sm">Details</button>
+      <button class="btn btn-primary btn-sm">{{T("book_details")}}</button>
       </p>
     </div>
 
@@ -34,10 +36,10 @@
   <input name="X-CSRF-Token" type="hidden" value="{{context.Get("csrf")}}"/>
   {{if .book.InCollection()}}
   <input class="btn btn-primary btn-block disabled"
-         type="submit" tabindex="-1" value="In collection" />
+         type="submit" tabindex="-1" value="{{T("collection_in")}}" />
   {{else}}
-  <input type="submit" class="btn btn-primary btn-block" value="Add to collection"/>
+  <input type="submit" class="btn btn-primary btn-block" value="{{T("collection_add")|capitalize}}"/>
   {{end}}
 </form>
-
+</div>
 {{end}}

@@ -17,8 +17,17 @@
   "auth_form_password_placeholder": {
     "other": "Password"
   },
+  "book_details": {
+    "other": "Details"
+  },
   "cancel": {
     "other": "Cancel"
+  },
+  "collection_add": {
+    "other": "add to collection"
+  },
+  "collection_in": {
+    "other": "In collection"
   },
   "confirm_password": {
     "other": "Confirm password"
@@ -34,6 +43,12 @@
   },
   "email_required": {
     "other": "email is required"
+  },
+  "flash_logout": {
+    "other": "you have been successfully logged out!"
+  },
+  "flash_welcome": {
+    "other": "welcome to rulz!"
   },
   "forgot_password": {
     "other": "Forgot your password?"
@@ -59,6 +74,9 @@
   "login": {
     "other": "Login"
   },
+  "logout": {
+    "other": "Logout"
+  },
   "menu_books": {
     "other": "Books"
   },
@@ -82,5 +100,26 @@
   },
   "signup": {
     "other": "Sign up"
+  },
+  "title_books": {
+    "other": "My collection"
+  },
+  "title_user": {
+    "other": "Your profile"
+  },
+  "user_password_change": {
+    "other": "Password change"
+  },
+  "user_password_change_confirmation": {
+    "other": "Confirm new password"
+  },
+  "user_password_change_current": {
+    "other": "Current password"
+  },
+  "user_password_change_new": {
+    "other": "New password"
+  },
+  "user_password_change_submit": {
+    "other": "Confirm"
   }
 }

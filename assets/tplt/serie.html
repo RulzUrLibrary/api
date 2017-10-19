@@ -6,44 +6,46 @@
 {{block page_title()}}{{.serie.Name}}{{end}}
 
 {{block body()}}
-<div class="column col-12 text-center mb-2">
-  <h3 class="text-gray">{{.serie.Authors}}</h3>
-</div>
-
-<div class="column col-12 mb-2">
-{{range volume := .serie.Volumes}}
-{{volume.Serie = .serie.Name}}
-
-<a class="tile column col-12 rounded{{if !volume.InCollection()}} disabled{{end}}"
-   href="{{url("book", volume.Isbn)}}" id="{{volume.Number}}">
-  <div class="tile-icon">
-    <figure class="figure">
-      <img class="thumb" src="{{volume.Thumbnail}}" alt="book cover">
-    </figure>
+<div class="columns">
+  <div class="column col-12 text-center mb-2">
+    <h3 class="text-gray">{{.serie.Authors}}</h3>
   </div>
-  <div class="tile-content">
-    <div class="column col-12 ml-2 mt-2">
-      <div class="float-right">
-        {{if volume.InCollection()}}
-        <small class="toast toast-success">
-          <i class="icon icon-check"></i>
-        </small>
-        {{else}}
-        <form action="{{context.Request().URL}}#{{volume.Number}}" method="POST">
-          <input type="hidden" value="{{volume.Isbn}}" name="isbn"/>
-          <input name="X-CSRF-Token" type="hidden" value="{{context.Get("csrf")}}"/>
-          <button type="Submit" class="btn btn-primary">
-            <small>add to collection</small>
-          </button>
-        </form>
-        {{end}}
+
+  <div class="column col-12 mb-2">
+    {{range volume := .serie.Volumes}}
+    {{volume.Serie = .serie.Name}}
+
+    <a class="tile column col-12 rounded{{if !volume.InCollection()}} disabled{{end}}"
+       href="{{url("book", volume.Isbn)}}" id="{{volume.Number}}">
+      <div class="tile-icon">
+        <figure class="figure">
+          <img class="thumb" src="{{volume.Thumbnail}}" alt="book cover">
+        </figure>
       </div>
-      <h2>{{volume.TitleDisplay()}}</h2>
-      <p class="text-gray">{{volume.Authors}}</p>
-      <p>{{volume.Description}}</p>
-    </div>
+      <div class="tile-content">
+        <div class="column col-12 ml-2 mt-2">
+          <div class="float-right">
+            {{if volume.InCollection()}}
+            <small class="toast toast-success">
+              <i class="icon icon-check"></i>
+            </small>
+            {{else}}
+            <form action="{{context.Request().URL}}#{{volume.Number}}" method="POST">
+              <input type="hidden" value="{{volume.Isbn}}" name="isbn"/>
+              <input name="X-CSRF-Token" type="hidden" value="{{context.Get("csrf")}}"/>
+              <button type="Submit" class="btn btn-primary">
+                <small>{{T("collection_add")}}</small>
+              </button>
+            </form>
+            {{end}}
+          </div>
+          <h2>{{volume.TitleDisplay()}}</h2>
+          <p class="text-gray">{{volume.Authors}}</p>
+          <p>{{volume.Description}}</p>
+        </div>
+      </div>
+    </a>
+    {{end}}
   </div>
-</a>
-{{end}}
 </div>
 {{end}}

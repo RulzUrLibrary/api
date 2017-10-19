@@ -9,4 +9,6 @@ const (
 	PASSWORD_REQUIRED = "password_required"
 	PASSWORD_LEN      = "password_len"
 	PASSWORD_EQFIELD  = "password_eqfield"
+	FLASH_LOGOUT      = "flash_logout"
+	FLASH_WELCOME     = "flash_welcome"
 )

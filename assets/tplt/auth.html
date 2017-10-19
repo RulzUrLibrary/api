@@ -17,71 +17,73 @@
 {{error_password := .["error"]["password"]}}
 {{error_auth := .["error"]["auth"]}}
 
-<div class="column col-md-12">
-  <h2 class="text-center column col-12">{{T("login")}}</h2>
-  <form method="POST" id="login">
-    <div class="form-group{{if isset(error_email)}} has-error{{end}}">
-      <label class="form-label" for="email">{{T("auth_form_email")}}</label>
-      <input placeholder="{{T("auth_form_email_placeholder")}}"
-             value="{{form.Email}}"
-             class="form-input" name="email" type="text" id="email" autocomplete="off"/>
-      {{if isset(error_email)}}
-      <p class="form-input-hint">{{T(error_email)|capitalize}}</p>
-      {{end}}
-    </div>
-    <div class="form-group{{if isset(error_password)}} has-error{{end}}">
-      <label class="form-label" for="password">{{T("auth_form_password")}}</label>
-      <input placeholder="{{T("auth_form_password_placeholder")}}"
-             value="{{form.Password}}"
-             class="form-input" name="password" type="password" id="password" autocomplete="off" />
-      {{if isset(error_password)}}
-      <p class="form-input-hint">{{T(error_password)|capitalize}}</p>
-      {{end}}
-    </div>
-    <input name="X-CSRF-Token" type="hidden" value="{{context.Get("csrf")}}"/>
-    <input name="token" type="hidden" id="token"/>
-    <input name="next" type="hidden" id="next" value="{{next}}"/>
+<div class="columns">
+  <div class="column col-md-12">
+    <h2 class="text-center column col-12">{{T("login")}}</h2>
+    <form method="POST" id="login">
+      <div class="form-group{{if isset(error_email)}} has-error{{end}}">
+        <label class="form-label" for="email">{{T("auth_form_email")}}</label>
+        <input placeholder="{{T("auth_form_email_placeholder")}}"
+               value="{{form.Email}}"
+               class="form-input" name="email" type="text" id="email" autocomplete="off"/>
+        {{if isset(error_email)}}
+        <p class="form-input-hint">{{T(error_email)|capitalize}}</p>
+        {{end}}
+      </div>
+      <div class="form-group{{if isset(error_password)}} has-error{{end}}">
+        <label class="form-label" for="password">{{T("auth_form_password")}}</label>
+        <input placeholder="{{T("auth_form_password_placeholder")}}"
+               value="{{form.Password}}"
+               class="form-input" name="password" type="password" id="password" autocomplete="off" />
+        {{if isset(error_password)}}
+        <p class="form-input-hint">{{T(error_password)|capitalize}}</p>
+        {{end}}
+      </div>
+      <input name="X-CSRF-Token" type="hidden" value="{{context.Get("csrf")}}"/>
+      <input name="token" type="hidden" id="token"/>
+      <input name="next" type="hidden" id="next" value="{{next}}"/>
 
-    {{if isset(error_auth) }}
-    <div class="text-error mb-2">
-      {{T(error_auth)|capitalize}}
-    </div>
-    {{end}}
-    <div class="form-group columns">
-      <div class="column col-3 col-md-12 pt-2">
-        <button class="btn btn-primary btn-block" type="submit">{{T("login")}}</button>
+      {{if isset(error_auth) }}
+      <div class="text-error mb-2">
+        {{T(error_auth)|capitalize}}
       </div>
-      <div class="column col-3 col-md-12 pt-2">
-        <button class="btn btn-default btn-block" type="reset">{{T("cancel")}}</button>
+      {{end}}
+      <div class="form-group columns">
+        <div class="column col-3 col-md-12 pt-2">
+          <button class="btn btn-primary btn-block" type="submit">{{T("login")}}</button>
+        </div>
+        <div class="column col-3 col-md-12 pt-2">
+          <button class="btn btn-default btn-block" type="reset">{{T("cancel")}}</button>
+        </div>
+        <div class="column col-6 hide-md col-ml-auto pt-2">
+          <button class="btn btn-link btn-block text-right">{{T("forgot_password")}}</button>
+        </div>
+        <div class="column col-12 show-md">
+          <a href="{{url("reset")}}" class="btn btn-link btn-block">{{T("forgot_password")}}</a>
+        </div>
       </div>
-      <div class="column col-6 hide-md col-ml-auto pt-2">
-        <button class="btn btn-link btn-block text-right">{{T("forgot_password")}}</button>
-      </div>
-      <div class="column col-12 show-md">
-        <a href="{{url("reset")}}" class="btn btn-link btn-block">{{T("forgot_password")}}</a>
-      </div>
-    </div>
-  </form>
-  <div class="divider col-12 text-center" data-content="{{T("divider_or")}}"></div>
-  <button class="btn btn-block" id="google-signin">
-    <img src="/static/img/google_logo.svg" />{{T("google_login")}}
-  </button>
-</div>
-<div class="divider-vert hide-md" data-content="{{T("divider_or")}}"></div>
-<div class="divider col-md-12 text-center show-md" data-content="{{T("divider_or")}}"></div>
+    </form>
+    <div class="divider col-12 text-center" data-content="{{T("divider_or")}}"></div>
+    <button class="btn btn-block" id="google-signin">
+      <img src="/static/img/google_logo.svg" />{{T("google_login")}}
+    </button>
+  </div>
+  <div class="divider-vert hide-md" data-content="{{T("divider_or")}}"></div>
+  <div class="divider col-md-12 text-center show-md" data-content="{{T("divider_or")}}"></div>
 
-<div class="column col-md-12">
-  <h2 class="text-center column col-12">{{T("signup")}}</h2>
-  <form method="GET" action="/auth/new">
-    <div class="form-group">
-      <label class="form-label" for="create">{{T("auth_form_email")}}</label>
-      <input placeholder="{{T("auth_form_email_placeholder")}}"
-             class="form-input" type="text" id="create"  name="email">
-    </div>
-    <div class="form-group">
-      <button class="btn btn-primary col-3 col-md-12 mt-10">{{T("signup")}}</button>
-      <button class="btn btn-link col-3 col-md-12 mt-10">{{T("auth_form_learn_more")}}</button>
-    </div>
-  </form>
+  <div class="column col-md-12">
+    <h2 class="text-center column col-12">{{T("signup")}}</h2>
+    <form method="GET" action="/auth/new">
+      <div class="form-group">
+        <label class="form-label" for="create">{{T("auth_form_email")}}</label>
+        <input placeholder="{{T("auth_form_email_placeholder")}}"
+               class="form-input" type="text" id="create"  name="email">
+      </div>
+      <div class="form-group">
+        <button class="btn btn-primary col-3 col-md-12 mt-10">{{T("signup")}}</button>
+        <button class="btn btn-link col-3 col-md-12 mt-10">{{T("auth_form_learn_more")}}</button>
+      </div>
+    </form>
+  </div>
 </div>
 {{end}}

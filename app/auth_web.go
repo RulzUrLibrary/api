@@ -16,7 +16,7 @@ func WEBUserGet(c *Context) error {
 }
 
 func WEBUserLogout(c *Context) error {
-	flash := utils.Flash{utils.FlashSuccess, "you have been successfully logged out!"}
+	flash := utils.Flash{utils.FlashSuccess, utils.FLASH_LOGOUT}
 	if err := c.SaveUser(nil, flash); err != nil {
 		return err
 	}
@@ -79,7 +79,7 @@ func WEBUserNewPost(c *Context) error {
 	user, err := c.DB.NewUser(creds.Email, creds.Password)
 	switch err {
 	case nil:
-		flash := utils.Flash{utils.FlashSuccess, "welcome to rulz!"}
+		flash := utils.Flash{utils.FlashSuccess, utils.FLASH_WELCOME}
 		if err := c.SaveUser(user, flash); err != nil {
 			return err
 		}
