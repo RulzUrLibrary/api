@@ -1,4 +1,7 @@
 {
+  "auth_err": {
+    "other": "email not registered or password invalid"
+  },
   "auth_form_email": {
     "other": "Email"
   },

@@ -1,4 +1,7 @@
 {
+  "auth_err": {
+    "other": "cette adresse mail n'est pas enregistré, ou le mot de passe est incorrect"
+  },
   "auth_form_email": {
     "other": "Email"
   },

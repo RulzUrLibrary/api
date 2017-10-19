@@ -91,25 +91,38 @@ func WEBUserNewPost(c *Context) error {
 }
 
 func WEBAuthGet(c *Context) error {
-	return c.Render(http.StatusOK, "auth.html", map[string]interface{}{})
+	return c.Render(http.StatusOK, "auth.html", dict{
+		"error": dict{}, "form": struct {
+			Email    string
+			Password string
+		}{},
+	})
 }
 
 func WEBAuthPost(c *Context) error {
 	creds := struct {
-		User     string `form:"user"`
-		Password string `form:"password"`
+		Email    string `form:"email" validate:"required"`
+		Password string `form:"password" validate:"required"`
 		Token    string `form:"token"`
 		Next     string `form:"next"`
 	}{}
+	render := func(code int, errs dict) error {
+		return c.Render(code, "auth.html", dict{"error": errs, "form": creds})
+	}
 
 	if err := c.Bind(&creds); err != nil {
 		return err
 	}
-	user, err := c.Auth.Login(creds.User, utils.DefaultS(creds.Token, creds.Password))
+	creds.Password = utils.DefaultS(creds.Token, creds.Password)
+	if err := c.Validate(&creds); err != nil {
+		return render(http.StatusBadRequest, validator.Dump(err, map[string]dictS{
+			"email":    dictS{"required": utils.EMAIL_REQUIRED},
+			"password": dictS{"required": utils.PASSWORD_REQUIRED},
+		}))
+	}
+	user, err := c.Auth.Login(creds.Email, creds.Password)
 	if err != nil {
-		return c.Render(http.StatusUnauthorized, "auth.html", map[string]interface{}{
-			"error": err,
-		})
+		return render(http.StatusUnauthorized, dict{"auth": utils.AUTH_ERR})
 	}
 	if err := c.SaveUser(user); err != nil {
 		return err

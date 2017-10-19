@@ -2,6 +2,7 @@ package utils
 
 const (
 	PROTECTED_ERR     = "protected_err"
+	AUTH_ERR          = "auth_err"
 	EMAIL_INVALID     = "email_invalid"
 	EMAIL_GMAIL       = "email_gmail"
 	EMAIL_REQUIRED    = "email_required"
