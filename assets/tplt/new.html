@@ -3,7 +3,7 @@
 {{block header()}}
 {{yield menu(active="user")}}
 {{end}}
-{{block page_title()}}Register{{end}}
+{{block page_title()}}{{T("signup")}}{{end}}
 
 {{block body()}}
 {{form := .["form"]}}
@@ -13,44 +13,32 @@
 <div class="column col-6 col-mx-auto">
   <form method="POST" action="{{url("new")}}">
     <div class="form-group{{if isset(error_email)}} has-error{{end}}">
-      <label class="form-label" for="email">Email</label>
-      <input class="form-input" name="email" type="text" id="email" placeholder="Valid email address" autocomplete="off" value="{{form.Email}}">
+      <label class="form-label" for="email">{{T("auth_form_email")}}</label>
+      <input placeholder="{{T("auth_form_email_placeholder")}}"
+             value="{{form.Email}}"
+             class="form-input" name="email" type="text" id="email" autocomplete="off"/>
       {{if isset(error_email)}}
-      <p class="form-input-hint">{{error_email|capitalize}}.</p>
+      <p class="form-input-hint">{{T(error_email)|capitalize}}</p>
       {{end}}
     </div>
     <div class="form-group{{if isset(error_password)}} has-error{{end}}">
-      <label class="form-label" for="password">Password</label>
-      <input class="form-input"
-             name="password"
-             type="password"
+      <label class="form-label" for="password">{{T("auth_form_password")}}</label>
+      <input placeholder="{{T("auth_form_password_placeholder")}}"
              value="{{form.Password}}"
-             id="password"
-             placeholder="Password"
-             autocomplete="off" />
-      <label class="form-label" for="confirmation">
-        Confirm password
-      </label>
-      <input class="form-input"
-             name="confirmation"
+             class="form-input" name="password" type="password" id="password" autocomplete="off" />
+      <label class="form-label" for="confirmation">{{T("confirm_password")}}</label>
+      <input placeholder="{{T("auth_form_password_placeholder")}}"
              value="{{form.Confirmation}}"
-             type="password"
-             id="confirmation"
-             placeholder="Password"
-             autocomplete="off" />
+             class="form-input" name="confirmation" type="password" id="confirmation" autocomplete="off" />
       {{if isset(error_password)}}
-      <p class="form-input-hint">{{error_password|capitalize}}.</p>
+      <p class="form-input-hint">{{T(error_password)|capitalize}}</p>
       {{end}}
     </div>
 
     <input name="X-CSRF-Token" type="hidden" value="{{context.Get("csrf")}}"/>
     <div class="form-group text-right">
-      <button class="btn btn-primary col-3 col-md-12 mt-1" type="submit">
-        Submit
-      </button>
-      <button class="btn btn-default col-3 col-md-12 mt-1" type="reset">
-        Cancel
-      </button>
+      <button class="btn btn-primary col-3 col-md-12 mt-1" type="submit">{{T("signup")}}</button>
+      <button class="btn btn-default col-3 col-md-12 mt-1" type="reset">{{T("cancel")}}</button>
     </div>
   </form>
 </div>

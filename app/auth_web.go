@@ -7,6 +7,7 @@ import (
 )
 
 type dict = utils.Dict
+type dictS = map[string]string
 
 func WEBUserGet(c *Context) error {
 	return c.Render(http.StatusOK, "user.html", map[string]interface{}{
@@ -42,11 +43,8 @@ func WEBUserNewGet(c *Context) error {
 		return err
 	}
 	if err := c.Validate(&query); err != nil {
-		errs = validator.Dump(err, map[string]map[string]string{
-			"email": map[string]string{
-				"email": "invalid email address",
-				"gmail": "email should not be from gmail, signin directly if you want to use it",
-			},
+		errs = validator.Dump(err, map[string]dictS{
+			"email": dictS{"email": utils.EMAIL_INVALID, "gmail": utils.EMAIL_GMAIL},
 		})
 	}
 	return c.Render(http.StatusOK, "new.html", dict{"error": errs, "form": query})
@@ -66,16 +64,14 @@ func WEBUserNewPost(c *Context) error {
 		return err
 	}
 	if err := c.Validate(&creds); err != nil {
-		return badRequest(validator.Dump(err, map[string]map[string]string{
-			"email": map[string]string{
-				"required": "email is required",
-				"email":    "invalid email address",
-				"gmail":    "email should not be from gmail, signin directly if you want to use it",
+		return badRequest(validator.Dump(err, map[string]dictS{
+			"email": dictS{
+				"required": utils.EMAIL_REQUIRED, "email": utils.EMAIL_INVALID,
+				"gmail": utils.EMAIL_GMAIL,
 			},
-			"password": map[string]string{
-				"required": "password is required",
-				"gt":       "password must be at least 8 characters long",
-				"eqfield":  "passwords must match",
+			"password": dictS{
+				"required": utils.PASSWORD_REQUIRED, "gt": utils.PASSWORD_LEN,
+				"eqfield": utils.PASSWORD_EQFIELD,
 			},
 		}))
 	}

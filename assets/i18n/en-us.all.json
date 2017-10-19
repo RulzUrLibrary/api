@@ -1,0 +1,83 @@
+{
+  "auth_form_email": {
+    "other": "Email"
+  },
+  "auth_form_email_placeholder": {
+    "other": "Your email address"
+  },
+  "auth_form_learn_more": {
+    "other": "Learn more"
+  },
+  "auth_form_password": {
+    "other": "Password"
+  },
+  "auth_form_password_placeholder": {
+    "other": "Password"
+  },
+  "cancel": {
+    "other": "Cancel"
+  },
+  "confirm_password": {
+    "other": "Confirm password"
+  },
+  "divider_or": {
+    "other": "OR"
+  },
+  "email_gmail": {
+    "other": "email should not be from gmail, signin directly if you want to use it"
+  },
+  "email_invalid": {
+    "other": "invalid email address"
+  },
+  "email_required": {
+    "other": "email is required"
+  },
+  "forgot_password": {
+    "other": "Forgot your password?"
+  },
+  "google_login": {
+    "other": "Login with Google"
+  },
+  "index_added_books": {
+    "other": "Last added books"
+  },
+  "index_search": {
+    "other": "Search a book..."
+  },
+  "index_search_placeholder": {
+    "other": "Enter title, author, ISBN..."
+  },
+  "index_search_results": {
+    "other": "Search results"
+  },
+  "index_search_submit": {
+    "other": "Search"
+  },
+  "login": {
+    "other": "Login"
+  },
+  "menu_books": {
+    "other": "Books"
+  },
+  "pagination_next": {
+    "other": "Next"
+  },
+  "pagination_previous": {
+    "other": "Previous"
+  },
+  "password_eqfield": {
+    "other": "passwords must match"
+  },
+  "password_len": {
+    "other": "password must be at least 8 characters long"
+  },
+  "password_required": {
+    "other": "password is required"
+  },
+  "protected_err": {
+    "other": "to access the resource you need to be logged first"
+  },
+  "signup": {
+    "other": "Sign up"
+  }
+}

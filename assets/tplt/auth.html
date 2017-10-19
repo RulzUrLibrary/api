@@ -19,20 +19,17 @@
 *}
 {{next := context.Request().URL.Query().Get("next")}}
 <div class="column col-md-12">
-  <h2 class="text-center column col-12">Login</h2>
+  <h2 class="text-center column col-12">{{T("login")}}</h2>
   <form method="POST" id="login">
     <div class="form-group">
-      <label class="form-label" for="user">User</label>
-      <input class="form-input" name="user" type="text" id="user" placeholder="User" autocomplete="off"/>
+      <label class="form-label" for="email">{{T("auth_form_email")}}</label>
+      <input placeholder="{{T("auth_form_email_placeholder")}}"
+             class="form-input" name="email" type="text" id="email" autocomplete="off"/>
     </div>
     <div class="form-group">
-      <label class="form-label" for="password">Password</label>
-      <input class="form-input"
-             name="password"
-             type="password"
-             id="password"
-             placeholder="Password"
-             autocomplete="off" />
+      <label class="form-label" for="password">{{T("auth_form_password")}}</label>
+      <input placeholder="{{T("auth_form_password_placeholder")}}"
+             class="form-input" name="password" type="password" id="password" autocomplete="off" />
     </div>
     <input name="X-CSRF-Token" type="hidden" value="{{context.Get("csrf")}}"/>
     <input name="token" type="hidden" id="token"/>
@@ -44,56 +41,39 @@
     {{end}}
     <div class="form-group columns">
       <div class="column col-3 col-md-12 pt-2">
-        <button class="btn btn-primary btn-block" type="submit">
-          Submit
-        </button>
+        <button class="btn btn-primary btn-block" type="submit">{{T("login")}}</button>
       </div>
       <div class="column col-3 col-md-12 pt-2">
-        <button class="btn btn-default btn-block" type="reset">
-          Cancel
-        </button>
+        <button class="btn btn-default btn-block" type="reset">{{T("cancel")}}</button>
       </div>
       <div class="column col-6 hide-md col-ml-auto pt-2">
-        <button class="btn btn-link btn-block text-right">Forgot your password?</button>
+        <button class="btn btn-link btn-block text-right">{{T("forgot_password")}}</button>
       </div>
       <div class="column col-12 show-md">
-        <a href="{{url("reset")}}" class="btn btn-link btn-block">Forgot your password?</a>
+        <a href="{{url("reset")}}" class="btn btn-link btn-block">{{T("forgot_password")}}</a>
       </div>
     </div>
   </form>
-  <div class="divider col-12 text-center" data-content="OR"></div>
+  <div class="divider col-12 text-center" data-content="{{T("divider_or")}}"></div>
   <button class="btn btn-block" id="google-signin">
-    <img src="/static/img/google_logo.svg" />
-    Login with Google
+    <img src="/static/img/google_logo.svg" />{{T("google_login")}}
   </button>
 </div>
-<div class="divider-vert hide-md" data-content="OR"></div>
-<div class="divider col-md-12 text-center show-md" data-content="OR"></div>
+<div class="divider-vert hide-md" data-content="{{T("divider_or")}}"></div>
+<div class="divider col-md-12 text-center show-md" data-content="{{T("divider_or")}}"></div>
 
 <div class="column col-md-12">
-  <h2 class="text-center column col-12">Signup</h2>
+  <h2 class="text-center column col-12">{{T("signup")}}</h2>
   <form method="GET" action="/auth/new">
     <div class="form-group">
-      <label class="form-label" for="create">Email</label>
-      <input class="form-input" type="text" id="create" placeholder="Valid email address" name="email">
+      <label class="form-label" for="create">{{T("auth_form_email")}}</label>
+      <input placeholder="{{T("auth_form_email_placeholder")}}"
+             class="form-input" type="text" id="create"  name="email">
     </div>
     <div class="form-group">
-      <button class="btn btn-primary col-3 col-md-12 mt-10">Sign up</button>
-      <button class="btn btn-link col-3 col-md-12 mt-10">Learn more</button>
+      <button class="btn btn-primary col-3 col-md-12 mt-10">{{T("signup")}}</button>
+      <button class="btn btn-link col-3 col-md-12 mt-10">{{T("auth_form_learn_more")}}</button>
     </div>
   </form>
 </div>
 {{end}}
-
-
-{*
-{{define "content"}}
-<div class="columns">
-  {{if .Context.User}}
-  {{template "user" .Context.User}}
-  {{else}}
-  {{template "login" .}}
-  {{end}}
-</div>
-{{end}}
-*}

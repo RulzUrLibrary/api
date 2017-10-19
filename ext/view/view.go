@@ -53,9 +53,21 @@ func (v *View) Render(w io.Writer, name string, data interface{}, c echo.Context
 	vars.Set("context", c)
 	vars.Set("flashes", flashes)
 	vars.Set("user", c.Get("user"))
-	vars.Set("T", t)
+	vars.SetFunc("T", makeT(t))
 
 	return tplt.Execute(w, vars, data)
+}
+
+func makeT(t i18n.TranslateFunc) jet.Func {
+	return func(a jet.Arguments) reflect.Value {
+		a.RequireNumOfArguments("t", 1, -1)
+		id := a.Get(0).Interface().(string)
+		args := []interface{}{}
+		for i := 1; i < a.NumOfArguments(); i++ {
+			args = append(args, a.Get(i))
+		}
+		return reflect.ValueOf(t(id, args...))
+	}
 }
 
 func makeUrl(app *echo.Echo) jet.Func {

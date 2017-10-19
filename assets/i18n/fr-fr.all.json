@@ -1,0 +1,83 @@
+{
+  "auth_form_email": {
+    "other": "Email"
+  },
+  "auth_form_email_placeholder": {
+    "other": "Adresse mail"
+  },
+  "auth_form_learn_more": {
+    "other": "En savoir plus"
+  },
+  "auth_form_password": {
+    "other": "Mot de passe"
+  },
+  "auth_form_password_placeholder": {
+    "other": "Mot de passe"
+  },
+  "cancel": {
+    "other": "Annuler"
+  },
+  "confirm_password": {
+    "other": "Confirmation du mot de passe"
+  },
+  "divider_or": {
+    "other": "OU"
+  },
+  "email_gmail": {
+    "other": "si vous voulez utiliser votre adresse gmail, connectez vous directement"
+  },
+  "email_invalid": {
+    "other": "l'adresse mail fourni est invalide"
+  },
+  "email_required": {
+    "other": "vous devez saisir une adresse email"
+  },
+  "forgot_password": {
+    "other": "Mot de passe oublié ?"
+  },
+  "google_login": {
+    "other": "Se connecter avec Google"
+  },
+  "index_added_books": {
+    "other": "Derniers ajouts"
+  },
+  "index_search": {
+    "other": "Chercher un livre..."
+  },
+  "index_search_placeholder": {
+    "other": "Tapez un titre, auteur, ISBN..."
+  },
+  "index_search_results": {
+    "other": "Résultats"
+  },
+  "index_search_submit": {
+    "other": "Chercher"
+  },
+  "login": {
+    "other": "Connexion"
+  },
+  "menu_books": {
+    "other": "Livres"
+  },
+  "pagination_next": {
+    "other": "Suivant"
+  },
+  "pagination_previous": {
+    "other": "Précédent"
+  },
+  "password_eqfield": {
+    "other": "les mots de passes saisis doivent être identiques"
+  },
+  "password_len": {
+    "other": "le mot de passe doit être long d'au moins 8 caractères"
+  },
+  "password_required": {
+    "other": "vous devez saisir un mot de passe"
+  },
+  "protected_err": {
+    "other": "pour accéder à cette page, vous devez vous authentifier d'abord"
+  },
+  "signup": {
+    "other": "S'inscrire"
+  }
+}
