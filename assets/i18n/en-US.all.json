@@ -1,0 +1,34 @@
+[
+	{
+		"id": "menu_books",
+		"translation": "Books"
+	},
+  {
+    "id": "index_search",
+    "translation": "Search a book..."
+  },
+  {
+    "id": "index_search_placeholder",
+    "translation": "Enter title, author, ISBN..."
+  },
+  {
+    "id": "index_search_submit",
+    "translation": "Search"
+  },
+  {
+    "id": "index_added_books",
+    "translation": "Last added books"
+  },
+  {
+    "id": "index_search_results",
+    "translation": "Search results"
+  },
+  {
+    "id": "pagination_previous",
+    "translation": "Previous"
+  },
+  {
+    "id": "pagination_next",
+    "translation": "Next"
+  }
+]

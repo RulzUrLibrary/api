@@ -1,0 +1,34 @@
+[
+	{
+		"id": "menu_books",
+		"translation": "Livres"
+	},
+  {
+    "id": "index_search",
+    "translation": "Chercher un livre..."
+  },
+  {
+    "id": "index_search_placeholder",
+    "translation": "Tapez un titre, auteur, ISBN..."
+  },
+  {
+    "id": "index_search_submit",
+    "translation": "Chercher"
+  },
+  {
+    "id": "index_added_books",
+    "translation": "Derniers ajouts"
+  },
+  {
+    "id": "index_search_results",
+    "translation": "Résultats"
+  },
+  {
+    "id": "pagination_previous",
+    "translation": "Précédent"
+  },
+  {
+    "id": "pagination_next",
+    "translation": "Suivant"
+  }
+]

@@ -3,6 +3,7 @@ package app
 import (
 	"github.com/BurntSushi/toml"
 	"github.com/rulzurlibrary/api/ext/db"
+	"github.com/rulzurlibrary/api/ext/view"
 	"os"
 	"path"
 	"path/filepath"
@@ -16,13 +17,13 @@ type Configuration struct {
 	Host     string           `json:"url"`
 	Port     int              `json:"port"`
 	Database db.Configuration `json:"database"`
+	View     view.Configuration
 	Paths    struct {
-		Static    string
-		Thumbs    string
-		Templates string
-		Cert      string
-		Key       string
-		Favicon   string
+		Static  string
+		Thumbs  string
+		Cert    string
+		Key     string
+		Favicon string
 	}
 }
 
@@ -53,9 +54,11 @@ func ParseConfig() (config Configuration, err error) {
 	// setup various paths
 	config.Paths.Cert = path.Join(letsencrypt, "fullchain.pem")
 	config.Paths.Key = path.Join(letsencrypt, "privkey.pem")
-	config.Paths.Templates = path.Join(base, "tplt")
 	config.Paths.Static = path.Join(base, "static")
 	config.Paths.Thumbs = path.Join(base, "thumbs")
 
+	config.View.I18n = path.Join(base, "i18n")
+	config.View.Templates = path.Join(base, "tplt")
+	config.View.Default = "en-US"
 	return
 }

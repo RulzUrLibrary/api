@@ -103,11 +103,7 @@ func New() *Application {
 	app.Web.Debug = app.Configuration.Debug
 	app.Web.Validator = validator.New()
 	app.Web.HTTPErrorHandler = HTTPErrorHandler
-	app.Web.Renderer = view.New(view.Configuration{
-		app.Configuration.Paths.Templates,
-		app.Configuration.Dev,
-		app.Web,
-	})
+	app.Web.Renderer = view.New(app.Web, app.Configuration.View)
 
 	app.Debug = app.Configuration.Debug
 	app.Scrapper = scrapper.New(app.Logger, app.Configuration.Paths.Thumbs)
