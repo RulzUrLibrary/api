@@ -28,7 +28,7 @@ func Dump(err error, msgs map[string]utils.Dict) utils.Dict {
 }
 
 func validatorGmail(fl validate.FieldLevel) bool {
-	return utils.MailAddress(fl.Field().String()) != "@gmail.com"
+	return utils.ValidMailProvider(fl.Field().String())
 }
 
 func New() *Validator {

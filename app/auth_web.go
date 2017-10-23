@@ -7,12 +7,13 @@ import (
 )
 
 func WEBUserGet(c *Context) error {
+	user := c.Get("user").(*utils.User)
 	return c.Render(http.StatusOK, "user.html",
-		dict{"error": dict{}, "user": c.Get("user"), "form": struct {
+		dict{"error": dict{}, "user": user, "form": struct {
 			Old  string
 			New  string
 			Conf string
-		}{}},
+		}{}, "misc": struct{ Valid bool }{utils.ValidMailProvider(user.Name)}},
 	)
 }
 
@@ -37,11 +38,12 @@ func WEBUserResetPost(c *Context) error {
 		New  string `form:"new" validate:"required,gt=8,eqfield=Conf,nefield=Old"`
 		Conf string `form:"confirmation"`
 	}{}
-	user := c.Get("user")
+	user := c.Get("user").(*utils.User)
 	badRequest := func(err interface{}) error {
-		return c.Render(http.StatusBadRequest, "user.html",
-			dict{"error": err, "user": user, "form": creds},
-		)
+		return c.Render(http.StatusBadRequest, "user.html", dict{
+			"error": err, "user": user, "form": creds,
+			"misc": struct{ Valid bool }{utils.ValidMailProvider(user.Name)},
+		})
 	}
 	if err := c.Bind(&creds); err != nil {
 		return err
@@ -56,7 +58,7 @@ func WEBUserResetPost(c *Context) error {
 		}))
 	}
 	if count, err := c.DB.ChangePassword(
-		creds.New, creds.Old, user.(*utils.User).Id,
+		creds.New, creds.Old, user.Id,
 	); err != nil {
 		return err
 	} else if count == 0 {

@@ -36,7 +36,7 @@
     </form>
   </div>
 </div>
-
+{{if .["misc"].Valid}}
 <div class="columns mt-2">
   <div class="column col-mx-auto col-6 col-md-12 mt-2 pt-2">
     <h4>{{T("user_password_change")}}</h4>
@@ -91,4 +91,5 @@
     </form>
   </div>
 </div>
+{{end}}
 {{end}}

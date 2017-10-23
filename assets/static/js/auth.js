@@ -1,10 +1,10 @@
 function onSignIn(googleUser) {
 	var form = document.getElementById('login')
-  var user = document.getElementById('user');
+  var email = document.getElementById('email');
   var token = document.getElementById('token');
 
   token.value = googleUser.getAuthResponse().id_token;
-  user.value = googleUser.getBasicProfile().getEmail();
+  email.value = googleUser.getBasicProfile().getEmail();
   form.submit();
 }
 

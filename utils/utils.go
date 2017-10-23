@@ -63,3 +63,8 @@ func DefaultS(s ...string) string {
 func MailAddress(s string) string {
 	return strings.TrimLeftFunc(s, func(r rune) bool { return r != '@' })
 }
+
+func ValidMailProvider(s string) bool {
+	ext := MailAddress(s)
+	return ext != "@gmail.com" // &&
+}
