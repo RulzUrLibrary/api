@@ -18,7 +18,7 @@
         </figure>
       </div>
       <div class="tile-content">
-        <p class="tile-title">{{.user.Name}}</p>
+        <p class="tile-title">{{.user.Email}}</p>
         <p class="tile-subtitle">
         Earth's Mightiest Heroes joined forces to take on threats that were
         too big for any one hero to tackle...
@@ -68,7 +68,6 @@
         {{end}}
 
       </div>
-
 
       <div class="form-group columns">
         <input name="X-CSRF-Token" type="hidden" value="{{context.Get("csrf")}}"/>

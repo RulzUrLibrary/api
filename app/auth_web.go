@@ -13,7 +13,7 @@ func WEBUserGet(c *Context) error {
 			Old  string
 			New  string
 			Conf string
-		}{}, "misc": struct{ Valid bool }{utils.ValidMailProvider(user.Name)}},
+		}{}, "misc": struct{ Valid bool }{utils.ValidMailProvider(user.Email)}},
 	)
 }
 
@@ -42,7 +42,7 @@ func WEBUserResetPost(c *Context) error {
 	badRequest := func(err interface{}) error {
 		return c.Render(http.StatusBadRequest, "user.html", dict{
 			"error": err, "user": user, "form": creds,
-			"misc": struct{ Valid bool }{utils.ValidMailProvider(user.Name)},
+			"misc": struct{ Valid bool }{utils.ValidMailProvider(user.Email)},
 		})
 	}
 	if err := c.Bind(&creds); err != nil {

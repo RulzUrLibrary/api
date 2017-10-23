@@ -46,8 +46,8 @@ func (f Flash) Icon() string {
 }
 
 type User struct {
-	Id   int
-	Name string
+	Id    int
+	Email string
 }
 
 type Book struct {
