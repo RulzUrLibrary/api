@@ -19,24 +19,26 @@
     <![endif]-->
   </head>
   <body>
-    <div class="container">
+    <div class="container grid-xl">
       <div class="columns">
-        <div class="column col-mx-auto col-8 col-xl-10 col-md-12">
+        <div class="column col-12">
           <header class="navbar mb-2">
             {{yield header()}}
           </header>
           <h1 class="column col-12 text-center">{{yield page_title()}}</h1>
-          {{range flash := flashes}}
-          <div class="column col-12 mt-2 text-center mb-2">
-            <h5 class="{{flash.Class()}}">
-              <i class="icon mr-2 {{flash.Icon()}}" style="margin-top:-0.1rem"></i>
-              <span>{{T(flash.Msg)|capitalize}}</span>
-            </h5>
-          </div>
         </div>
-        {{end}}
-        {{yield body()}}
       </div>
+      {{range flash := flashes}}
+      <div class="columns">
+        <div class="column col-12 mt-2 text-center mb-2">
+          <h5 class="{{flash.Class()}}">
+            <i class="icon mr-2 {{flash.Icon()}}" style="margin-top:-0.1rem"></i>
+            <span>{{T(flash.Msg)|capitalize}}</span>
+          </h5>
+        </div>
+      </div>
+      {{end}}
+      {{yield body()}}
     </div>
     <script src="/static/js/main.js"></script>
     {{block script()}}{{end}}

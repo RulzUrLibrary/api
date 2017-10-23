@@ -6,6 +6,7 @@ import (
 	"github.com/gorilla/sessions"
 	"github.com/labstack/echo"
 	"github.com/nicksnyder/go-i18n/i18n"
+	"github.com/rulzurlibrary/api/utils"
 	"io"
 	"net/url"
 	"path/filepath"
@@ -24,14 +25,15 @@ type View struct {
 	Default string
 }
 
-func (v *View) GetI18n(c echo.Context) (i18n.TranslateFunc, error) {
+func (v *View) GetI18n(c echo.Context) i18n.TranslateFunc {
 	cookieLang := ""
-	if cookie, err := c.Request().Cookie("lang"); err == nil {
+	if cookie, err := c.Cookie("lang"); err == nil {
 		cookieLang = cookie.Value
 	}
 	acceptLang := c.Request().Header.Get("Accept-Language")
 	defaultLang := v.Default // known valid language
-	return i18n.Tfunc(cookieLang, acceptLang, defaultLang)
+	c.Set("lang", utils.DefaultS(cookieLang, acceptLang, defaultLang)[0:2])
+	return i18n.MustTfunc(cookieLang, acceptLang, defaultLang)
 }
 
 func (v *View) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
@@ -39,10 +41,6 @@ func (v *View) Render(w io.Writer, name string, data interface{}, c echo.Context
 	tplt, err := v.GetTemplate(name)
 	if err != nil {
 		// template could not be loaded
-		return err
-	}
-	t, err := v.GetI18n(c)
-	if err != nil {
 		return err
 	}
 	session, _ := c.Get("session").(*sessions.Session)
@@ -53,7 +51,7 @@ func (v *View) Render(w io.Writer, name string, data interface{}, c echo.Context
 	vars.Set("context", c)
 	vars.Set("flashes", flashes)
 	vars.Set("user", c.Get("user"))
-	vars.SetFunc("T", makeT(t))
+	vars.SetFunc("T", makeT(v.GetI18n(c)))
 
 	return tplt.Execute(w, vars, data)
 }
@@ -110,6 +108,11 @@ func query(a jet.Arguments) reflect.Value {
 	return reflect.ValueOf(u)
 }
 
+func str(a jet.Arguments) reflect.Value {
+	a.RequireNumOfArguments("str", 1, 1)
+	return reflect.ValueOf(a.Get(0).Interface().(string))
+}
+
 func debug(a jet.Arguments) reflect.Value {
 	a.RequireNumOfArguments("debug", 1, 1)
 	return reflect.ValueOf(fmt.Sprintf("%#v", a.Get(0)))
@@ -130,6 +133,7 @@ func New(app *echo.Echo, config Configuration) *View {
 	view.AddGlobalFunc("title", title)
 	view.AddGlobalFunc("capitalize", capitalize)
 	view.AddGlobalFunc("query", query)
+	view.AddGlobalFunc("str", str)
 
 	if app.Debug {
 		view.AddGlobalFunc("debug", debug)

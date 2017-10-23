@@ -71,6 +71,12 @@
   "index_search_submit": {
     "other": "Search"
   },
+  "lang_en": {
+    "other": "EN"
+  },
+  "lang_fr": {
+    "other": "FR"
+  },
   "login": {
     "other": "Login"
   },

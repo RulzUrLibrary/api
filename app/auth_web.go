@@ -15,6 +15,13 @@ func WEBUserGet(c *Context) error {
 	})
 }
 
+func WEBUserLang(c *Context) error {
+	c.SetCookie(&http.Cookie{
+		Name: "lang", Value: c.FormValue("lang"), HttpOnly: false, Path: "/",
+	})
+	return c.Redirect(http.StatusSeeOther, c.FormValue("next"))
+}
+
 func WEBUserLogout(c *Context) error {
 	flash := utils.Flash{utils.FlashSuccess, utils.FLASH_LOGOUT}
 	if err := c.SaveUser(nil, flash); err != nil {

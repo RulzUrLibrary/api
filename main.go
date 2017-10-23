@@ -43,6 +43,7 @@ func main() {
 
 	rulz.Web.POST("/user/password", rulz.Handler(app.WEBUserPassword), app.Protected).Name = "password"
 	rulz.Web.POST("/user/logout", rulz.Handler(app.WEBUserLogout), app.Protected).Name = "logout"
+	rulz.Web.POST("/user/lang", rulz.Handler(app.WEBUserLang)).Name = "lang"
 
 	rulz.Web.GET("/books/", rulz.Handler(app.WEBBookList), app.Protected).Name = "books"
 

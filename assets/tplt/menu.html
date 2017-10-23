@@ -1,4 +1,5 @@
 {{block menu(active="index")}}
+{{lang := str(context.Get("lang"))}}
 <ul class="tab tab-block col-12">
   <li class="tab-item{{if active == "index"}} active{{end}}">
     <a href="{{url("index")}}">Rulz!</a>
@@ -8,15 +9,34 @@
   </li>
   <li class="tab-item tab-action{{if active == "user"}} active{{end}}">
     {{if isset(user)}}
-     <a class="float-right" href="{{url("user")}}">
-      <img src="/static/img/avatar-1.png" class="avatar avatar-sm ml-2 mr-2" style="margin-top:-.1rem; margin-bottom:-.2rem"/>
+    <a class="float-right" href="{{url("user")}}">
+      <img style="margin-top:-.1rem; margin-bottom:-.2rem"
+           src="/static/img/avatar-1.png" class="avatar avatar-sm ml-2 mr-2"/>
     </a>
     {{else}}
-<a class="float-right" href="{{url("auth")}}">
-      <figure class="avatar avatar-sm ml-2 mr-2" style="margin-top:-.1rem; margin-bottom:-.2rem" data-initial="??">
+    <a class="float-right" href="{{url("auth")}}">
+      <figure class="avatar avatar-sm ml-2 mr-2"
+              style="margin-top:-.1rem; margin-bottom:-.2rem" data-initial="??">
       </figure>
     </a>
     {{end}}
+    <form class="float-right" method="POST" action="{{url("lang")}}">
+      <input name="lang" type="hidden" value="fr-FR"/>
+      <input name="next" type="hidden" value="{{context.Request().URL}}"/>
+      <input name="X-CSRF-Token" type="hidden" value="{{context.Get("csrf")}}"/>
+      <input style="padding: .4rem .2rem .3rem .2rem; margin-right: .4rem"
+             type="submit" class="btn btn-link" value="{{T("lang_fr")}}"/>
+    </form>
+    <!-- TODO: fix this! -->
+    <div class="float-right" style="padding: .4rem .2rem .3rem .2rem"> / </div>
+
+    <form class="float-right" method="POST" action="{{url("lang")}}">
+      <input name="lang" type="hidden" value="en-US"/>
+      <input name="next" type="hidden" value="{{context.Request().URL}}"/>
+      <input name="X-CSRF-Token" type="hidden" value="{{context.Get("csrf")}}"/>
+      <input style="padding: .4rem .2rem .3rem .2rem"
+             type="submit" class="btn btn-link" value="{{T("lang_en")}}"/>
+    </form>
   </li>
 </ul>
 {{end}}
