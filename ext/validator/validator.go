@@ -15,7 +15,7 @@ func (v *Validator) Validate(i interface{}) error {
 	return v.validator.Struct(i)
 }
 
-func Dump(err error, msgs map[string]map[string]string) utils.Dict {
+func Dump(err error, msgs map[string]utils.Dict) utils.Dict {
 	ve, ok := err.(validate.ValidationErrors)
 	if !ok {
 		panic("dumping error failed")

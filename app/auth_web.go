@@ -47,9 +47,9 @@ func WEBUserResetPost(c *Context) error {
 		return err
 	}
 	if err := c.Validate(&creds); err != nil {
-		return badRequest(validator.Dump(err, map[string]dictS{
-			"old": dictS{"required": utils.OLD_PASSWORD_REQUIRED},
-			"new": dictS{
+		return badRequest(validator.Dump(err, map[string]dict{
+			"old": dict{"required": utils.OLD_PASSWORD_REQUIRED},
+			"new": dict{
 				"required": utils.PASSWORD_REQUIRED, "gt": utils.PASSWORD_LEN,
 				"eqfield": utils.PASSWORD_EQFIELD, "nefield": utils.PASSWORD_NEQFIELD,
 			},
@@ -84,8 +84,8 @@ func WEBUserNewGet(c *Context) error {
 		return err
 	}
 	if err := c.Validate(&query); err != nil {
-		errs = validator.Dump(err, map[string]dictS{
-			"email": dictS{"email": utils.EMAIL_INVALID, "gmail": utils.EMAIL_GMAIL},
+		errs = validator.Dump(err, map[string]dict{
+			"email": dict{"email": utils.EMAIL_INVALID, "gmail": utils.EMAIL_GMAIL},
 		})
 	}
 	return c.Render(http.StatusOK, "new.html", dict{"error": errs, "form": query})
@@ -105,12 +105,12 @@ func WEBUserNewPost(c *Context) error {
 		return err
 	}
 	if err := c.Validate(&creds); err != nil {
-		return badRequest(validator.Dump(err, map[string]dictS{
-			"email": dictS{
+		return badRequest(validator.Dump(err, map[string]dict{
+			"email": dict{
 				"required": utils.EMAIL_REQUIRED, "email": utils.EMAIL_INVALID,
 				"gmail": utils.EMAIL_GMAIL,
 			},
-			"password": dictS{
+			"password": dict{
 				"required": utils.PASSWORD_REQUIRED, "gt": utils.PASSWORD_LEN,
 				"eqfield": utils.PASSWORD_EQFIELD,
 			},
@@ -156,9 +156,9 @@ func WEBAuthPost(c *Context) error {
 	}
 	creds.Password = utils.DefaultS(creds.Token, creds.Password)
 	if err := c.Validate(&creds); err != nil {
-		return render(http.StatusBadRequest, validator.Dump(err, map[string]dictS{
-			"email":    dictS{"required": utils.EMAIL_REQUIRED},
-			"password": dictS{"required": utils.PASSWORD_REQUIRED},
+		return render(http.StatusBadRequest, validator.Dump(err, map[string]dict{
+			"email":    dict{"required": utils.EMAIL_REQUIRED},
+			"password": dict{"required": utils.PASSWORD_REQUIRED},
 		}))
 	}
 	user, err := c.Auth.Login(creds.Email, creds.Password)

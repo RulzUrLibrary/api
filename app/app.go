@@ -16,7 +16,6 @@ import (
 )
 
 type dict = utils.Dict
-type dictS = map[string]string
 
 type Context struct {
 	echo.Context
