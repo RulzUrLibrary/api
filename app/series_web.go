@@ -9,7 +9,7 @@ func WEBSerieGet(c *Context) error {
 	if serie, err := SerieGet(c); err != nil {
 		return err
 	} else {
-		return c.Render(http.StatusOK, "serie.html", map[string]interface{}{"serie": serie})
+		return c.Render(http.StatusOK, "serie.html", dict{"serie": serie})
 	}
 }
 

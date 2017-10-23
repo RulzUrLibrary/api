@@ -26,9 +26,7 @@ func WEBIndex(c *Context) (err error) {
 		if err != nil {
 			return err
 		}
-		return c.Render(http.StatusOK, "book.html", map[string]interface{}{
-			"book": book,
-		})
+		return c.Render(http.StatusOK, "book.html", dict{"book": book})
 	} else if pattern == "" {
 		books, query.Count, err = c.DB.BookList(query.Limit(), query.Offset())
 	} else {
@@ -37,8 +35,5 @@ func WEBIndex(c *Context) (err error) {
 	if err != nil {
 		return
 	}
-	return c.Render(http.StatusOK, "index.html", map[string]interface{}{
-		"books":      books,
-		"pagination": query.Pagination,
-	})
+	return c.Render(http.StatusOK, "index.html", dict{"books": books, "pagination": query.Pagination})
 }

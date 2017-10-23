@@ -24,17 +24,14 @@ func WEBBookList(c *Context) (err error) {
 		return
 	}
 
-	return c.Render(http.StatusOK, "books.html", map[string]interface{}{
-		"series":     series.ToStructs(true),
-		"pagination": query,
-	})
+	return c.Render(http.StatusOK, "books.html", dict{"series": series.ToStructs(true), "pagination": query})
 }
 
 func WEBBookGet(c *Context) error {
 	if book, err := BookGet(c); err != nil {
 		return err
 	} else {
-		return c.Render(http.StatusOK, "book.html", map[string]interface{}{"book": book})
+		return c.Render(http.StatusOK, "book.html", dict{"book": book})
 	}
 }
 

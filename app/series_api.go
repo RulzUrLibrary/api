@@ -27,7 +27,5 @@ func APISerieList(c *Context) (err error) {
 	if err != nil {
 		return err
 	}
-	return c.JSON(http.StatusOK, map[string]interface{}{
-		"_meta": meta, "series": series.ToStructs(true),
-	})
+	return c.JSON(http.StatusOK, dict{"_meta": meta, "series": series.ToStructs(true)})
 }

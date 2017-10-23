@@ -50,13 +50,13 @@ func APIBookList(c *Context) (err error) {
 		if err != nil {
 			return err
 		}
-		return c.JSON(http.StatusOK, map[string]interface{}{"_meta": s.Meta, "books": books})
+		return c.JSON(http.StatusOK, dict{"_meta": s.Meta, "books": books})
 	} else {
 		books, err = c.DB.BookSearch(s.Pattern, s.Limit, s.Offset)
 		if err != nil {
 			return err
 		}
-		return c.JSON(http.StatusOK, map[string]interface{}{"_meta": s.Meta, "books": books})
+		return c.JSON(http.StatusOK, dict{"_meta": s.Meta, "books": books})
 	}
 }
 

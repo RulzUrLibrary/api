@@ -15,6 +15,9 @@ import (
 	"strings"
 )
 
+type dict = utils.Dict
+type dictS = map[string]string
+
 type Context struct {
 	echo.Context
 	DB       *db.DB
@@ -63,7 +66,7 @@ func (app *Application) Handler(h func(*Context) error) echo.HandlerFunc {
 
 func HTTPErrorHandler(err error, c echo.Context) {
 	code := http.StatusInternalServerError
-	data := map[string]interface{}{"error": err, "msg": "Internal server error"}
+	data := dict{"error": err, "msg": "Internal server error"}
 
 	if httpErr, ok := err.(*echo.HTTPError); ok {
 		code = httpErr.Code

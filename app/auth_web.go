@@ -6,13 +6,8 @@ import (
 	"net/http"
 )
 
-type dict = utils.Dict
-type dictS = map[string]string
-
 func WEBUserGet(c *Context) error {
-	return c.Render(http.StatusOK, "user.html", map[string]interface{}{
-		"user": c.Get("user"),
-	})
+	return c.Render(http.StatusOK, "user.html", dict{"user": c.Get("user")})
 }
 
 func WEBUserLang(c *Context) error {
