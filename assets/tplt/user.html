@@ -6,6 +6,9 @@
 {{block page_title()}}{{T("title_user")}}{{end}}
 
 {{block body()}}
+{{form := .["form"]}}
+{{error_old := .["error"]["old"]}}
+{{error_new := .["error"]["new"]}}
 <div class="columns">
   <div class="column col-6 col-md-12 col-mx-auto">
     <div class="tile">
@@ -37,26 +40,54 @@
 <div class="columns mt-2">
   <div class="column col-mx-auto col-6 col-md-12 mt-2 pt-2">
     <h4>{{T("user_password_change")}}</h4>
-    <form action="{{url("password")}}" method="POST">
+    <form action="{{url("reset")}}" method="POST">
 
-      <div class="form-group">
+      <div class="form-group{{if isset(error_old)}} has-error{{end}}">
         <label class="form-label" for="old">{{T("user_password_change_current")}}</label>
         <input placeholder="{{T("user_password_change_current")}}"
+               value="{{form.Old}}"
                class="form-input" name="old" type="password" id="old" autocomplete="off" />
+        {{if isset(error_old)}}
+        <p class="form-input-hint">{{T(error_old)|capitalize}}</p>
+        {{end}}
+
       </div>
 
-      <div class="form-group">
+      <div class="form-group{{if isset(error_new)}} has-error{{end}}">
         <label class="form-label" for="new">{{T("user_password_change_new")}}</label>
         <input placeholder="{{T("user_password_change_new")}}"
+               value="{{form.New}}"
                class="form-input" name="new" type="password" id="new" autocomplete="off" />
 
         <label class="form-label" for="confirmation">{{T("user_password_change_confirmation")}}</label>
         <input placeholder="{{T("user_password_change_confirmation")}}"
+               value="{{form.Conf}}"
                class="form-input" name="confirmation" type="password" id="confirmation" autocomplete="off" />
+        {{if isset(error_new)}}
+        <p class="form-input-hint">{{T(error_new)|capitalize}}</p>
+        {{end}}
+
       </div>
 
-      <input name="X-CSRF-Token" type="hidden" value="{{context.Get("csrf")}}"/>
-      <input type="Submit" class="btn btn-primary" value="{{T("user_password_change_submit")}}"/>
+
+      <div class="form-group columns">
+        <input name="X-CSRF-Token" type="hidden" value="{{context.Get("csrf")}}"/>
+        <div class="column col-3 col-md-12 pt-2">
+          <input type="submit" class="btn btn-primary btn-block" value="{{T("user_password_change_submit")}}"/>
+        </div>
+        <div class="column col-3 col-md-12 pt-2">
+          <input class="btn btn-default btn-block" type="reset" value="{{T("cancel")}}"/>
+        </div>
+        <div class="column col-6 hide-md col-ml-auto pt-2">
+          <a href="{{url("reset")}}" class="btn btn-link btn-block text-right">
+            {{T("forgot_password")}}
+          </a>
+        </div>
+        <div class="column col-12 show-md">
+          <a href="{{url("reset")}}" class="btn btn-link btn-block">{{T("forgot_password")}}</a>
+        </div>
+      </div>
+
     </form>
   </div>
 </div>

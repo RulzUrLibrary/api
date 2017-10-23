@@ -47,6 +47,9 @@
   "flash_logout": {
     "other": "vous êtes maintenant déconnecté !"
   },
+  "flash_password": {
+    "other": "le mot de passe a été mis à jour avec succès"
+  },
   "flash_welcome": {
     "other": "bienvenue sur notre site !"
   },
@@ -86,6 +89,9 @@
   "menu_books": {
     "other": "Livres"
   },
+  "old_password_required": {
+    "other": "vous devez saisir le mot de passe actuel"
+  },
   "pagination_next": {
     "other": "Suivant"
   },
@@ -95,8 +101,14 @@
   "password_eqfield": {
     "other": "les mots de passes saisis doivent être identiques"
   },
+  "password_invalid": {
+    "other": "le mot de passe saisi ne correspond pas avec celui enregistré"
+  },
   "password_len": {
     "other": "le mot de passe doit être long d'au moins 8 caractères"
+  },
+  "password_neqfield": {
+    "other": "le nouveau mot de passe doit être différent du précédement enregistré"
   },
   "password_required": {
     "other": "vous devez saisir un mot de passe"

@@ -47,6 +47,9 @@
   "flash_logout": {
     "other": "you have been successfully logged out!"
   },
+  "flash_password": {
+    "other": "password successfully updated"
+  },
   "flash_welcome": {
     "other": "welcome to rulz!"
   },
@@ -86,6 +89,9 @@
   "menu_books": {
     "other": "Books"
   },
+  "old_password_required": {
+    "other": "current password is required"
+  },
   "pagination_next": {
     "other": "Next"
   },
@@ -95,8 +101,14 @@
   "password_eqfield": {
     "other": "passwords must match"
   },
+  "password_invalid": {
+    "other": "this is not your current password, try again"
+  },
   "password_len": {
     "other": "password must be at least 8 characters long"
+  },
+  "password_neqfield": {
+    "other": "new password must differ from previous entry"
   },
   "password_required": {
     "other": "password is required"

@@ -7,7 +7,13 @@ import (
 )
 
 func WEBUserGet(c *Context) error {
-	return c.Render(http.StatusOK, "user.html", dict{"user": c.Get("user")})
+	return c.Render(http.StatusOK, "user.html",
+		dict{"error": dict{}, "user": c.Get("user"), "form": struct {
+			Old  string
+			New  string
+			Conf string
+		}{}},
+	)
 }
 
 func WEBUserLang(c *Context) error {
@@ -25,8 +31,41 @@ func WEBUserLogout(c *Context) error {
 	return c.Redirect(http.StatusSeeOther, c.Echo().Reverse("index"))
 }
 
-func WEBUserPassword(c *Context) error {
-	return nil
+func WEBUserResetPost(c *Context) error {
+	creds := struct {
+		Old  string `form:"old" validate:"required"`
+		New  string `form:"new" validate:"required,gt=8,eqfield=Conf,nefield=Old"`
+		Conf string `form:"confirmation"`
+	}{}
+	user := c.Get("user")
+	badRequest := func(err interface{}) error {
+		return c.Render(http.StatusBadRequest, "user.html",
+			dict{"error": err, "user": user, "form": creds},
+		)
+	}
+	if err := c.Bind(&creds); err != nil {
+		return err
+	}
+	if err := c.Validate(&creds); err != nil {
+		return badRequest(validator.Dump(err, map[string]dictS{
+			"old": dictS{"required": utils.OLD_PASSWORD_REQUIRED},
+			"new": dictS{
+				"required": utils.PASSWORD_REQUIRED, "gt": utils.PASSWORD_LEN,
+				"eqfield": utils.PASSWORD_EQFIELD, "nefield": utils.PASSWORD_NEQFIELD,
+			},
+		}))
+	}
+	if count, err := c.DB.ChangePassword(
+		creds.New, creds.Old, user.(*utils.User).Id,
+	); err != nil {
+		return err
+	} else if count == 0 {
+		return badRequest(dict{"old": utils.PASSWORD_INVALID})
+	}
+	if err := c.Flashes(utils.Flash{utils.FlashSuccess, utils.FLASH_PASSWORD}); err != nil {
+		return err
+	}
+	return WEBUserGet(c)
 }
 
 func WEBUserReset(c *Context) error {

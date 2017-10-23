@@ -10,6 +10,11 @@ SELECT COALESCE(pwhash = crypt($2, pwhash), FALSE), id
 FROM users
 WHERE name = $1`
 
+const changePassword = `
+UPDATE users SET pwhash = crypt($1, gen_salt('bf'))
+WHERE COALESCE(pwhash = crypt($2, pwhash), FALSE) AND id = $3
+`
+
 const authGoogle = `
 WITH s AS (
 	SELECT id FROM users WHERE name = $1
@@ -41,6 +46,10 @@ func (db *DB) Auth(name, password string) (*utils.User, error) {
 func (db *DB) AuthGoogle(name string) (*utils.User, error) {
 	user := &utils.User{Name: name}
 	return user, db.QueryRow(authGoogle, name).Scan(&user.Id)
+}
+
+func (db *DB) ChangePassword(new, old string, user int) (int, error) {
+	return db.Exec(changePassword, new, old, user)
 }
 
 func (db *DB) NewUser(name, password string) (*utils.User, error) {

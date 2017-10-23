@@ -56,7 +56,9 @@
           <button class="btn btn-default btn-block" type="reset">{{T("cancel")}}</button>
         </div>
         <div class="column col-6 hide-md col-ml-auto pt-2">
-          <button class="btn btn-link btn-block text-right">{{T("forgot_password")}}</button>
+          <a href="{{url("reset")}}" class="btn btn-link btn-block text-right">
+            {{T("forgot_password")}}
+          </a>
         </div>
         <div class="column col-12 show-md">
           <a href="{{url("reset")}}" class="btn btn-link btn-block">{{T("forgot_password")}}</a>

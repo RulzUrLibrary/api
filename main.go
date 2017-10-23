@@ -40,8 +40,8 @@ func main() {
 
 	rulz.Web.GET("/user", rulz.Handler(app.WEBUserGet), app.Protected).Name = "user"
 	rulz.Web.GET("/user/reset", rulz.Handler(app.WEBUserReset), app.Protected).Name = "reset"
+	rulz.Web.POST("/user/reset", rulz.Handler(app.WEBUserResetPost), app.Protected)
 
-	rulz.Web.POST("/user/password", rulz.Handler(app.WEBUserPassword), app.Protected).Name = "password"
 	rulz.Web.POST("/user/logout", rulz.Handler(app.WEBUserLogout), app.Protected).Name = "logout"
 	rulz.Web.POST("/user/lang", rulz.Handler(app.WEBUserLang)).Name = "lang"
 
