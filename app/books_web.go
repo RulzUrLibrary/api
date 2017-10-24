@@ -19,12 +19,14 @@ func WEBBookList(c *Context) (err error) {
 		return
 	}
 
-	series, query.Count, err = c.DB.SerieListU(query.Limit(), query.Offset(), user.Id)
+	series, query.Count, err = c.Echo().Database.SerieListU(query.Limit(),
+		query.Offset(), user.Id)
 	if err != nil {
 		return
 	}
 
-	return c.Render(http.StatusOK, "books.html", dict{"series": series.ToStructs(true), "pagination": query})
+	return c.Render(http.StatusOK, "books.html",
+		dict{"series": series.ToStructs(true), "pagination": query})
 }
 
 func WEBBookGet(c *Context) error {
@@ -40,7 +42,7 @@ func WEBBookPost(c *Context) (err error) {
 	var user = c.Get("user").(*utils.User)
 
 	if isbn := c.Param("isbn"); isbn != "" {
-		count, err = c.DB.BookPut(user.Id, isbn)
+		count, err = c.Echo().Database.BookPut(user.Id, isbn)
 		if err != nil {
 			return
 		}

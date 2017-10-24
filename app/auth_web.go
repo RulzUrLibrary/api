@@ -57,7 +57,7 @@ func WEBUserResetPost(c *Context) error {
 			},
 		}))
 	}
-	if count, err := c.DB.ChangePassword(
+	if count, err := c.Echo().Database.ChangePassword(
 		creds.New, creds.Old, user.Id,
 	); err != nil {
 		return err
@@ -94,6 +94,7 @@ func WEBUserNewGet(c *Context) error {
 }
 
 func WEBUserNewPost(c *Context) error {
+	app := c.Echo()
 	creds := struct {
 		Email        string `form:"email" validate:"required,email,gmail"`
 		Password     string `form:"password" validate:"required,gt=8,eqfield=Confirmation"`
@@ -163,7 +164,7 @@ func WEBAuthPost(c *Context) error {
 			"password": dict{"required": utils.PASSWORD_REQUIRED},
 		}))
 	}
-	user, err := c.Auth.Login(creds.Email, creds.Password)
+	user, err := c.Echo().Auth.Login(creds.Email, creds.Password)
 	if err != nil {
 		return render(http.StatusUnauthorized, dict{"auth": utils.AUTH_ERR})
 	}

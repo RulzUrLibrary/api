@@ -19,9 +19,9 @@ func SerieGet(c *Context) (*utils.Serie, error) {
 		)
 	}
 	if ok {
-		serie, err = c.DB.SerieGetU(id, user.Id)
+		serie, err = c.Echo().Database.SerieGetU(id, user.Id)
 	} else {
-		serie, err = c.DB.SerieGet(id)
+		serie, err = c.Echo().Database.SerieGet(id)
 	}
 	switch err {
 	case nil:
@@ -36,8 +36,8 @@ func SerieList(c *Context, limit, offset int) (*db.Series, int, error) {
 	user, ok := c.Get("user").(*utils.User)
 
 	if ok {
-		return c.DB.SerieListU(limit, offset, user.Id)
+		return c.Echo().Database.SerieListU(limit, offset, user.Id)
 	} else {
-		return c.DB.SerieList(limit, offset)
+		return c.Echo().Database.SerieList(limit, offset)
 	}
 }

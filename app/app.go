@@ -19,10 +19,7 @@ type dict = utils.Dict
 
 type Context struct {
 	echo.Context
-	DB       *db.DB
-	Auth     *auth.Auth
-	Logger   echo.Logger
-	Scrapper *scrapper.Scrapper
+	App *Application
 }
 
 func (c *Context) Flashes(flashes ...utils.Flash) error {
@@ -31,6 +28,10 @@ func (c *Context) Flashes(flashes ...utils.Flash) error {
 		session.AddFlash(flash)
 	}
 	return session.Save(c.Request(), c.Response())
+}
+
+func (c *Context) Echo() *Application {
+	return c.App
 }
 
 func (c *Context) SaveUser(user *utils.User, flashes ...utils.Flash) error {
@@ -59,7 +60,7 @@ type Application struct {
 
 func (app *Application) Handler(h func(*Context) error) echo.HandlerFunc {
 	return func(original echo.Context) error {
-		return h(&Context{original, app.Database, app.Auth, app.Logger, app.Scrapper})
+		return h(&Context{original, app})
 	}
 }
 

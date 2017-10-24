@@ -13,9 +13,9 @@ func BookGet(c *Context) (_ *utils.Book, err error) {
 	isbn := c.Param("isbn")
 	user, ok := c.Get("user").(*utils.User)
 	if ok {
-		book, err = c.DB.BookGetU(isbn, user.Id)
+		book, err = c.Echo().Database.BookGetU(isbn, user.Id)
 	} else {
-		book, err = c.DB.BookGet(isbn)
+		book, err = c.Echo().Database.BookGet(isbn)
 	}
 	if err == utils.ErrNotFound {
 		return nil, echo.NewHTTPError(http.StatusNotFound, "book "+isbn+" not found")
@@ -30,6 +30,7 @@ func BookPost(c *Context, isbn string) (book utils.Book, ok bool, err error) {
 		}
 		return *book.ToStructs(false), err
 	}
+	db := c.Echo().Database
 
 	isbn = utils.SanitizeIsbn(isbn)
 	if len(isbn) == 0 {
@@ -37,18 +38,18 @@ func BookPost(c *Context, isbn string) (book utils.Book, ok bool, err error) {
 		return
 	}
 	// check if book exists in database and return it if so
-	if book, err = fn(c.DB.BookGet(isbn)); err == nil {
+	if book, err = fn(db.BookGet(isbn)); err == nil {
 		return book, true, nil
 	} else if err != utils.ErrNotFound {
 		return
 	}
 	// request additional informations
-	switch book, err = c.Scrapper.Amazon(isbn); err {
+	switch book, err = c.Echo().Scrapper.Amazon(isbn); err {
 	case nil:
-		err = c.DB.BookSave(&book)
+		err = db.BookSave(&book)
 		return
 	case utils.ErrCaptcha:
-		if _, err = c.DB.CaptchaAdd(isbn); err == nil {
+		if _, err = db.CaptchaAdd(isbn); err == nil {
 			err = echo.NewHTTPError(http.StatusAccepted,
 				"request correctly received but unable to be processed currently.")
 		}
@@ -64,9 +65,9 @@ func BookPost(c *Context, isbn string) (book utils.Book, ok bool, err error) {
 func BookList(c *Context, limit, offset int) ([]*utils.Book, int, error) {
 	user, ok := c.Get("user").(*utils.User)
 	if ok {
-		return c.DB.BookListU(limit, offset, user.Id)
+		return c.Echo().Database.BookListU(limit, offset, user.Id)
 	} else {
-		return c.DB.BookList(limit, offset)
+		return c.Echo().Database.BookList(limit, offset)
 	}
 }
 
@@ -82,6 +83,6 @@ func change(c *Context, fn func(int, ...string) (int, error)) (int, error) {
 	if len(books.Isbns) == 0 {
 		return 0, nil
 	}
-	c.Logger.Debug(books)
+	c.Echo().Logger.Debug(books)
 	return fn(user.Id, books.Isbns...)
 }
