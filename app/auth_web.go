@@ -119,7 +119,7 @@ func WEBUserNewPost(c *Context) error {
 		}))
 	}
 
-	user, err := c.DB.NewUser(creds.Email, creds.Password)
+	user, _, err := c.DB.NewUser(creds.Email, creds.Password)
 	switch err {
 	case nil:
 		flash := utils.Flash{utils.FlashSuccess, utils.FLASH_WELCOME}

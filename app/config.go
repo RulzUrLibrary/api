@@ -3,6 +3,7 @@ package app
 import (
 	"github.com/BurntSushi/toml"
 	"github.com/rulzurlibrary/api/ext/db"
+	"github.com/rulzurlibrary/api/ext/smtp"
 	"github.com/rulzurlibrary/api/ext/view"
 	"os"
 	"path"
@@ -12,11 +13,12 @@ import (
 const CONFIG_ENV = "RULZURLIBRARY_CONFIG"
 
 type Configuration struct {
-	Debug    bool             `json:"debug"`
-	Dev      bool             `json:"dev"`
-	Host     string           `json:"url"`
-	Port     int              `json:"port"`
-	Database db.Configuration `json:"database"`
+	Debug    bool
+	Dev      bool
+	Host     string
+	Port     int
+	Database db.Configuration
+	Smtp     smtp.Configuration
 	View     view.Configuration
 	Paths    struct {
 		Static  string

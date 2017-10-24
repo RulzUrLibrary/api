@@ -52,14 +52,15 @@ func (db *DB) ChangePassword(new, old string, user int) (int, error) {
 	return db.Exec(changePassword, new, old, user)
 }
 
-func (db *DB) NewUser(email, password string) (*utils.User, error) {
+func (db *DB) NewUser(email, password string) (*utils.User, string, error) {
 	var ok bool
+	var activate sql.NullString
 	var user = &utils.User{Email: email}
 
-	err := db.QueryRow(newUser, email, password).Scan(&user.Id, &ok)
+	err := db.QueryRow(newUser, email, password).Scan(&user.Id, &activate, &ok)
 
 	if err == nil && !ok {
-		return nil, utils.ErrUserExists
+		return nil, "", utils.ErrUserExists
 	}
-	return user, err
+	return user, activate.String, err
 }
