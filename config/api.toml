@@ -8,4 +8,11 @@ name = "rulzurlibrary"
 user = "rulzurlibrary"
 host = "172.22.0.2"
 port = 5432
-password = "some_password"
+
+[i18n]
+default = "en-US"
+
+[smtp]
+user = "contact@rulz.xyz"
+host = "ssl0.ovh.net"
+port = 587
