@@ -13,9 +13,9 @@ func BookGet(c *Context) (_ *utils.Book, err error) {
 	isbn := c.Param("isbn")
 	user, ok := c.Get("user").(*utils.User)
 	if ok {
-		book, err = c.Echo().Database.BookGetU(isbn, user.Id)
+		book, err = c.App.Database.BookGetU(isbn, user.Id)
 	} else {
-		book, err = c.Echo().Database.BookGet(isbn)
+		book, err = c.App.Database.BookGet(isbn)
 	}
 	if err == utils.ErrNotFound {
 		return nil, echo.NewHTTPError(http.StatusNotFound, "book "+isbn+" not found")
@@ -30,7 +30,7 @@ func BookPost(c *Context, isbn string) (book utils.Book, ok bool, err error) {
 		}
 		return *book.ToStructs(false), err
 	}
-	db := c.Echo().Database
+	db := c.App.Database
 
 	isbn = utils.SanitizeIsbn(isbn)
 	if len(isbn) == 0 {
@@ -44,7 +44,7 @@ func BookPost(c *Context, isbn string) (book utils.Book, ok bool, err error) {
 		return
 	}
 	// request additional informations
-	switch book, err = c.Echo().Scrapper.Amazon(isbn); err {
+	switch book, err = c.App.Scrapper.Amazon(isbn); err {
 	case nil:
 		err = db.BookSave(&book)
 		return
@@ -65,9 +65,9 @@ func BookPost(c *Context, isbn string) (book utils.Book, ok bool, err error) {
 func BookList(c *Context, limit, offset int) ([]*utils.Book, int, error) {
 	user, ok := c.Get("user").(*utils.User)
 	if ok {
-		return c.Echo().Database.BookListU(limit, offset, user.Id)
+		return c.App.Database.BookListU(limit, offset, user.Id)
 	} else {
-		return c.Echo().Database.BookList(limit, offset)
+		return c.App.Database.BookList(limit, offset)
 	}
 }
 
@@ -83,6 +83,6 @@ func change(c *Context, fn func(int, ...string) (int, error)) (int, error) {
 	if len(books.Isbns) == 0 {
 		return 0, nil
 	}
-	c.Echo().Logger.Debug(books)
+	c.App.Logger.Debug(books)
 	return fn(user.Id, books.Isbns...)
 }

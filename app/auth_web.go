@@ -57,7 +57,7 @@ func WEBUserResetPost(c *Context) error {
 			},
 		}))
 	}
-	if count, err := c.Echo().Database.ChangePassword(
+	if count, err := c.App.Database.ChangePassword(
 		creds.New, creds.Old, user.Id,
 	); err != nil {
 		return err
@@ -94,7 +94,6 @@ func WEBUserNewGet(c *Context) error {
 }
 
 func WEBUserNewPost(c *Context) error {
-	app := c.Echo()
 	creds := struct {
 		Email        string `form:"email" validate:"required,email,gmail"`
 		Password     string `form:"password" validate:"required,gt=8,eqfield=Confirmation"`
@@ -120,7 +119,7 @@ func WEBUserNewPost(c *Context) error {
 		}))
 	}
 
-	user, activate, err := app.Database.NewUser(creds.Email, creds.Password)
+	user, activate, err := c.App.Database.NewUser(creds.Email, creds.Password)
 	switch err {
 	case nil:
 	case utils.ErrUserExists:
@@ -130,10 +129,12 @@ func WEBUserNewPost(c *Context) error {
 	}
 	flash := utils.Flash{utils.FlashSuccess, utils.FLASH_WELCOME}
 	if err := c.SaveUser(user, flash); err != nil {
+		c.App.Database.MustDeleteUser(user)
 		return err
 	}
-	activate = app.Reverse("activate", activate)
-	if err := app.Smtp.ActivationMail(c.Context, creds.Email, activate); err != nil {
+	activate = c.ReverseAbs("activate", activate)
+	if err := c.App.Smtp.ActivationMail(c.Context, creds.Email, activate); err != nil {
+		c.App.Database.MustDeleteUser(user)
 		return err
 	}
 
@@ -170,9 +171,9 @@ func WEBAuthPost(c *Context) error {
 			"password": dict{"required": utils.PASSWORD_REQUIRED},
 		}))
 	}
-	user, err := c.Echo().Auth.Login(creds.Email, creds.Password)
+	user, err := c.App.Auth.Login(creds.Email, creds.Password)
 	if err != nil {
-		return render(http.StatusUnauthorized, dict{"auth": utils.AUTH_ERR})
+		return render(http.StatusUnauthorized, dict{"auth": utils.ERR_AUTH})
 	}
 	if err := c.SaveUser(user); err != nil {
 		return err
@@ -181,5 +182,23 @@ func WEBAuthPost(c *Context) error {
 }
 
 func WEBUserActivate(c *Context) error {
-	return nil
+	activate := c.Param("id")
+	redirect := "index"
+	if _, ok := c.Get("user").(*utils.User); ok {
+		redirect = "books"
+	}
+
+	switch err := c.App.Database.DeleteActivate(activate); err {
+	case nil:
+	case utils.ErrAlreadyActivate:
+		return c.Render(http.StatusBadRequest, "error.html",
+			dict{"code": http.StatusBadRequest, "msg": utils.ERR_ALREADY_ACTIVATED})
+	default:
+		return err
+	}
+	flash := utils.Flash{utils.FlashSuccess, utils.FLASH_ACTIVATED}
+	if err := c.Flashes(flash); err != nil {
+		return err
+	}
+	return c.Redirect(http.StatusTemporaryRedirect, c.Echo().Reverse(redirect))
 }

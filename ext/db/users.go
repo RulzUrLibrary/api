@@ -25,14 +25,20 @@ SELECT id FROM i UNION ALL SELECT id FROM s`
 
 const newUser = `
 WITH s AS (
-  SELECT id, null, false FROM users WHERE email = $1
+  SELECT id, activate, false FROM users WHERE email = $1
 ), i AS (
   INSERT INTO users ("email", "pwhash", "activate")
   SELECT $1, crypt($2, gen_salt('bf')), gen_random_uuid()
   WHERE NOT EXISTS (SELECT 1 FROM s)
   RETURNING id, activate, true
 )
-SELECT id, bool FROM i UNION ALL SELECT id, bool FROM s`
+SELECT id, activate, bool FROM i UNION ALL SELECT id, activate, bool FROM s`
+
+const deleteUser = `
+DELETE FROM users WHERE id = $1`
+
+const deleteActivate = `
+UPDATE users SET activate = null WHERE activate = $1`
 
 func (db *DB) Auth(email, password string) (*utils.User, error) {
 	var ok bool
@@ -59,11 +65,35 @@ func (db *DB) NewUser(email, password string) (*utils.User, string, error) {
 	var ok bool
 	var activate sql.NullString
 	var user = &utils.User{Email: email}
-
 	err := db.QueryRow(newUser, email, password).Scan(&user.Id, &activate, &ok)
 
 	if err == nil && !ok {
 		return nil, "", utils.ErrUserExists
 	}
 	return user, activate.String, err
+}
+
+func (db *DB) DeleteUser(user *utils.User) (int, error) {
+	return db.Exec(deleteUser, user.Id)
+}
+
+func (db *DB) DeleteActivate(activate string) error {
+	count, err := db.Exec(deleteActivate, activate)
+	if err != nil {
+		return err
+	}
+	if count == 0 {
+		return utils.ErrAlreadyActivate
+	}
+	return nil
+}
+
+func (db *DB) MustDeleteUser(user *utils.User) {
+	count, err := db.DeleteUser(user)
+	if count != 1 {
+		panic("no user removed")
+	}
+	if err != nil {
+		panic(err)
+	}
 }

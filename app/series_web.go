@@ -16,7 +16,7 @@ func WEBSerieGet(c *Context) error {
 func WEBSeriePost(c *Context) error {
 	if isbn := c.FormValue("isbn"); isbn != "" {
 		var user = c.Get("user").(*utils.User)
-		if _, err := c.Echo().Database.BookPut(user.Id, isbn); err != nil {
+		if _, err := c.App.Database.BookPut(user.Id, isbn); err != nil {
 			return err
 		}
 	}

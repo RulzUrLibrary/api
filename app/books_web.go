@@ -19,7 +19,7 @@ func WEBBookList(c *Context) (err error) {
 		return
 	}
 
-	series, query.Count, err = c.Echo().Database.SerieListU(query.Limit(),
+	series, query.Count, err = c.App.Database.SerieListU(query.Limit(),
 		query.Offset(), user.Id)
 	if err != nil {
 		return
@@ -42,7 +42,7 @@ func WEBBookPost(c *Context) (err error) {
 	var user = c.Get("user").(*utils.User)
 
 	if isbn := c.Param("isbn"); isbn != "" {
-		count, err = c.Echo().Database.BookPut(user.Id, isbn)
+		count, err = c.App.Database.BookPut(user.Id, isbn)
 		if err != nil {
 			return
 		}

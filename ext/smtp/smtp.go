@@ -15,7 +15,7 @@ const alt_tld = "contact@rulz.bar"
 func encodeRFC2047(String string) string {
 	// use mail's rfc2047 to encode any string
 	addr := mail.Address{String, ""}
-	return strings.Trim(addr.String(), " <>@")
+	return strings.Trim(addr.String(), " <>@\"")
 }
 
 type Configuration struct {
@@ -62,7 +62,6 @@ func (s *Smtp) NewMail(from string) *Mail {
 }
 
 func (s *Smtp) SendMail(to []string, msg []byte) error {
-	s.Logger.Debug(msg)
 	host := fmt.Sprintf("%s:%d", s.conf.Host, s.conf.Port)
 	return smtp.SendMail(host, s.Auth, s.conf.User, to, msg)
 }

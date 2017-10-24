@@ -1,4 +1,7 @@
 {
+  "activation_subject": {
+    "other": "Activation du compte"
+  },
   "auth_err": {
     "other": "cette adresse mail n'est pas enregistré, ou le mot de passe est incorrect"
   },
@@ -44,6 +47,12 @@
   "email_required": {
     "other": "vous devez saisir une adresse email"
   },
+  "err_already_activated": {
+    "other": "Ce compte est déjà activé ou le lien d'activation est invalide"
+  },
+  "flash_activated": {
+    "other": "votre compte est maintenant actif!"
+  },
   "flash_logout": {
     "other": "vous êtes maintenant déconnecté !"
   },
@@ -85,6 +94,12 @@
   },
   "logout": {
     "other": "Déconnexion"
+  },
+  "mail_activate_link": {
+    "other": "Cliquez sur le lien suivant pour activer votre compte:"
+  },
+  "mail_signature": {
+    "other": "L'équipe rulz"
   },
   "menu_books": {
     "other": "Livres"

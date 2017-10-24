@@ -29,10 +29,10 @@ func main() {
 
 	/* --------------------------------- WEB --------------------------------- */
 	rulz.Web.Use(app.CookieAuth(rulz.Configuration.Dev))
+	rulz.Web.Use(app.I18n(rulz.Configuration.I18n))
 	rulz.Web.Use(middleware.CSRFWithConfig(middleware.CSRFConfig{
 		TokenLookup: "form:X-CSRF-Token",
 	}))
-	rulz.Web.Use(app.I18n(rulz.Configuration.I18n))
 
 	rulz.Web.Static("/static", rulz.Configuration.Paths.Static)
 	rulz.Web.Static("/thumbs", rulz.Configuration.Paths.Thumbs)

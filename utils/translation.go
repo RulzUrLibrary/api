@@ -1,8 +1,9 @@
 package utils
 
 const (
-	PROTECTED_ERR         = "protected_err"
-	AUTH_ERR              = "auth_err"
+	ERR_PROTECTED         = "err_protected"
+	ERR_AUTH              = "err_auth"
+	ERR_ALREADY_ACTIVATED = "err_already_activated"
 	EMAIL_INVALID         = "email_invalid"
 	EMAIL_GMAIL           = "email_gmail"
 	EMAIL_REQUIRED        = "email_required"
@@ -15,5 +16,6 @@ const (
 	FLASH_LOGOUT          = "flash_logout"
 	FLASH_WELCOME         = "flash_welcome"
 	FLASH_PASSWORD        = "flash_password"
+	FLASH_ACTIVATED       = "flash_activated"
 	ACTIVATION_SUBJECT    = "activation_subject"
 )

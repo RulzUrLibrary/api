@@ -28,9 +28,9 @@ func WEBIndex(c *Context) (err error) {
 		}
 		return c.Render(http.StatusOK, "book.html", dict{"book": book})
 	} else if pattern == "" {
-		books, query.Count, err = c.Echo().Database.BookList(query.Limit(), query.Offset())
+		books, query.Count, err = c.App.Database.BookList(query.Limit(), query.Offset())
 	} else {
-		books, err = c.Echo().Database.BookSearch(pattern, query.Limit(), query.Offset())
+		books, err = c.App.Database.BookSearch(pattern, query.Limit(), query.Offset())
 	}
 	if err != nil {
 		return

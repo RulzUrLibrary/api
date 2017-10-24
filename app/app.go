@@ -31,8 +31,19 @@ func (c *Context) Flashes(flashes ...utils.Flash) error {
 	return session.Save(c.Request(), c.Response())
 }
 
-func (c *Context) Echo() *Application {
-	return c.App
+func (c *Context) Reverse(name string, params ...interface{}) string {
+	return c.Echo().Reverse(name, params...)
+}
+
+func (c *Context) ReverseAbs(name string, params ...interface{}) string {
+	host := c.App.Configuration.Host
+	port := c.App.Configuration.Port
+
+	if c.App.Configuration.Dev {
+		return fmt.Sprintf("http://%s:%d%s", host, port, c.Reverse(name, params...))
+	} else {
+		return fmt.Sprintf("https://%s%s", host, c.Reverse(name, params...))
+	}
 }
 
 func (c *Context) SaveUser(user *utils.User, flashes ...utils.Flash) error {

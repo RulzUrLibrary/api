@@ -52,7 +52,7 @@ func APIBookList(c *Context) (err error) {
 		}
 		return c.JSON(http.StatusOK, dict{"_meta": s.Meta, "books": books})
 	} else {
-		books, err = c.Echo().Database.BookSearch(s.Pattern, s.Limit, s.Offset)
+		books, err = c.App.Database.BookSearch(s.Pattern, s.Limit, s.Offset)
 		if err != nil {
 			return err
 		}
@@ -61,7 +61,7 @@ func APIBookList(c *Context) (err error) {
 }
 
 func APIBookPut(c *Context) error {
-	count, err := change(c, c.Echo().Database.BookPut)
+	count, err := change(c, c.App.Database.BookPut)
 	if err != nil {
 		return err
 	}
@@ -71,7 +71,7 @@ func APIBookPut(c *Context) error {
 }
 
 func APIBookDelete(c *Context) (err error) {
-	count, err := change(c, c.Echo().Database.BookDelete)
+	count, err := change(c, c.App.Database.BookDelete)
 	if err != nil {
 		return err
 	}

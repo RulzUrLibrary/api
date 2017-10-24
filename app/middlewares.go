@@ -77,7 +77,7 @@ func Protected(next echo.HandlerFunc) echo.HandlerFunc {
 		}
 		u.RawQuery = v.Encode()
 		session, _ := c.Get("session").(*sessions.Session)
-		session.AddFlash(utils.Flash{utils.FlashError, utils.PROTECTED_ERR})
+		session.AddFlash(utils.Flash{utils.FlashError, utils.ERR_PROTECTED})
 		session.Save(c.Request(), c.Response())
 		return c.Redirect(http.StatusSeeOther, u.String())
 	}

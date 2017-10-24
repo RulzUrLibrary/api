@@ -1,4 +1,7 @@
 {
+  "activation_subject": {
+    "other": "Activate your account"
+  },
   "auth_err": {
     "other": "email not registered or password invalid"
   },
@@ -44,6 +47,12 @@
   "email_required": {
     "other": "email is required"
   },
+  "err_already_activated": {
+    "other": "Account already activated or activation link invalid"
+  },
+  "flash_activated": {
+    "other": "account successfully activated!"
+  },
   "flash_logout": {
     "other": "you have been successfully logged out!"
   },
@@ -85,6 +94,12 @@
   },
   "logout": {
     "other": "Logout"
+  },
+  "mail_activate_link": {
+    "other": "Please activate your account by clicking the following link:"
+  },
+  "mail_signature": {
+    "other": "The rulz team"
   },
   "menu_books": {
     "other": "Books"
