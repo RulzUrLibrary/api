@@ -25,9 +25,12 @@ SELECT id FROM i UNION ALL SELECT id FROM s`
 
 const newUser = `
 WITH s AS (
-  SELECT id, false FROM users WHERE email = $1
+  SELECT id, null, false FROM users WHERE email = $1
 ), i AS (
-  INSERT INTO users ("email", "pwhash") SELECT $1, crypt($2, gen_salt('bf')) WHERE NOT EXISTS (SELECT 1 FROM s) RETURNING id, true
+  INSERT INTO users ("email", "pwhash", "activate")
+  SELECT $1, crypt($2, gen_salt('bf')), gen_random_uuid()
+  WHERE NOT EXISTS (SELECT 1 FROM s)
+  RETURNING id, activate, true
 )
 SELECT id, bool FROM i UNION ALL SELECT id, bool FROM s`
 

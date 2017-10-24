@@ -8,6 +8,7 @@ import (
 	"github.com/rulzurlibrary/api/ext/auth"
 	"github.com/rulzurlibrary/api/ext/db"
 	"github.com/rulzurlibrary/api/ext/scrapper"
+	"github.com/rulzurlibrary/api/ext/smtp"
 	"github.com/rulzurlibrary/api/ext/validator"
 	"github.com/rulzurlibrary/api/ext/view"
 	"github.com/rulzurlibrary/api/utils"
@@ -55,6 +56,7 @@ type Application struct {
 	Database      *db.DB
 	Scrapper      *scrapper.Scrapper
 	Auth          *auth.Auth
+	Smtp          *smtp.Smtp
 	Configuration Configuration
 }
 
@@ -112,6 +114,7 @@ func New() *Application {
 	app.Scrapper = scrapper.New(app.Logger, app.Configuration.Paths.Thumbs)
 	app.Database = db.New(app.Logger, app.Configuration.Database)
 	app.Auth = auth.New(app.Logger, app.Database)
+	app.Smtp = smtp.New(app.Logger, app.Configuration.Smtp)
 
 	if !app.Configuration.Dev {
 		app.HideBanner = true

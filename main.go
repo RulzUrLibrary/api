@@ -32,6 +32,7 @@ func main() {
 	rulz.Web.Use(middleware.CSRFWithConfig(middleware.CSRFConfig{
 		TokenLookup: "form:X-CSRF-Token",
 	}))
+	rulz.Web.Use(app.I18n(rulz.Configuration.I18n))
 
 	rulz.Web.Static("/static", rulz.Configuration.Paths.Static)
 	rulz.Web.Static("/thumbs", rulz.Configuration.Paths.Thumbs)
@@ -39,6 +40,7 @@ func main() {
 	rulz.Web.GET("/", rulz.Handler(app.WEBIndex)).Name = "index"
 
 	rulz.Web.GET("/user", rulz.Handler(app.WEBUserGet), app.Protected).Name = "user"
+	rulz.Web.GET("/user/activate/:id", rulz.Handler(app.WEBUserActivate)).Name = "activate"
 	rulz.Web.GET("/user/reset", rulz.Handler(app.WEBUserReset), app.Protected).Name = "reset"
 	rulz.Web.POST("/user/reset", rulz.Handler(app.WEBUserResetPost), app.Protected)
 

@@ -4,6 +4,7 @@ import (
 	"github.com/gorilla/securecookie"
 	"github.com/gorilla/sessions"
 	"github.com/labstack/echo"
+	"github.com/rulzurlibrary/api/ext/i18n"
 	"github.com/rulzurlibrary/api/utils"
 	"net/http"
 	"net/url"
@@ -103,6 +104,17 @@ func CookieAuth(dev bool) echo.MiddlewareFunc {
 				}
 			}
 			c.Set(SESSION_KEY, session)
+			return next(c)
+		}
+	}
+}
+
+func I18n(config i18n.Configuration) echo.MiddlewareFunc {
+	i := i18n.New(config)
+
+	return func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			i.SetI18n(c)
 			return next(c)
 		}
 	}

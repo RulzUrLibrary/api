@@ -5,35 +5,19 @@ import (
 	"github.com/CloudyKit/jet"
 	"github.com/gorilla/sessions"
 	"github.com/labstack/echo"
-	"github.com/nicksnyder/go-i18n/i18n"
-	"github.com/rulzurlibrary/api/utils"
+	"github.com/rulzurlibrary/api/ext/i18n"
 	"io"
 	"net/url"
-	"path/filepath"
 	"reflect"
 	"strings"
 )
 
 type Configuration struct {
 	Templates string
-	I18n      string
-	Default   string
 }
 
 type View struct {
 	*jet.Set
-	Default string
-}
-
-func (v *View) GetI18n(c echo.Context) i18n.TranslateFunc {
-	cookieLang := ""
-	if cookie, err := c.Cookie("lang"); err == nil {
-		cookieLang = cookie.Value
-	}
-	acceptLang := c.Request().Header.Get("Accept-Language")
-	defaultLang := v.Default // known valid language
-	c.Set("lang", utils.DefaultS(cookieLang, acceptLang, defaultLang)[0:2])
-	return i18n.MustTfunc(cookieLang, acceptLang, defaultLang)
 }
 
 func (v *View) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
@@ -51,12 +35,13 @@ func (v *View) Render(w io.Writer, name string, data interface{}, c echo.Context
 	vars.Set("context", c)
 	vars.Set("flashes", flashes)
 	vars.Set("user", c.Get("user"))
-	vars.SetFunc("T", makeT(v.GetI18n(c)))
+	vars.SetFunc("T", makeT(c))
 
 	return tplt.Execute(w, vars, data)
 }
 
-func makeT(t i18n.TranslateFunc) jet.Func {
+func makeT(c echo.Context) jet.Func {
+	t := i18n.GetI18n(c)
 	return func(a jet.Arguments) reflect.Value {
 		a.RequireNumOfArguments("t", 1, -1)
 		id := a.Get(0).Interface().(string)
@@ -119,13 +104,7 @@ func debug(a jet.Arguments) reflect.Value {
 }
 
 func New(app *echo.Echo, config Configuration) *View {
-	view := &View{jet.NewHTMLSet(config.Templates), config.Default}
-
-	matches, _ := filepath.Glob(filepath.Join(config.I18n, "*.all.json"))
-	for _, match := range matches {
-		i18n.MustLoadTranslationFile(match)
-
-	}
+	view := &View{jet.NewHTMLSet(config.Templates)}
 	view.SetDevelopmentMode(app.Debug)
 
 	// add a reverse url helper

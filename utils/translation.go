@@ -15,4 +15,5 @@ const (
 	FLASH_LOGOUT          = "flash_logout"
 	FLASH_WELCOME         = "flash_welcome"
 	FLASH_PASSWORD        = "flash_password"
+	ACTIVATION_SUBJECT    = "activation_subject"
 )

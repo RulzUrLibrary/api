@@ -4,12 +4,19 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/labstack/echo"
+	"mime/quotedprintable"
 	"net/mail"
 	"net/smtp"
 	"strings"
 )
 
 const alt_tld = "contact@rulz.bar"
+
+func encodeRFC2047(String string) string {
+	// use mail's rfc2047 to encode any string
+	addr := mail.Address{String, ""}
+	return strings.Trim(addr.String(), " <>@")
+}
 
 type Configuration struct {
 	User     string
@@ -66,8 +73,7 @@ func (m *Mail) To(name, address string) *Mail {
 }
 
 func (m *Mail) Subject(object string) *Mail {
-	addr := mail.Address{object, ""}
-	m.subject = strings.Trim(addr.String(), " <>@")
+	m.subject = encodeRFC2047(object)
 	return m
 }
 
@@ -76,9 +82,8 @@ func (m *Mail) Body(content []byte) *Mail {
 	return m
 }
 
-func (m *Mail) Body(content []string) *Mail {
-	m.body = content
-	return m
+func (m *Mail) BodyS(content string) *Mail {
+	return m.Body([]byte(content))
 }
 
 func (m *Mail) Send() error {
@@ -89,13 +94,18 @@ func (m *Mail) Send() error {
 	header["To"] = m.to.String()
 	header["Subject"] = m.subject
 	header["MIME-Version"] = "1.0"
-	header["Content-Type"] = "text/plain; charset=\"utf-8\""
+	header["Content-Type"] = "text/html; charset=\"utf-8\""
+	header["Content-Transfer-Encoding"] = "quoted-printable"
+	header["Content-Disposition"] = "inline"
 
 	for k, v := range header {
 		msg += fmt.Sprintf("%s: %s\r\n", k, v)
 	}
 	body := bytes.NewBufferString(msg + "\r\n")
-	body.Write(m.body)
+
+	encode := quotedprintable.NewWriter(body)
+	encode.Write(m.body)
+	encode.Close()
 
 	return m.SendMail(m.to.Strings(), body.Bytes())
 }

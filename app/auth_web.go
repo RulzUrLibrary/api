@@ -120,18 +120,24 @@ func WEBUserNewPost(c *Context) error {
 		}))
 	}
 
-	user, _, err := c.DB.NewUser(creds.Email, creds.Password)
+	user, activate, err := app.Database.NewUser(creds.Email, creds.Password)
 	switch err {
 	case nil:
-		flash := utils.Flash{utils.FlashSuccess, utils.FLASH_WELCOME}
-		if err := c.SaveUser(user, flash); err != nil {
-			return err
-		}
-		return c.Redirect(http.StatusSeeOther, c.Echo().Reverse("books"))
 	case utils.ErrUserExists:
 		return badRequest(dict{"email": err.Error()})
+	default:
+		return err
 	}
-	return err
+	flash := utils.Flash{utils.FlashSuccess, utils.FLASH_WELCOME}
+	if err := c.SaveUser(user, flash); err != nil {
+		return err
+	}
+	activate = app.Reverse("activate", activate)
+	if err := app.Smtp.ActivationMail(c.Context, creds.Email, activate); err != nil {
+		return err
+	}
+
+	return c.Redirect(http.StatusSeeOther, c.Echo().Reverse("books"))
 }
 
 func WEBAuthGet(c *Context) error {
@@ -172,4 +178,8 @@ func WEBAuthPost(c *Context) error {
 		return err
 	}
 	return c.Redirect(http.StatusSeeOther, utils.DefaultS(creds.Next, c.Echo().Reverse("books")))
+}
+
+func WEBUserActivate(c *Context) error {
+	return nil
 }
