@@ -17,19 +17,31 @@
   "auth_form_password_placeholder": {
     "other": "Password"
   },
-  "book_added": {
+  "book_collection_added": {
     "other": "book added to collection"
   },
-  "book_already_added": {
+  "book_collection_already_added": {
     "other": "book was already in the collection"
   },
-  "book_already_removed": {
+  "book_collection_already_removed": {
     "other": "book was already out of the collection"
+  },
+  "book_collection_removed": {
+    "other": "book removed from collection"
   },
   "book_details": {
     "other": "Details"
   },
-  "book_removed": {
+  "book_wishlist_added": {
+    "other": "book added to wishlist"
+  },
+  "book_wishlist_already_added": {
+    "other": "book was already in the wishlist"
+  },
+  "book_wishlist_already_removed": {
+    "other": "book was already out of the wishlist"
+  },
+  "book_wishlist_removed": {
     "other": "book removed from collection"
   },
   "cancel": {
@@ -202,5 +214,11 @@
   },
   "user_password_reset_submit": {
     "other": "Send mail"
+  },
+  "wishlist_add": {
+    "other": "add to wishlist"
+  },
+  "wishlist_del": {
+    "other": "remove from wishlist"
   }
 }

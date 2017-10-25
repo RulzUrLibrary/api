@@ -14,9 +14,15 @@ func WEBSerieGet(c *Context) error {
 }
 
 func WEBSeriePost(c *Context) error {
-	if isbn := c.FormValue("isbn"); isbn != "" {
-		var user = c.Get("user").(*utils.User)
-		if _, err := c.App.Database.BookPut(user.Id, isbn); err != nil {
+	var user = c.Get("user").(*utils.User)
+
+	switch c.FormValue("action") {
+	case "collection":
+		if _, err := c.App.Database.BookPut(user.Id, c.FormValue("isbn")); err != nil {
+			return err
+		}
+	case "wishlist":
+		if _, err := c.App.Database.WishlistPut(user.Id, c.FormValue("isbn")); err != nil {
 			return err
 		}
 	}

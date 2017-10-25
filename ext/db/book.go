@@ -2,6 +2,7 @@ package db
 
 import (
 	"database/sql"
+	"github.com/lib/pq"
 	"github.com/rulzurlibrary/api/utils"
 )
 
@@ -13,24 +14,21 @@ type Book struct {
 	serie       sql.NullString
 	description sql.NullString
 	price       sql.NullFloat64
-	owned       sql.NullBool
+	tags        pq.StringArray
 	authors     Authors
 }
 
 func (b *Book) ToStructs(partial bool) *utils.Book {
 	book := &utils.Book{
 		b.Isbn, "", b.title.String, b.description.String,
-		float32(b.price.Float64), int(b.number.Int64), b.serie.String, nil,
-		nil,
+		float32(b.price.Float64), int(b.number.Int64), b.serie.String,
+		toTags(b.tags), nil,
 	}
 	if !partial {
 		book.Thumbnail = "/thumbs/" + b.Isbn + ".jpg"
 		book.Authors = b.authors.ToStructs()
 	}
 
-	if b.owned.Valid {
-		book.Owned = &b.owned.Bool
-	}
 	return book
 }
 
@@ -66,4 +64,12 @@ func (b *Books) ToStructs(partial bool) (books utils.Books) {
 		books = append(books, b.books[id].ToStructs(partial))
 	}
 	return
+}
+
+func toTags(array pq.StringArray) *utils.Tags {
+	tags := utils.Tags(array)
+	if tags == nil {
+		return nil
+	}
+	return &tags
 }

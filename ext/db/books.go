@@ -15,10 +15,11 @@ LEFT OUTER JOIN authors a ON (ba.fk_author = a.id)
 WHERE b.isbn = $1`
 
 const SelectBookU = `
-SELECT b.id, b.isbn, b.title, b.description, b.price, b.num, s.name, a.id, a.name,
-	EXISTS(SELECT true FROM collections WHERE fk_book = b.id AND fk_user = $2)
+SELECT b.id, b.isbn, b.title, b.description, b.price, b.num, s.name, a.id,
+	a.name, tags
 FROM books b
 INNER JOIN series s ON (b.fk_serie = s.id)
+LEFT OUTER JOIN collections ON (b.id = fk_book AND fk_user = $2)
 LEFT OUTER JOIN book_authors ba ON (b.id = ba.fk_book)
 LEFT OUTER JOIN authors a ON (ba.fk_author = a.id)
 WHERE b.isbn = $1`
@@ -35,9 +36,10 @@ LEFT OUTER JOIN series s ON (b.fk_serie = s.id)
 ORDER BY b.id DESC`
 
 const SelectBooksU = `
-SELECT b.id, b.isbn, b.title, b.description, b.price, b.num, s.name, a.id, a.name
+SELECT b.id, b.isbn, b.title, b.description, b.price, b.num, s.name, a.id,
+	a.name, tags
 FROM (
-	SELECT id, isbn, title, description, price, fk_serie, num
+	SELECT id, isbn, title, description, price, fk_serie, num, tags
 	FROM books, collections
 	WHERE fk_book = id AND fk_user = $3
 	ORDER BY num ASC, id DESC LIMIT $1 OFFSET $2
@@ -96,10 +98,6 @@ LEFT OUTER JOIN series s ON (b.fk_serie = s.id)`
 
 const CountCollection = `
 SELECT COUNT(id) FROM books, collections WHERE fk_user = $1 AND fk_book = id`
-
-const AddBook = `
-INSERT INTO collections SELECT b.id, $2 FROM books b WHERE b.isbn = $1
-ON CONFLICT (fk_book, fk_user) DO UPDATE SET fk_user = $2`
 
 const SearchBooks = `
 SELECT b.id, b.isbn, b.title, b.description, b.price, b.num, s.name, a.id, a.name
@@ -180,7 +178,7 @@ func (db *DB) BookGetU(id string, user int) (*Book, error) {
 		func(b *Book, a *Author) []interface{} {
 			return []interface{}{
 				&b.Id, &b.Isbn, &b.title, &b.description, &b.price, &b.number,
-				&b.serie, &a.id, &a.name, &b.owned,
+				&b.serie, &a.id, &a.name, &b.tags,
 			}
 		},
 	})
@@ -251,7 +249,7 @@ func (db *DB) BookListU(limit, offset, user int) ([]*utils.Book, int, error) {
 			func(b *Book, a *Author) []interface{} {
 				return []interface{}{
 					&b.Id, &b.Isbn, &b.title, &b.description, &b.price, &b.number,
-					&b.serie, &a.id, &a.name,
+					&b.serie, &a.id, &a.name, &b.tags,
 				}
 			},
 		},

@@ -26,7 +26,7 @@ func (s Serie) ToStructs(partial bool) *utils.Serie {
 		serie.Title = book.Title
 		serie.Isbn = book.Isbn
 		serie.Thumbnail = book.Thumbnail
-		serie.Owned = book.Owned
+		serie.Tags = book.Tags
 		serie.Volumes = nil
 	} else {
 		serie.Name = s.name.String

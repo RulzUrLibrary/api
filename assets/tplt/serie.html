@@ -29,13 +29,22 @@
             <small class="toast toast-success">
               <i class="icon icon-check"></i>
             </small>
+            {{else if volume.InWishlist()}}
+            <small class="toast">
+              <i class="icon icon-bookmark"></i>
+            </small>
             {{else}}
             <form action="{{context.Request().URL}}#{{volume.Number}}" method="POST">
               <input type="hidden" value="{{volume.Isbn}}" name="isbn"/>
               <input name="X-CSRF-Token" type="hidden" value="{{context.Get("csrf")}}"/>
-              <button type="Submit" class="btn btn-primary">
-                <small>{{T("collection_add")}}</small>
-              </button>
+              <div class="btn-group btn-group-block">
+                <button type="submit" class="btn btn-primary" name="action" value="collection">
+                  <i class="icon icon-plus"></i>
+                </button>
+                <button type="submit" class="btn" name="action" value="wishlist">
+                  <i class="icon icon-bookmark"></i>
+                </button>
+              </div>
             </form>
             {{end}}
           </div>

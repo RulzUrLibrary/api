@@ -58,7 +58,7 @@ type Book struct {
 	Price       float32  `json:"price,omitempty"`
 	Number      int      `json:"number,omitempty"`
 	Serie       string   `json:"serie,omitempty"`
-	Owned       *bool    `json:"owned,omitempty"` // tricking golang json encoding
+	Tags        *Tags    `json:"tags,omitempty"`
 	Authors     *Authors `json:"authors,omitempty"`
 }
 
@@ -73,7 +73,11 @@ func (b Book) TitleDisplay() string {
 }
 
 func (b Book) InCollection() bool {
-	return b.Owned != nil && *b.Owned
+	return b.Tags.In("collection")
+}
+
+func (b Book) InWishlist() bool {
+	return b.Tags.In("wishlist")
 }
 
 type Books []*Book
@@ -102,9 +106,23 @@ type Serie struct {
 	Thumbnail   string   `json:"thumbnail,omitempty"`
 	Title       string   `json:"title,omitempty"`
 	Isbn        string   `json:"isbn,omitempty"`
-	Owned       *bool    `json:"owned,omitempty"`
+	Tags        *Tags    `json:"tags,omitempty"`
 	Authors     *Authors `json:"authors,omitempty"`
 	Volumes     Books    `json:"volumes,omitempty"`
+}
+
+type Tags []string
+
+func (t *Tags) In(obj string) bool {
+	if t == nil {
+		return false
+	}
+	for _, o := range *t {
+		if o == obj {
+			return true
+		}
+	}
+	return false
 }
 
 func (s Serie) Thumb() string {

@@ -17,8 +17,12 @@ func BookGet(c *Context) (_ *utils.Book, err error) {
 	} else {
 		book, err = c.App.Database.BookGet(isbn)
 	}
-	if err == utils.ErrNotFound {
+	switch err {
+	case nil:
+	case utils.ErrNotFound:
 		return nil, echo.NewHTTPError(http.StatusNotFound, "book "+isbn+" not found")
+	default:
+		return nil, err
 	}
 	return book.ToStructs(false), err
 }

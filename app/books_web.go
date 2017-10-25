@@ -1,7 +1,6 @@
 package app
 
 import (
-	"github.com/labstack/echo"
 	"github.com/rulzurlibrary/api/ext/db"
 	"github.com/rulzurlibrary/api/utils"
 	"net/http"
@@ -38,31 +37,31 @@ func WEBBookGet(c *Context) error {
 }
 
 func WEBBookPost(c *Context) error {
-	var success, failure string
-	var fn func(int, ...string) (int, error)
-
-	switch c.FormValue("action") {
-	case "del":
-		success = "book_removed"
-		failure = "book_already_removed"
-		fn = c.App.Database.BookDelete
-	case "add":
-		success = "book_added"
-		failure = "book_already_added"
-		fn = c.App.Database.BookPut
-	default:
-		return echo.NewHTTPError(http.StatusBadRequest)
+	type st struct {
+		success string
+		failure string
+		fn      func(int, ...string) (int, error)
 	}
+	s := map[string]map[string]st{
+		"wishlist": map[string]st{
+			"del": st{"book_wishlist_removed", "book_wishlist_already_removed", c.App.Database.BookDelete},
+			"add": st{"book_wishlist_added", "book_wishlist_already_added", c.App.Database.WishlistPut},
+		},
+		"collection": map[string]st{
+			"del": st{"book_collection_removed", "book_collection_already_removed", c.App.Database.BookDelete},
+			"add": st{"book_collection_added", "book_collection_already_added", c.App.Database.BookPut},
+		},
+	}[c.FormValue("tag")][c.FormValue("action")]
 
-	count, err := fn(c.Get("user").(*utils.User).Id, c.Param("isbn"))
+	count, err := s.fn(c.Get("user").(*utils.User).Id, c.Param("isbn"))
 	if err != nil {
 		return err
 	}
 
 	if count == 0 {
-		err = c.Flashes(utils.Flash{utils.FlashWarning, failure})
+		err = c.Flashes(utils.Flash{utils.FlashWarning, s.failure})
 	} else {
-		err = c.Flashes(utils.Flash{utils.FlashSuccess, success})
+		err = c.Flashes(utils.Flash{utils.FlashSuccess, s.success})
 	}
 	if err != nil {
 		return err

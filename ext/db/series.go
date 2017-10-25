@@ -12,22 +12,20 @@ FROM (
 ) _`
 
 const SelectSeriesU = `
-SELECT b.id, title, num, isbn, s.id, s.name, a.id, a.name,
-	(SELECT b.description WHERE b.num IS NULL OR b.num = 1),
-	EXISTS(SELECT true FROM collections WHERE fk_book = b.id AND fk_user = $3)
+SELECT b.id, title, num, isbn, s.id, s.name, a.id, a.name, tags
 FROM (
     SELECT s.id FROM books b, collections, series s
     WHERE fk_user = $3 AND fk_book = b.id AND fk_serie = s.id
     GROUP BY s.id ORDER BY s.name NULLS LAST LIMIT $1 OFFSET $2
 ) r, books b
 INNER JOIN series s ON (fk_serie = s.id)
-LEFT OUTER JOIN book_authors ba ON (b.id = fk_book)
+LEFT OUTER JOIN collections c ON (c.fk_book = b.id AND fk_user = $3)
+LEFT OUTER JOIN book_authors ba ON (b.id = ba.fk_book)
 LEFT JOIN authors a ON (fk_author = a.id)
 WHERE s.id = r.id ORDER BY s.name, num`
 
 const SelectSeries = `
-SELECT b.id, title, num, isbn, s.id, s.name, a.id, a.name,
-	(SELECT b.description WHERE b.num IS NULL OR b.num = 1)
+SELECT b.id, title, num, isbn, s.id, s.name, a.id, a.name
 FROM (
   SELECT id FROM series
   GROUP BY id ORDER BY id DESC NULLS LAST LIMIT $1 OFFSET $2
@@ -46,12 +44,11 @@ LEFT JOIN authors a ON (fk_author = a.id)
 WHERE s.id = $1 ORDER BY num`
 
 const SelectSerieU = `
-SELECT b.id, title, num, description, isbn, a.id, a.name, s.name, EXISTS(
-  SELECT true FROM collections WHERE fk_book = b.id AND fk_user = $2
-)
+SELECT b.id, title, num, description, isbn, a.id, a.name, s.name, tags
 FROM books b
 INNER JOIN series s ON (fk_serie = s.id)
-LEFT OUTER JOIN book_authors ba ON (b.id = fk_book)
+LEFT OUTER JOIN collections c ON (c.fk_book = b.id AND fk_user = $2)
+LEFT OUTER JOIN book_authors ba ON (b.id = ba.fk_book)
 LEFT JOIN authors a ON (fk_author = a.id)
 WHERE s.id = $1 ORDER BY num`
 
@@ -127,7 +124,7 @@ func (db *DB) SerieGetU(id, user int) (*Serie, error) {
 		func(s *Serie, b *Book, a *Author) []interface{} {
 			return []interface{}{
 				&b.Id, &b.title, &b.number, &b.description, &b.Isbn, &a.id, &a.name,
-				&s.name, &b.owned,
+				&s.name, &b.tags,
 			}
 		},
 	})
@@ -157,7 +154,6 @@ func (db *DB) SerieList(limit, offset int) (*Series, int, error) {
 			func(s *Serie, b *Book, a *Author) []interface{} {
 				return []interface{}{
 					&b.Id, &b.title, &b.number, &b.Isbn, &s.id, &s.name, &a.id, &a.name,
-					&s.description,
 				}
 			},
 		}, CountSeries, []interface{}{},
@@ -171,7 +167,7 @@ func (db *DB) SerieListU(limit, offset, user int) (*Series, int, error) {
 			func(s *Serie, b *Book, a *Author) []interface{} {
 				return []interface{}{
 					&b.Id, &b.title, &b.number, &b.Isbn, &s.id, &s.name, &a.id, &a.name,
-					&s.description, &b.owned,
+					&b.tags,
 				}
 			},
 		}, CountSeriesU, []interface{}{user},
