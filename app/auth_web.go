@@ -6,6 +6,17 @@ import (
 	"net/http"
 )
 
+func dynamic(c *Context, from, where, param string) error {
+	ok, err := c.App.Database.Exists(from, where, param)
+	if err != nil {
+		return err
+	}
+	if !ok {
+		return ErrNotFound
+	}
+	return nil
+}
+
 func WEBUserGet(c *Context) error {
 	user := c.Get("user").(*utils.User)
 	return c.Render(http.StatusOK, "user.html",
@@ -119,12 +130,8 @@ func WEBUserReinit(c *Context) error {
 		return c.Render(code, "reinit.html", dict{"form": form, "errors": errors})
 	}
 
-	ok, err := c.App.Database.Exists("users", "reset", reset)
-	if err != nil {
+	if err := dynamic(c, "users", "reset", reset); err != nil {
 		return err
-	}
-	if !ok {
-		return ErrNotFound
 	}
 
 	if c.Request().Method == http.MethodPost {
@@ -258,7 +265,9 @@ func WEBAuthPost(c *Context) error {
 
 func WEBUserActivate(c *Context) error {
 	activate := c.Param("id")
-
+	if err := dynamic(c, "users", "activate", activate); err != nil {
+		return err
+	}
 	switch err := c.App.Database.DeleteActivate(activate); err {
 	case nil:
 	case utils.ErrAlreadyActivate:
