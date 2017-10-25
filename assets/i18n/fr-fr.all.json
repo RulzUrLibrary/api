@@ -1,7 +1,4 @@
 {
-  "activation_subject": {
-    "other": "Activation du compte"
-  },
   "auth_err": {
     "other": "cette adresse mail n'est pas enregistré, ou le mot de passe est incorrect"
   },
@@ -35,14 +32,20 @@
   "confirm_password": {
     "other": "Confirmation du mot de passe"
   },
+  "disclaimer": {
+    "other": "Attention"
+  },
   "divider_or": {
     "other": "OU"
   },
   "email_gmail": {
     "other": "si vous voulez utiliser votre adresse gmail, connectez vous directement"
   },
+  "email_gmail_reset": {
+    "other": "Vous ne pouvez pas reinitialiser votre mot de passe si l'email associé est @gmail.com. Parce qu'il n'y a pas de mot de passe associé"
+  },
   "email_invalid": {
-    "other": "l'adresse mail fourni est invalide"
+    "other": "l'adresse email fourni n'est pas une adresse email valide"
   },
   "email_required": {
     "other": "vous devez saisir une adresse email"
@@ -98,6 +101,12 @@
   "mail_activate_link": {
     "other": "Cliquez sur le lien suivant pour activer votre compte:"
   },
+  "mail_reset_link": {
+    "other": "Cliquez sur le lien suivant pour réinitialiser votre mot de passe:"
+  },
+  "mail_reset_title": {
+    "other": "Vous avez demandé une réinitialisation de mot de passe"
+  },
   "mail_signature": {
     "other": "L'équipe rulz"
   },
@@ -131,11 +140,29 @@
   "protected_err": {
     "other": "pour accéder à cette page, vous devez vous authentifier d'abord"
   },
+  "sent_reset_mail_disclaimer": {
+    "other": "Vérifiez bien que l'adresse email est celle de votre compte, si ce compte n'existe pas, aucun email n'a été envoyé."
+  },
+  "sent_reset_mail_msg": {
+    "other": "Un email a été envoyé à l'adresse suivante pour réinitialiser le mot de passe"
+  },
+  "sent_reset_mail_title": {
+    "other": "Email envoyé!"
+  },
   "signup": {
     "other": "S'inscrire"
   },
+  "subject_activation": {
+    "other": "Activation du compte"
+  },
+  "subject_reset": {
+    "other": "Réinitialisation de votre mot de passe"
+  },
   "title_books": {
     "other": "Ma collection"
+  },
+  "title_reset": {
+    "other": "Réinitialiser votre mot de passe"
   },
   "title_user": {
     "other": "Mon compte"
@@ -154,5 +181,14 @@
   },
   "user_password_change_submit": {
     "other": "Confirmer"
+  },
+  "user_password_reset_email": {
+    "other": "L'adresse mail lié à votre compte"
+  },
+  "user_password_reset_help": {
+    "other": "Il est possible de changer votre mot de passe si vous l'avez oublié. Vous devez saisir l'adresse email associé à votre compte dans le formulaire si dessous. Nous allons vous envoyer un lien pour réinitialiser le mot de passe si l'adresse email existe dans notre base de donnés."
+  },
+  "user_password_reset_submit": {
+    "other": "Envoyer l'email"
   }
 }

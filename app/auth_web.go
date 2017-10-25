@@ -32,7 +32,7 @@ func WEBUserLogout(c *Context) error {
 	return c.Redirect(http.StatusSeeOther, c.Echo().Reverse("index"))
 }
 
-func WEBUserResetPost(c *Context) error {
+func WEBUserChange(c *Context) error {
 	creds := struct {
 		Old  string `form:"old" validate:"required"`
 		New  string `form:"new" validate:"required,gt=8,eqfield=Conf,nefield=Old"`
@@ -57,7 +57,7 @@ func WEBUserResetPost(c *Context) error {
 			},
 		}))
 	}
-	if count, err := c.App.Database.ChangePassword(
+	if count, err := c.App.Database.PasswordChange(
 		creds.New, creds.Old, user.Id,
 	); err != nil {
 		return err
@@ -70,8 +70,83 @@ func WEBUserResetPost(c *Context) error {
 	return WEBUserGet(c)
 }
 
-func WEBUserReset(c *Context) error {
-	return nil
+func WEBUserResetGet(c *Context) error {
+	email := ""
+	if user, ok := c.Get("user").(*utils.User); ok {
+		email = user.Email
+	}
+	return c.Render(http.StatusOK, "reset.html", dict{"email": email, "error": dict{}})
+}
+
+func WEBUserResetPost(c *Context) error {
+	query := struct {
+		Email string `form:"email" validate:"required,email,gmail"`
+	}{}
+
+	if err := c.Bind(&query); err != nil {
+		return err
+	}
+	if err := c.Validate(&query); err != nil {
+		errs := validator.Dump(err, map[string]dict{
+			"email": dict{
+				"email": utils.EMAIL_INVALID, "gmail": utils.EMAIL_GMAIL_RESET,
+				"required": utils.EMAIL_REQUIRED,
+			},
+		})
+		return c.Render(http.StatusBadRequest, "reset.html", dict{"email": query.Email, "error": errs})
+	}
+
+	if link, err := c.App.Database.CreateReset(query.Email); err != nil {
+		return err
+	} else if link != "" {
+		link = c.ReverseAbs("reinit", link)
+		if err := c.App.Smtp.ResetMail(c, query.Email, link); err != nil {
+			return err
+		}
+	}
+
+	return c.Render(http.StatusOK, "sent.html", dict{"email": query.Email})
+}
+
+func WEBUserReinit(c *Context) error {
+	reset := c.Param("id")
+	form := struct {
+		Password     string `form:"password" validate:"required,gt=8,eqfield=Confirmation"`
+		Confirmation string `form:"confirmation"`
+	}{}
+	errors := dict{}
+	render := func(code int) error {
+		return c.Render(code, "reinit.html", dict{"form": form, "errors": errors})
+	}
+
+	ok, err := c.App.Database.Exists("users", "reset", reset)
+	if err != nil {
+		return err
+	}
+	if !ok {
+		return ErrNotFound
+	}
+
+	if c.Request().Method == http.MethodPost {
+		if err := c.Bind(&form); err != nil {
+			return err
+		}
+		if err := c.Validate(&form); err != nil {
+			errors = validator.Dump(err, map[string]dict{
+				"password": dict{
+					"required": utils.PASSWORD_REQUIRED, "gt": utils.PASSWORD_LEN,
+					"eqfield": utils.PASSWORD_EQFIELD,
+				},
+			})
+			return render(http.StatusBadRequest)
+		}
+		if err := c.App.Database.PasswordReset(form.Password, reset); err != nil {
+			return err
+		}
+		return c.RedirectWithFlash(utils.FLASH_PASSWORD)
+	}
+
+	return render(http.StatusOK)
 }
 
 func WEBUserNewGet(c *Context) error {
@@ -183,10 +258,6 @@ func WEBAuthPost(c *Context) error {
 
 func WEBUserActivate(c *Context) error {
 	activate := c.Param("id")
-	redirect := "index"
-	if _, ok := c.Get("user").(*utils.User); ok {
-		redirect = "books"
-	}
 
 	switch err := c.App.Database.DeleteActivate(activate); err {
 	case nil:
@@ -196,9 +267,6 @@ func WEBUserActivate(c *Context) error {
 	default:
 		return err
 	}
-	flash := utils.Flash{utils.FlashSuccess, utils.FLASH_ACTIVATED}
-	if err := c.Flashes(flash); err != nil {
-		return err
-	}
-	return c.Redirect(http.StatusTemporaryRedirect, c.Echo().Reverse(redirect))
+
+	return c.RedirectWithFlash(utils.FLASH_ACTIVATED)
 }

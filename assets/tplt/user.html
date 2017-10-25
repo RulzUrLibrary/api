@@ -36,11 +36,11 @@
     </form>
   </div>
 </div>
-{{if .["misc"].Valid}}
+{{if .misc.Valid}}
 <div class="columns mt-2">
   <div class="column col-mx-auto col-6 col-md-12 mt-2 pt-2">
     <h4>{{T("user_password_change")}}</h4>
-    <form action="{{url("reset")}}" method="POST">
+    <form action="{{url("change")}}" method="POST">
 
       <div class="form-group{{if isset(error_old)}} has-error{{end}}">
         <label class="form-label" for="old">{{T("user_password_change_current")}}</label>

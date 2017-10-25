@@ -18,6 +18,9 @@ import (
 
 type dict = utils.Dict
 
+// aliases
+var ErrNotFound = echo.ErrNotFound
+
 type Context struct {
 	echo.Context
 	App *Application
@@ -44,6 +47,18 @@ func (c *Context) ReverseAbs(name string, params ...interface{}) string {
 	} else {
 		return fmt.Sprintf("https://%s%s", host, c.Reverse(name, params...))
 	}
+}
+
+func (c *Context) RedirectWithFlash(msg string) error {
+	flash := utils.Flash{utils.FlashSuccess, msg}
+	if err := c.Flashes(flash); err != nil {
+		return err
+	}
+	redirect := "index"
+	if _, ok := c.Get("user").(*utils.User); ok {
+		redirect = "books"
+	}
+	return c.Redirect(http.StatusSeeOther, c.Echo().Reverse(redirect))
 }
 
 func (c *Context) SaveUser(user *utils.User, flashes ...utils.Flash) error {

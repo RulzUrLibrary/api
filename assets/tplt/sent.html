@@ -1,0 +1,15 @@
+{{extends "base.html"}}
+{{import "menu.html"}}
+{{block header()}}
+{{yield menu()}}
+{{end}}
+{{block page_title()}}{{T("sent_reset_mail_title")}}{{end}}
+
+{{block body()}}
+<div class="colums">
+  <div class="col-8 col-md-12 col-mx-auto">
+    <p>{{T("sent_reset_mail_msg")}}: <span class="text-primary">{{.email}}</span></p>
+    <p><b>{{T("disclaimer")}}:</b>{{T("sent_reset_mail_disclaimer")}}</p>
+  </div>
+</div>
+{{end}}

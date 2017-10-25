@@ -1,0 +1,41 @@
+{{extends "base.html"}}
+{{import "menu.html"}}
+{{block header()}}
+{{yield menu(active="user")}}
+{{end}}
+{{block page_title()}}{{T("title_reset")}}{{end}}
+
+{{block body()}}
+{{form := .["form"]}}
+{{error_password := .["errors"]["password"]}}
+<div class="columns mt-2">
+  <div class="column col-mx-auto col-6 col-md-12 mt-2 pt-2">
+    <form method="POST">
+      <div class="form-group{{if isset(error_password)}} has-error{{end}}">
+        <label class="form-label" for="password">{{T("user_password_change_new")}}</label>
+        <input placeholder="{{T("user_password_change_new")}}"
+               value="{{form.Password}}"
+               class="form-input" name="password" type="password" id="password" autocomplete="off" />
+
+        <label class="form-label" for="confirmation">{{T("user_password_change_confirmation")}}</label>
+        <input placeholder="{{T("user_password_change_confirmation")}}"
+               value="{{form.Confirmation}}"
+               class="form-input" name="confirmation" type="password" id="confirmation" autocomplete="off" />
+        {{if isset(error_password)}}
+        <p class="form-input-hint">{{T(error_password)|capitalize}}</p>
+        {{end}}
+      </div>
+
+      <div class="form-group columns">
+        <input name="X-CSRF-Token" type="hidden" value="{{context.Get("csrf")}}"/>
+        <div class="column col-md-12 pt-2">
+          <input type="submit" class="btn btn-primary btn-block" value="{{T("user_password_change_submit")}}"/>
+        </div>
+        <div class="column col-md-12 pt-2">
+          <input class="btn btn-default btn-block" type="reset" value="{{T("cancel")}}"/>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+{{end}}

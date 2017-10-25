@@ -1,7 +1,4 @@
 {
-  "activation_subject": {
-    "other": "Activate your account"
-  },
   "auth_err": {
     "other": "email not registered or password invalid"
   },
@@ -35,11 +32,17 @@
   "confirm_password": {
     "other": "Confirm password"
   },
+  "disclaimer": {
+    "other": "Disclaimer"
+  },
   "divider_or": {
     "other": "OR"
   },
   "email_gmail": {
     "other": "email should not be from gmail, signin directly if you want to use it"
+  },
+  "email_gmail_reset": {
+    "other": "You can't reset a gmail account password, because there's no password"
   },
   "email_invalid": {
     "other": "invalid email address"
@@ -98,6 +101,12 @@
   "mail_activate_link": {
     "other": "Please activate your account by clicking the following link:"
   },
+  "mail_reset_link": {
+    "other": "Please click the following link to reset your password:"
+  },
+  "mail_reset_title": {
+    "other": "You requested a password reset"
+  },
   "mail_signature": {
     "other": "The rulz team"
   },
@@ -131,11 +140,29 @@
   "protected_err": {
     "other": "to access the resource you need to be logged first"
   },
+  "sent_reset_mail_disclaimer": {
+    "other": "Check if the email address is valid, if it does not exists in our database, no mail have been sent."
+  },
+  "sent_reset_mail_msg": {
+    "other": "An email has been sent to the following address to reinitialise the password"
+  },
+  "sent_reset_mail_title": {
+    "other": "Email sent!"
+  },
   "signup": {
     "other": "Sign up"
   },
+  "subject_activation": {
+    "other": "Activate your account"
+  },
+  "subject_reset": {
+    "other": "Reset your password"
+  },
   "title_books": {
     "other": "My collection"
+  },
+  "title_reset": {
+    "other": "Reset password"
   },
   "title_user": {
     "other": "Your profile"
@@ -154,5 +181,14 @@
   },
   "user_password_change_submit": {
     "other": "Confirm"
+  },
+  "user_password_reset_email": {
+    "other": "Your account email address"
+  },
+  "user_password_reset_help": {
+    "other": "You can reset your password if you forgot it, by submitting your account email. It will send you a link which will allow you to put a new password."
+  },
+  "user_password_reset_submit": {
+    "other": "Send mail"
   }
 }

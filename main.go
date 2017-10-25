@@ -41,8 +41,14 @@ func main() {
 
 	rulz.Web.GET("/user", rulz.Handler(app.WEBUserGet), app.Protected).Name = "user"
 	rulz.Web.GET("/user/activate/:id", rulz.Handler(app.WEBUserActivate)).Name = "activate"
-	rulz.Web.GET("/user/reset", rulz.Handler(app.WEBUserReset), app.Protected).Name = "reset"
-	rulz.Web.POST("/user/reset", rulz.Handler(app.WEBUserResetPost), app.Protected)
+
+	rulz.Web.POST("/user/change", rulz.Handler(app.WEBUserChange), app.Protected).Name = "change"
+
+	rulz.Web.GET("/user/reset", rulz.Handler(app.WEBUserResetGet)).Name = "reset"
+	rulz.Web.POST("/user/reset", rulz.Handler(app.WEBUserResetPost))
+
+	rulz.Web.GET("/user/reset/:id", rulz.Handler(app.WEBUserReinit)).Name = "reinit"
+	rulz.Web.POST("/user/reset/:id", rulz.Handler(app.WEBUserReinit))
 
 	rulz.Web.POST("/user/logout", rulz.Handler(app.WEBUserLogout), app.Protected).Name = "logout"
 	rulz.Web.POST("/user/lang", rulz.Handler(app.WEBUserLang)).Name = "lang"

@@ -6,6 +6,7 @@ const (
 	ERR_ALREADY_ACTIVATED = "err_already_activated"
 	EMAIL_INVALID         = "email_invalid"
 	EMAIL_GMAIL           = "email_gmail"
+	EMAIL_GMAIL_RESET     = "email_gmail_reset"
 	EMAIL_REQUIRED        = "email_required"
 	PASSWORD_REQUIRED     = "password_required"
 	PASSWORD_LEN          = "password_len"
@@ -17,5 +18,6 @@ const (
 	FLASH_WELCOME         = "flash_welcome"
 	FLASH_PASSWORD        = "flash_password"
 	FLASH_ACTIVATED       = "flash_activated"
-	ACTIVATION_SUBJECT    = "activation_subject"
+	SUBJECT_ACTIVATION    = "subject_activation"
+	SUBJECT_RESET         = "subject_reset"
 )

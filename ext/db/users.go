@@ -10,10 +10,13 @@ SELECT COALESCE(pwhash = crypt($2, pwhash), FALSE), id
 FROM users
 WHERE email = $1`
 
-const changePassword = `
+const passwordChange = `
 UPDATE users SET pwhash = crypt($1, gen_salt('bf'))
 WHERE COALESCE(pwhash = crypt($2, pwhash), FALSE) AND id = $3
 `
+
+const passwordReset = `
+UPDATE users SET pwhash = crypt($1, gen_salt('bf')), reset = null WHERE reset = $2`
 
 const authGoogle = `
 WITH s AS (
@@ -40,6 +43,9 @@ DELETE FROM users WHERE id = $1`
 const deleteActivate = `
 UPDATE users SET activate = null WHERE activate = $1`
 
+const createReset = `
+UPDATE users SET reset = gen_random_uuid() WHERE email = $1 RETURNING reset`
+
 func (db *DB) Auth(email, password string) (*utils.User, error) {
 	var ok bool
 	var user = &utils.User{Email: email}
@@ -57,8 +63,13 @@ func (db *DB) AuthGoogle(email string) (*utils.User, error) {
 	return user, db.QueryRow(authGoogle, email).Scan(&user.Id)
 }
 
-func (db *DB) ChangePassword(new, old string, user int) (int, error) {
-	return db.Exec(changePassword, new, old, user)
+func (db *DB) PasswordChange(new, old string, user int) (int, error) {
+	return db.Exec(passwordChange, new, old, user)
+}
+
+func (db *DB) PasswordReset(new, reset string) error {
+	_, err := db.DB.Exec(passwordReset, new, reset)
+	return err
 }
 
 func (db *DB) NewUser(email, password string) (*utils.User, string, error) {
@@ -96,4 +107,14 @@ func (db *DB) MustDeleteUser(user *utils.User) {
 	if err != nil {
 		panic(err)
 	}
+}
+
+func (db *DB) CreateReset(email string) (reset string, err error) {
+	// we don't consider user non existing as an error,
+	// to avoid email registered guessing
+	err = db.QueryRow(createReset, email).Scan(&reset)
+	if err == sql.ErrNoRows {
+		err = nil
+	}
+	return
 }
