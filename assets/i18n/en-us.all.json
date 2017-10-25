@@ -17,8 +17,20 @@
   "auth_form_password_placeholder": {
     "other": "Password"
   },
+  "book_added": {
+    "other": "book added to collection"
+  },
+  "book_already_added": {
+    "other": "book was already in the collection"
+  },
+  "book_already_removed": {
+    "other": "book was already out of the collection"
+  },
   "book_details": {
     "other": "Details"
+  },
+  "book_removed": {
+    "other": "book removed from collection"
   },
   "cancel": {
     "other": "Cancel"
@@ -26,8 +38,8 @@
   "collection_add": {
     "other": "add to collection"
   },
-  "collection_in": {
-    "other": "In collection"
+  "collection_del": {
+    "other": "remove from collection"
   },
   "confirm_password": {
     "other": "Confirm password"

@@ -17,8 +17,20 @@
   "auth_form_password_placeholder": {
     "other": "Mot de passe"
   },
+  "book_added": {
+    "other": "le livre a été ajouté à votre collection"
+  },
+  "book_already_added": {
+    "other": "le livre est déjà dans votre collection"
+  },
+  "book_already_removed": {
+    "other": "le livre n'était pas dans votre collection"
+  },
   "book_details": {
     "other": "Détails"
+  },
+  "book_removed": {
+    "other": "le livre a été retiré de votre collection"
   },
   "cancel": {
     "other": "Annuler"
@@ -26,8 +38,8 @@
   "collection_add": {
     "other": "ajouter à ma collection"
   },
-  "collection_in": {
-    "other": "Dans ma collection"
+  "collection_del": {
+    "other": "retirer de ma collection"
   },
   "confirm_password": {
     "other": "Confirmation du mot de passe"

@@ -1,6 +1,7 @@
 package app
 
 import (
+	"github.com/labstack/echo"
 	"github.com/rulzurlibrary/api/ext/db"
 	"github.com/rulzurlibrary/api/utils"
 	"net/http"
@@ -8,7 +9,6 @@ import (
 
 func WEBBookList(c *Context) (err error) {
 	var series *db.Series
-	var user = c.Get("user").(*utils.User)
 	var query = NewPagination()
 
 	if err = c.Bind(&query); err != nil {
@@ -20,7 +20,7 @@ func WEBBookList(c *Context) (err error) {
 	}
 
 	series, query.Count, err = c.App.Database.SerieListU(query.Limit(),
-		query.Offset(), user.Id)
+		query.Offset(), c.Get("user").(*utils.User).Id)
 	if err != nil {
 		return
 	}
@@ -37,23 +37,35 @@ func WEBBookGet(c *Context) error {
 	}
 }
 
-func WEBBookPost(c *Context) (err error) {
-	var count int
-	var user = c.Get("user").(*utils.User)
+func WEBBookPost(c *Context) error {
+	var success, failure string
+	var fn func(int, ...string) (int, error)
 
-	if isbn := c.Param("isbn"); isbn != "" {
-		count, err = c.App.Database.BookPut(user.Id, isbn)
-		if err != nil {
-			return
-		}
-		if count == 0 {
-			err = c.Flashes(utils.Flash{utils.FlashWarning, "book already in collection!"})
-		} else {
-			err = c.Flashes(utils.Flash{utils.FlashSuccess, "book added to collection!"})
-		}
-		if err != nil {
-			return
-		}
+	switch c.FormValue("action") {
+	case "del":
+		success = "book_removed"
+		failure = "book_already_removed"
+		fn = c.App.Database.BookDelete
+	case "add":
+		success = "book_added"
+		failure = "book_already_added"
+		fn = c.App.Database.BookPut
+	default:
+		return echo.NewHTTPError(http.StatusBadRequest)
+	}
+
+	count, err := fn(c.Get("user").(*utils.User).Id, c.Param("isbn"))
+	if err != nil {
+		return err
+	}
+
+	if count == 0 {
+		err = c.Flashes(utils.Flash{utils.FlashWarning, failure})
+	} else {
+		err = c.Flashes(utils.Flash{utils.FlashSuccess, success})
+	}
+	if err != nil {
+		return err
 	}
 	return WEBBookGet(c)
 }
