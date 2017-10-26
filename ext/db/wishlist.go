@@ -13,6 +13,10 @@ SELECT id, $1, '{"wishlist"}' FROM books WHERE %s ON CONFLICT DO NOTHING`
 const countWishList = `
 SELECT COUNT(*) FROM collections WHERE fk_user = $1 AND 'wishlist'=ANY(tags)`
 
+const countWishListU = `
+SELECT COUNT(*) FROM collections c, wishlists w
+WHERE c.fk_user = w.fk_user AND w.uuid = $1 AND 'wishlist'=ANY(tags)`
+
 const wishList = `
 SELECT b.id, b.isbn, b.title, b.description, b.price, b.num, s.name, a.id,
 	a.name, tags
@@ -26,6 +30,30 @@ LEFT OUTER JOIN book_authors ba ON (b.id = ba.fk_book)
 LEFT OUTER JOIN authors a ON (ba.fk_author = a.id)
 LEFT OUTER JOIN series s ON (b.fk_serie = s.id)
 ORDER BY b.num ASC, b.id DESC`
+
+const wishListU = `
+SELECT b.id, b.isbn, b.title, b.description, b.price, b.num, s.name, a.id,
+	a.name, tags
+FROM (
+	SELECT id, isbn, title, description, price, fk_serie, num, tags
+	FROM books, collections c, wishlists w
+	WHERE fk_book = id AND c.fk_user = w.fk_user AND uuid = $3 AND 'wishlist'=ANY(tags)
+	ORDER BY num ASC, id DESC LIMIT $1 OFFSET $2
+) b
+LEFT OUTER JOIN book_authors ba ON (b.id = ba.fk_book)
+LEFT OUTER JOIN authors a ON (ba.fk_author = a.id)
+LEFT OUTER JOIN series s ON (b.fk_serie = s.id)
+ORDER BY b.num ASC, b.id DESC`
+
+const wishLink = `
+WITH i AS (
+	SELECT uuid FROM wishlists WHERE fk_user = $1
+), j AS (
+	INSERT INTO wishlists ("uuid", "fk_user")
+	SELECT gen_random_uuid(), $1
+	WHERE NOT EXISTS (SELECT 1 FROM i) RETURNING uuid
+)
+SELECT uuid FROM i UNION ALL SELECT uuid FROM j`
 
 func (db *DB) WishlistPut(user int, books ...string) (int, error) {
 	var args = []interface{}{user}
@@ -49,5 +77,24 @@ func (db *DB) WishList(limit, offset, user int) ([]*utils.Book, int, error) {
 			},
 		},
 		countWishList, []interface{}{user},
+	})
+}
+
+func (db *DB) WishListLink(user int) (uuid string, err error) {
+	err = db.QueryRow(wishLink, user).Scan(&uuid)
+	return
+}
+
+func (db *DB) WishListU(limit, offset int, uuid string) ([]*utils.Book, int, error) {
+	return db.bookList(queryBookList{
+		queryBook{wishListU, []interface{}{limit, offset, uuid},
+			func(b *Book, a *Author) []interface{} {
+				return []interface{}{
+					&b.Id, &b.Isbn, &b.title, &b.description, &b.price, &b.number,
+					&b.serie, &a.id, &a.name, &b.tags,
+				}
+			},
+		},
+		countWishListU, []interface{}{uuid},
 	})
 }

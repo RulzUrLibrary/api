@@ -1,0 +1,15 @@
+{{extends "base.html"}}
+{{import "menu.html"}}
+{{import "pagination.html"}}
+
+{{block header()}} {{yield menu(active="wishlist")}} {{end}}
+{{block page_title()}}{{T("title_share")}}{{end}}
+
+{{block body()}}
+<div class="colums">
+  <div class="col-8 col-md-12 col-mx-auto">
+    <p>{{T("share_link_msg")}}: <div class="text-primary">{{.link}}</div></p>
+    <p><b>{{T("disclaimer")}}:</b>{{T("share_link_disclaimer")}}</p>
+  </div>
+</div>
+{{end}}

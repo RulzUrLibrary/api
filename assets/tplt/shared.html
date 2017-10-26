@@ -3,15 +3,12 @@
 {{import "pagination.html"}}
 
 {{block header()}} {{yield menu(active="wishlist")}} {{end}}
-{{block page_title()}}{{T("title_wishlist")}}{{end}}
+{{block page_title()}}{{T("title_shared")}}{{end}}
 
 {{block body()}}
 <div class="columns">
-  <div class="column col-4 col-md-12 mb-2 col-mx-auto">
-    <form class="column col-md-6 col-sm-12" method="POST">
-      <input name="X-CSRF-Token" type="hidden" value="{{context.Get("csrf")}}"/>
-      <input class="btn btn-primary btn-block" type="submit" value="{{T("wishlist_share")}}"/>
-    </form>
+  <div class="column col-12">
+    <p class="empty"><b>{{T("shared_msg")}}</b><p>
   </div>
 </div>
 <div class="columns">

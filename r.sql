@@ -27,4 +27,10 @@
 ----WHERE b.isbn = '2351420187'
 --WHERE b.isbn = '9781849839730'
 
-SELECT COUNT(*) FROM collections WHERE fk_user = 1 AND 'wishlist'=ANY(tags)
+--SELECT COUNT(*) FROM collections WHERE fk_user = 1 AND 'wishlist'=ANY(tags)
+
+CREATE TABLE IF NOT EXISTS wishlists (
+  uuid text UNIQUE,
+  fk_user integer UNIQUE REFERENCES users (id) ON DELETE CASCADE
+);
+

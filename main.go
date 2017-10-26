@@ -54,7 +54,11 @@ func main() {
 	rulz.Web.POST("/user/lang", rulz.Handler(app.WEBUserLang)).Name = "lang"
 
 	rulz.Web.GET("/books/", rulz.Handler(app.WEBBookList), app.Protected).Name = "books"
+
 	rulz.Web.GET("/wishlist", rulz.Handler(app.WEBWishList), app.Protected).Name = "wishlist"
+	rulz.Web.POST("/wishlist", rulz.Handler(app.WEBWishListShare), app.Protected)
+
+	rulz.Web.GET("/wishlist/:id", rulz.Handler(app.WEBWishListGet)).Name = "share"
 
 	rulz.Web.GET("/books/:isbn", rulz.Handler(app.WEBBookGet)).Name = "book"
 	rulz.Web.POST("/books/:isbn", rulz.Handler(app.WEBBookPost))

@@ -30,16 +30,16 @@
     "other": "Détails"
   },
   "book_wishlist_added": {
-    "other": "le livre a été ajouté à votre wishlist"
+    "other": "le livre a été ajouté à votre liste de souhaits"
   },
   "book_wishlist_already_added": {
-    "other": "le livre est déjà dans votre wishlist"
+    "other": "le livre est déjà dans votre liste de souhaits"
   },
   "book_wishlist_already_removed": {
-    "other": "le livre n'était pas dans votre wishlist"
+    "other": "le livre n'était pas dans votre liste de souhaits"
   },
   "book_wishlist_removed": {
-    "other": "le livre a été retiré de votre wishlist"
+    "other": "le livre a été retiré de votre liste de souhaits"
   },
   "cancel": {
     "other": "Annuler"
@@ -141,7 +141,7 @@
     "other": "Livres"
   },
   "menu_wishlist": {
-    "other": "Wishlist"
+    "other": "Liste de souhaits"
   },
   "old_password_required": {
     "other": "vous devez saisir le mot de passe actuel"
@@ -176,6 +176,15 @@
   "sent_reset_mail_title": {
     "other": "Email envoyé!"
   },
+  "share_link_disclaimer": {
+    "other": "Vos amis pourront consulter votre liste de souhait mais ne pourront pas l'éditer. Pensez à maintenir votre liste de souhait et collection à jour ;)."
+  },
+  "share_link_msg": {
+    "other": "Vous pouvez partager votre liste de souhaits avec vos amis en utilisant le lien suivant"
+  },
+  "shared_msg": {
+    "other": "Un ami a partagé sa liste de souhait avec vous. Vous pouvez voir si dessous la liste de livre manquant à sa collection. Si vous voulez indiquer quels livres vous souhaitez lui offrir (et éviter les doublons). Vous devez vous enregistrer/connecter sur Rulz!"
+  },
   "signup": {
     "other": "S'inscrire"
   },
@@ -191,11 +200,17 @@
   "title_reset": {
     "other": "Réinitialiser votre mot de passe"
   },
+  "title_share": {
+    "other": "Partager votre liste de souhaits"
+  },
+  "title_shared": {
+    "other": "Liste de souhaits"
+  },
   "title_user": {
     "other": "Mon compte"
   },
   "title_wishlist": {
-    "other": "Votre wishlist"
+    "other": "Votre liste de souhaits"
   },
   "user_password_change": {
     "other": "Changer de mot de passe"
@@ -222,9 +237,12 @@
     "other": "Envoyer l'email"
   },
   "wishlist_add": {
-    "other": "ajouter à ma wishlist"
+    "other": "ajouter à ma liste de souhaits"
   },
   "wishlist_del": {
-    "other": "retirer de ma wishlist"
+    "other": "retirer de ma liste de souhaits"
+  },
+  "wishlist_share": {
+    "other": "Partager la liste de souhaits"
   }
 }

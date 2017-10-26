@@ -1,7 +1,7 @@
 {{extends "base.html"}}
 {{import "menu.html"}}
 {{block header()}}
-{{yield menu()}}
+{{yield menu(active="")}}
 {{end}}
 {{block page_title()}}
 <div style="padding: 200px 0 200px 0">{{.code}}: {{T(.msg)}}</div>

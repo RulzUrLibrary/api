@@ -176,6 +176,15 @@
   "sent_reset_mail_title": {
     "other": "Email sent!"
   },
+  "share_link_disclaimer": {
+    "other": "Your friends will be able to see your wishlist, but not able to edit it. Do not forget to keep your collection and wishlist up to date ;)."
+  },
+  "share_link_msg": {
+    "other": "You can share your wishlist with friends by sending them the following link"
+  },
+  "shared_msg": {
+    "other": "A friend shared a wishlist with you. You can consult the missing book of his/her collection below. If you want to update this list in order to indicate which books you want to offer. You need to sign up/login to Rulz!"
+  },
   "signup": {
     "other": "Sign up"
   },
@@ -190,6 +199,12 @@
   },
   "title_reset": {
     "other": "Reset password"
+  },
+  "title_share": {
+    "other": "Share your wishlist"
+  },
+  "title_shared": {
+    "other": "Wishlist"
   },
   "title_user": {
     "other": "Your profile"
@@ -226,5 +241,8 @@
   },
   "wishlist_del": {
     "other": "remove from wishlist"
+  },
+  "wishlist_share": {
+    "other": "Share your wishlist"
   }
 }

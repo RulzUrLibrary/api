@@ -6,17 +6,6 @@ import (
 	"net/http"
 )
 
-func dynamic(c *Context, from, where, param string) error {
-	ok, err := c.App.Database.Exists(from, where, param)
-	if err != nil {
-		return err
-	}
-	if !ok {
-		return ErrNotFound
-	}
-	return nil
-}
-
 func WEBUserGet(c *Context) error {
 	user := c.Get("user").(*utils.User)
 	return c.Render(http.StatusOK, "user.html",

@@ -21,6 +21,17 @@ type dict = utils.Dict
 // aliases
 var ErrNotFound = echo.ErrNotFound
 
+func dynamic(c *Context, from, where, param string) error {
+	ok, err := c.App.Database.Exists(from, where, param)
+	if err != nil {
+		return err
+	}
+	if !ok {
+		return ErrNotFound
+	}
+	return nil
+}
+
 type Context struct {
 	echo.Context
 	App *Application
