@@ -1,7 +1,4 @@
 {
-  "auth_err": {
-    "other": "email not registered or password invalid"
-  },
   "auth_form_email": {
     "other": "Email"
   },
@@ -76,6 +73,12 @@
   },
   "err_already_activated": {
     "other": "Account already activated or activation link invalid"
+  },
+  "err_auth": {
+    "other": "email not registered or password invalid"
+  },
+  "err_protected": {
+    "other": "to access the resource you need to be logged first"
   },
   "flash_activated": {
     "other": "account successfully activated!"
@@ -163,9 +166,6 @@
   },
   "password_required": {
     "other": "password is required"
-  },
-  "protected_err": {
-    "other": "to access the resource you need to be logged first"
   },
   "sent_reset_mail_disclaimer": {
     "other": "Check if the email address is valid, if it does not exists in our database, no mail have been sent."

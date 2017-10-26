@@ -1,7 +1,4 @@
 {
-  "auth_err": {
-    "other": "cette adresse mail n'est pas enregistré, ou le mot de passe est incorrect"
-  },
   "auth_form_email": {
     "other": "Email"
   },
@@ -76,6 +73,12 @@
   },
   "err_already_activated": {
     "other": "Ce compte est déjà activé ou le lien d'activation est invalide"
+  },
+  "err_auth": {
+    "other": "cette adresse mail n'est pas enregistré, ou le mot de passe est incorrect"
+  },
+  "err_protected": {
+    "other": "pour accéder à cette page, vous devez vous authentifier d'abord"
   },
   "flash_activated": {
     "other": "votre compte est maintenant actif!"
@@ -163,9 +166,6 @@
   },
   "password_required": {
     "other": "vous devez saisir un mot de passe"
-  },
-  "protected_err": {
-    "other": "pour accéder à cette page, vous devez vous authentifier d'abord"
   },
   "sent_reset_mail_disclaimer": {
     "other": "Vérifiez bien que l'adresse email est celle de votre compte, si ce compte n'existe pas, aucun email n'a été envoyé."
