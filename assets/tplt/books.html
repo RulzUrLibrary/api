@@ -11,7 +11,7 @@
     {{yield pagination(obj=.pagination,base=context.Request().URL)}}
     {{range serie := .series}}
     {{link := serie.Isbn == "" ? url("serie", serie.Id) : url("book", serie.Isbn)}}
-    <a class="tile column col-12 rounded" href="{{link}}">
+    <a class="tile column col-12 rounded{{if serie.InWishlist()}} disabled{{end}}" href="{{link}}">
       <div class="tile-icon">
         <figure class="figure">
           <img class="thumb" src="{{serie.Thumb()}}" alt="book cover">
@@ -23,6 +23,10 @@
             {{if len(serie.Volumes) > 0}}
             <small class="toast {{if serie.Volumes.Ratio() == 1.0}}toast-success{{else}}toast-primary{{end}}">
               {{serie.Volumes.Owned()}}
+            </small>
+            {{else if serie.InWishlist()}}
+            <small class="toast">
+              <i class="icon icon-bookmark"></i>
             </small>
             {{else}}
             <small class="toast toast-success">

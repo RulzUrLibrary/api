@@ -133,6 +133,10 @@ func (s Serie) Thumb() string {
 	}
 }
 
+func (s Serie) InWishlist() bool {
+	return s.Tags.In("wishlist")
+}
+
 type Author struct {
 	Id   int    `json:"-"`
 	Name string `json:"name"`
