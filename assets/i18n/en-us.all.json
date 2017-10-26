@@ -137,6 +137,9 @@
   "menu_books": {
     "other": "Books"
   },
+  "menu_wishlist": {
+    "other": "Wishlist"
+  },
   "old_password_required": {
     "other": "current password is required"
   },
@@ -190,6 +193,9 @@
   },
   "title_user": {
     "other": "Your profile"
+  },
+  "title_wishlist": {
+    "other": "Wishlist"
   },
   "user_password_change": {
     "other": "Password change"

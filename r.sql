@@ -18,11 +18,13 @@
 -- arnold = 9781849839730
 -- fullmetal = 2351420187
 
-SELECT b.id, b.isbn, b.title, b.description, b.price, b.num, s.name, a.id, a.name, tags
-FROM books b
-INNER JOIN series s ON (b.fk_serie = s.id)
-LEFT OUTER JOIN collections ON (b.id = fk_book AND fk_user = 1)
-LEFT OUTER JOIN book_authors ba ON (b.id = ba.fk_book)
-LEFT OUTER JOIN authors a ON (ba.fk_author = a.id)
---WHERE b.isbn = '2351420187'
-WHERE b.isbn = '9781849839730'
+--SELECT b.id, b.isbn, b.title, b.description, b.price, b.num, s.name, a.id, a.name, tags
+--FROM books b
+--INNER JOIN series s ON (b.fk_serie = s.id)
+--LEFT OUTER JOIN collections ON (b.id = fk_book AND fk_user = 1)
+--LEFT OUTER JOIN book_authors ba ON (b.id = ba.fk_book)
+--LEFT OUTER JOIN authors a ON (ba.fk_author = a.id)
+----WHERE b.isbn = '2351420187'
+--WHERE b.isbn = '9781849839730'
+
+SELECT COUNT(*) FROM collections WHERE fk_user = 1 AND 'wishlist'=ANY(tags)
