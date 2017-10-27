@@ -2,74 +2,84 @@ package db
 
 import (
 	"database/sql"
-	"github.com/lib/pq"
 	"github.com/rulzurlibrary/api/utils"
 )
 
 type Book struct {
-	Id          int
-	Isbn        string
+	id          sql.NullInt64
+	isbn        sql.NullString
 	title       sql.NullString
 	number      sql.NullInt64
 	serie       sql.NullString
+	serie_id    sql.NullInt64
 	description sql.NullString
 	price       sql.NullFloat64
-	tags        pq.StringArray
+	owned       sql.NullBool
 	authors     Authors
+	wishlists   Wishlists
 }
 
-func (b *Book) ToStructs(partial bool) *utils.Book {
-	book := &utils.Book{
-		b.Isbn, "", b.title.String, b.description.String,
-		float32(b.price.Float64), int(b.number.Int64), b.serie.String,
-		toTags(b.tags), nil,
-	}
+func (b Book) ToStructs(partial bool) (book utils.Book) {
+	book.Isbn = b.isbn.String
+	book.Title = b.title.String
+	book.Price = float32(b.price.Float64)
+	book.Serie = b.serie.String
+	book.Number = int(b.number.Int64)
+	book.Wishlists = b.wishlists.ToWishlists(partial)
+
 	if !partial {
-		book.Thumbnail = "/thumbs/" + b.Isbn + ".jpg"
-		book.Authors = b.authors.ToStructs()
+		book.Description = b.description.String
+		book.Thumbnail = "/thumbs/" + b.isbn.String + ".jpg"
+		book.Authors = b.authors.Authors
 	}
 
-	return book
-}
-
-type Books struct {
-	books map[int]*Book
-	order []int
-}
-
-func NewBooks() *Books {
-	return &Books{make(map[int]*Book), make([]int, 0)}
-}
-
-func (b *Books) Add(book *Book) {
-	if _, ok := b.books[book.Id]; !ok {
-		b.order = append(b.order, book.Id)
+	if b.owned.Valid {
+		book.Owned = &b.owned.Bool
 	}
-	b.books[book.Id] = book
+
+	return
 }
 
-func (b *Books) Get(id int) *Book {
-	return b.books[id]
-}
+func (b Book) ToSerie(partial bool) (serie utils.Serie) {
+	serie.Description = b.description.String
+	serie.Authors = b.authors.Authors
 
-func (b *Books) First() *Book {
-	if len(b.books) > 0 {
-		return b.books[b.order[0]]
-	}
-	return nil
-}
+	if b.number.Valid {
+		serie.Id = b.serie_id.Int64
+		serie.Name = b.serie.String
 
-func (b *Books) ToStructs(partial bool) (books utils.Books) {
-	for _, id := range b.order {
-		books = append(books, b.books[id].ToStructs(partial))
+		b.serie.String = ""
+		serie.Volumes = &utils.Books{b.ToStructs(partial)}
+	} else {
+		serie.Isbn = b.isbn.String
+		serie.Title = b.title.String
+		if b.owned.Valid {
+			serie.Owned = &b.owned.Bool
+		}
 	}
 	return
 }
 
-func toTags(array pq.StringArray) *utils.Tags {
-	tags := utils.Tags(array)
-	if tags == nil {
-		return nil
+type Books []Book
+
+func (b Books) ToStructs(partial bool) (books utils.Books) {
+	for _, book := range b {
+		books = append(books, book.ToStructs(partial))
 	}
-	return &tags
+	return books
+}
+
+func (b Books) ToSeries(partial bool) (series utils.Series) {
+	var last utils.Serie
+
+	for _, book := range b {
+		if book.serie_id.Int64 == last.Id {
+			book.serie.String = "" // we are dumping series, no need to keep this
+			*last.Volumes = append(*last.Volumes, book.ToStructs(partial))
+		} else {
+			last = book.ToSerie(partial)
+			series = append(series, last)
+		}
+	}
+	return series
 }

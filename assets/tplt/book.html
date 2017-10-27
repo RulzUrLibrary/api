@@ -7,54 +7,64 @@
 
 {{block body()}}
 <div class="columns">
-<div class="column col-12">
-  <div class="divider"></div>
-</div>
-{{range author := .book.Authors}}
-<div class="column col-6">
-  <div class="tile">
-    <div class="tile-content">
-      <p class="tile-title">{{author.Name}}</p>
-      <p class="tile-subtitle">Some bio stuff maybe...</p>
-      <p>
-      <button class="btn btn-primary btn-sm">{{T("book_details")}}</button>
-      </p>
-    </div>
+  <div class="column col-12">
+    <div class="divider"></div>
+  </div>
+  <div class="column col-12">
+  <h3>{{T("book_authors")}}</h3>
+  </div>
+  {{range author := .book.Authors}}
+  <div class="column col-6">
+    <div class="tile">
+      <div class="tile-content">
+        <p class="tile-title">{{author.Name}}</p>
+        <p class="tile-subtitle">Some bio stuff maybe...</p>
+        <p>
+        <button class="btn btn-primary btn-sm">{{T("book_details")}}</button>
+        </p>
+      </div>
 
+    </div>
   </div>
-</div>
-{{end}}
-<div class="column col-12">
-  <div class="divider"></div>
-</div>
-<div class="column col-12">
-  <p class="text-justify"> {{.book.Description}} </p>
-</div>
-<form class="column col-md-6 col-sm-12" method="POST">
-  <input name="X-CSRF-Token" type="hidden" value="{{context.Get("csrf")}}"/>
-  {{if !.book.InCollection() && !.book.InWishlist()}}
-  <input type="hidden" name="action" value="add"/>
-  <div class="btn-group">
-    <button class="btn btn-primary" type="submit" name="tag" value="collection">
-      {{T("collection_add")|capitalize}}
-    </button>
-    <button class="btn" type="submit" name="tag" value="wishlist">
-      {{T("wishlist_add")|capitalize}}
-    </button>
+  {{end}}
+  {{if .book.Wishlists}}
+  <div class="column col-12">
+    <div class="divider"></div>
   </div>
-  {{else}}
-  <input type="hidden" name="action" value="del"/>
-  {{if .book.InCollection()}}
-  <button class="btn" type="submit" name="tag" value="collection">
-    {{T("collection_del")|capitalize}}
-  </button>
+  <div class="column col-12">
+    <h3>{{T("book_wishlists")}}</h3>
+    <form method="POST">
+    {{range wishlist := .book.Wishlists}}
+    <span class="chip">
+      {{wishlist.Name}}
+      <button type="submit" class="btn btn-clear" aria-label="Close" role="button" name="wish" value="{{wishlist.Uuid}}"></button>
+    </span>
+    {{end}}
+    <input name="X-CSRF-Token" type="hidden" value="{{context.Get("csrf")}}"/>
+    </form>
+  </div>
   {{end}}
-  {{if .book.InWishlist()}}
-  <button class="btn" type="submit" name="tag" value="wishlist">
-    {{T("wishlist_del")|capitalize}}
-  </button>
-  {{end}}
-  {{end}}
-</form>
+<div class="column col-12">
+    <div class="divider"></div>
+  </div>
+
+  <div class="column col-12">
+    <p class="text-justify"> {{.book.Description}} </p>
+  </div>
+  <form class="column col-md-6 col-sm-12" method="POST">
+    <input name="X-CSRF-Token" type="hidden" value="{{context.Get("csrf")}}"/>
+    {{if !.book.InCollection() }}
+    <input type="hidden" name="action" value="add"/>
+    <div class="btn-group">
+      <button class="btn btn-primary" type="submit">{{T("collection_add")|capitalize}}</button>
+      <a class="btn" href="{{url("share", .book.Isbn)}}">{{T("wishlist_add")|capitalize}}</a>
+    </div>
+    {{else}}
+    <input type="hidden" name="action" value="del"/>
+    {{if .book.InCollection()}}
+    <button class="btn" type="submit">{{T("collection_del")|capitalize}}</button>
+    {{end}}
+    {{end}}
+  </form>
 </div>
 {{end}}

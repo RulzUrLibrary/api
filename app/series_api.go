@@ -7,14 +7,14 @@ import (
 
 func APISerieGet(c *Context) error {
 	serie, err := SerieGet(c)
-	if err == nil {
-		c.JSON(http.StatusOK, serie)
+	if err != nil {
+		return err
 	}
-	return err
+	return c.JSON(http.StatusOK, serie.ToSeries(false)[0])
 }
 
 func APISerieList(c *Context) (err error) {
-	var series *db.Series
+	var books db.Books
 	var meta = NewMeta()
 
 	if err = c.Bind(&meta); err != nil {
@@ -23,9 +23,9 @@ func APISerieList(c *Context) (err error) {
 	if err = c.Validate(&meta); err != nil {
 		return
 	}
-	series, meta.Count, err = SerieList(c, meta.Limit, meta.Offset)
+	books, meta.Count, err = SerieList(c, meta.Limit, meta.Offset)
 	if err != nil {
 		return err
 	}
-	return c.JSON(http.StatusOK, dict{"_meta": meta, "series": series.ToStructs(true)})
+	return c.JSON(http.StatusOK, dict{"_meta": meta, "series": books.ToSeries(true)})
 }

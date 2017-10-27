@@ -17,7 +17,7 @@ func Dump(i interface{}) string {
 	return string(bytes)
 }
 
-func Ceil(i, j int) int {
+func Ceil(i int64, j int) int {
 	if j == 0 {
 		return 0
 	}

@@ -29,10 +29,6 @@
             <small class="toast toast-success">
               <i class="icon icon-check"></i>
             </small>
-            {{else if volume.InWishlist()}}
-            <small class="toast">
-              <i class="icon icon-bookmark"></i>
-            </small>
             {{else}}
             <form action="{{context.Request().URL}}#{{volume.Number}}" method="POST">
               <input type="hidden" value="{{volume.Isbn}}" name="isbn"/>

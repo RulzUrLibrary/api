@@ -55,13 +55,18 @@ func main() {
 
 	rulz.Web.GET("/books/", rulz.Handler(app.WEBBookList), app.Protected).Name = "books"
 
-	rulz.Web.GET("/wishlist", rulz.Handler(app.WEBWishList), app.Protected).Name = "wishlist"
-	rulz.Web.POST("/wishlist", rulz.Handler(app.WEBWishListShare), app.Protected)
+	rulz.Web.GET("/wishlists/", rulz.Handler(app.WEBWishlist), app.Protected).Name = "wishlists"
 
-	rulz.Web.GET("/wishlist/:id", rulz.Handler(app.WEBWishListGet)).Name = "share"
+	rulz.Web.GET("/tags/", rulz.Handler(app.WEBTag), app.Protected).Name = "tags"
+	rulz.Web.POST("/tags/", rulz.Handler(app.WEBTag), app.Protected)
+
+	rulz.Web.GET("/wishlist/:id", rulz.Handler(app.WEBWishListGet)).Name = "wishlist"
 
 	rulz.Web.GET("/books/:isbn", rulz.Handler(app.WEBBookGet)).Name = "book"
 	rulz.Web.POST("/books/:isbn", rulz.Handler(app.WEBBookPost))
+
+	rulz.Web.GET("/books/:isbn/wishlist", rulz.Handler(app.WEBWishlistAdd), app.Protected).Name = "share"
+	rulz.Web.POST("/books/:isbn/wishlist", rulz.Handler(app.WEBWishlistPost), app.Protected)
 
 	// TODO: find a better way to identify series
 	rulz.Web.GET("/series/:id", rulz.Handler(app.WEBSerieGet), app.Protected).Name = "serie"

@@ -8,8 +8,9 @@ import (
 	"net/http"
 )
 
-func BookGet(c *Context) (_ *utils.Book, err error) {
-	var book *db.Book
+func BookGet(c *Context) (b utils.Book, err error) {
+	var book db.Book
+
 	isbn := c.Param("isbn")
 	user, ok := c.Get("user").(*utils.User)
 	if ok {
@@ -20,19 +21,19 @@ func BookGet(c *Context) (_ *utils.Book, err error) {
 	switch err {
 	case nil:
 	case utils.ErrNotFound:
-		return nil, echo.NewHTTPError(http.StatusNotFound, "book "+isbn+" not found")
+		return b, echo.NewHTTPError(http.StatusNotFound, "book "+isbn+" not found")
 	default:
-		return nil, err
+		return b, err
 	}
 	return book.ToStructs(false), err
 }
 
 func BookPost(c *Context, isbn string) (book utils.Book, ok bool, err error) {
-	fn := func(book *db.Book, err error) (utils.Book, error) {
+	fn := func(book db.Book, err error) (b utils.Book, _ error) {
 		if err != nil {
-			return utils.Book{}, err
+			return b, err
 		}
-		return *book.ToStructs(false), err
+		return book.ToStructs(false), err
 	}
 	db := c.App.Database
 
@@ -66,16 +67,7 @@ func BookPost(c *Context, isbn string) (book utils.Book, ok bool, err error) {
 	return
 }
 
-func BookList(c *Context, limit, offset int) ([]*utils.Book, int, error) {
-	user, ok := c.Get("user").(*utils.User)
-	if ok {
-		return c.App.Database.BookListU(limit, offset, user.Id)
-	} else {
-		return c.App.Database.BookList(limit, offset)
-	}
-}
-
-func change(c *Context, fn func(int, ...string) (int, error)) (int, error) {
+func change(c *Context, fn func(int, ...string) (int64, error)) (int64, error) {
 	var user = c.Get("user").(*utils.User)
 	var books struct {
 		Isbns []string `json:"isbns"`

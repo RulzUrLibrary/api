@@ -1,13 +1,14 @@
 package app
 
 import (
+	"github.com/labstack/echo"
 	"github.com/rulzurlibrary/api/ext/db"
 	"github.com/rulzurlibrary/api/utils"
 	"net/http"
 )
 
 func WEBBookList(c *Context) (err error) {
-	var series *db.Series
+	var series db.Books
 	var query = NewPagination()
 
 	if err = c.Bind(&query); err != nil {
@@ -25,7 +26,7 @@ func WEBBookList(c *Context) (err error) {
 	}
 
 	return c.Render(http.StatusOK, "books.html",
-		dict{"series": series.ToStructs(true), "pagination": query})
+		dict{"series": series.ToSeries(true), "pagination": query})
 }
 
 func WEBBookGet(c *Context) error {
@@ -36,32 +37,36 @@ func WEBBookGet(c *Context) error {
 	}
 }
 
-func WEBBookPost(c *Context) error {
-	type st struct {
-		success string
-		failure string
-		fn      func(int, ...string) (int, error)
-	}
-	s := map[string]map[string]st{
-		"wishlist": map[string]st{
-			"del": st{"book_wishlist_removed", "book_wishlist_already_removed", c.App.Database.BookDelete},
-			"add": st{"book_wishlist_added", "book_wishlist_already_added", c.App.Database.WishlistPut},
-		},
-		"collection": map[string]st{
-			"del": st{"book_collection_removed", "book_collection_already_removed", c.App.Database.BookDelete},
-			"add": st{"book_collection_added", "book_collection_already_added", c.App.Database.BookPut},
-		},
-	}[c.FormValue("tag")][c.FormValue("action")]
+func WEBBookPost(c *Context) (err error) {
+	var success, failure string
+	var count int64
 
-	count, err := s.fn(c.Get("user").(*utils.User).Id, c.Param("isbn"))
+	if wish := c.FormValue("wish"); wish != "" {
+		success = "book_wishlist_removed"
+		failure = "book_wishlist_already_removed"
+		count, err = c.App.Database.WishDelete(c.Get("user").(*utils.User).Id,
+			c.Param("isbn"), wish)
+	} else if action := c.FormValue("action"); action == "del" {
+		success = "book_collection_removed"
+		failure = "book_collection_already_removed"
+		count, err = c.App.Database.BookDelete(c.Get("user").(*utils.User).Id,
+			c.Param("isbn"))
+	} else if action == "add" {
+		success = "book_collection_added"
+		failure = "book_collection_already_added"
+		count, err = c.App.Database.BookPut(c.Get("user").(*utils.User).Id,
+			c.Param("isbn"))
+	} else {
+		err = echo.NewHTTPError(http.StatusBadRequest, nil)
+	}
 	if err != nil {
 		return err
 	}
 
 	if count == 0 {
-		err = c.Flashes(utils.Flash{utils.FlashWarning, s.failure})
+		err = c.Flashes(utils.Flash{utils.FlashWarning, failure})
 	} else {
-		err = c.Flashes(utils.Flash{utils.FlashSuccess, s.success})
+		err = c.Flashes(utils.Flash{utils.FlashSuccess, success})
 	}
 	if err != nil {
 		return err

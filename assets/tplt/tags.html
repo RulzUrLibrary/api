@@ -1,0 +1,33 @@
+{{extends "base.html"}}
+{{import "menu.html"}}
+{{import "pagination.html"}}
+
+{{block header()}} {{yield menu(active="wishlists")}} {{end}}
+{{block page_title()}}{{T("title_wishlists")}}{{end}}
+
+{{block body()}}
+{{form := .["form"]}}
+{{error_name := .["errors"]["name"]}}
+
+<div class="columns">
+  <div class="column col-6 col-md-12">
+    <h2>{{T("wishlist_form")}}</h2>
+    <form method="POST">
+      <div class="form-group{{if isset(error_name)}} has-error{{end}}">
+        <label class="form-label" for="name">{{T("wishlist_form_name")}}</label>
+        <input placeholder="{{T("wishlist_form_name_placeholder")}}"
+               value="{{form.Name}}"
+               class="form-input" name="name" type="text" id="name" autocomplete="off"/>
+        {{if isset(error_name)}}
+        <p class="form-input-hint">{{T(error_name)|capitalize}}</p>
+        {{end}}
+      </div>
+      <input name="X-CSRF-Token" type="hidden" value="{{context.Get("csrf")}}"/>
+      <div class="form-group text-right">
+        <button class="btn btn-primary col-6 col-md-12 mt-1" type="submit">{{T("wishlist_form_submit")}}</button>
+        <button class="btn btn-default col-3 col-md-12 mt-1" type="reset">{{T("cancel")}}</button>
+      </div>
+    </form>
+  </div>
+</div>
+{{end}}

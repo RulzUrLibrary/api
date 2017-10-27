@@ -1,100 +1,85 @@
 package db
 
 import (
+	"bytes"
+	"database/sql"
 	"fmt"
+	"github.com/lib/pq"
 	"github.com/rulzurlibrary/api/utils"
-	"strings"
 )
 
-const wishlistPut = `
-INSERT INTO collections ("fk_book", "fk_user", "tags")
-SELECT id, $1, '{"wishlist"}' FROM books WHERE %s ON CONFLICT DO NOTHING`
+type Wishlist struct {
+	id   sql.NullInt64
+	name sql.NullString
+	uuid sql.NullString
+	user sql.NullString
+	book Book
+}
 
-const countWishList = `
-SELECT COUNT(*) FROM collections WHERE fk_user = $1 AND 'wishlist'=ANY(tags)`
+func (w *Wishlist) Scan(src interface{}) (err error) {
+	var elems [][]byte
 
-const countWishListU = `
-SELECT COUNT(*) FROM collections c, wishlists w
-WHERE c.fk_user = w.fk_user AND w.uuid = $1 AND 'wishlist'=ANY(tags)`
-
-const wishList = `
-SELECT b.id, b.isbn, b.title, b.description, b.price, b.num, s.name, a.id,
-	a.name, tags
-FROM (
-	SELECT id, isbn, title, description, price, fk_serie, num, tags
-	FROM books, collections
-	WHERE fk_book = id AND fk_user = $3 AND 'wishlist'=ANY(tags)
-	ORDER BY num ASC, id DESC LIMIT $1 OFFSET $2
-) b
-LEFT OUTER JOIN book_authors ba ON (b.id = ba.fk_book)
-LEFT OUTER JOIN authors a ON (ba.fk_author = a.id)
-LEFT OUTER JOIN series s ON (b.fk_serie = s.id)
-ORDER BY b.num ASC, b.id DESC`
-
-const wishListU = `
-SELECT b.id, b.isbn, b.title, b.description, b.price, b.num, s.name, a.id,
-	a.name, tags
-FROM (
-	SELECT id, isbn, title, description, price, fk_serie, num, tags
-	FROM books, collections c, wishlists w
-	WHERE fk_book = id AND c.fk_user = w.fk_user AND uuid = $3 AND 'wishlist'=ANY(tags)
-	ORDER BY num ASC, id DESC LIMIT $1 OFFSET $2
-) b
-LEFT OUTER JOIN book_authors ba ON (b.id = ba.fk_book)
-LEFT OUTER JOIN authors a ON (ba.fk_author = a.id)
-LEFT OUTER JOIN series s ON (b.fk_serie = s.id)
-ORDER BY b.num ASC, b.id DESC`
-
-const wishLink = `
-WITH i AS (
-	SELECT uuid FROM wishlists WHERE fk_user = $1
-), j AS (
-	INSERT INTO wishlists ("uuid", "fk_user")
-	SELECT gen_random_uuid(), $1
-	WHERE NOT EXISTS (SELECT 1 FROM i) RETURNING uuid
-)
-SELECT uuid FROM i UNION ALL SELECT uuid FROM j`
-
-func (db *DB) WishlistPut(user int, books ...string) (int, error) {
-	var args = []interface{}{user}
-	var where = []string{}
-
-	for i, isbn := range books {
-		where = append(where, fmt.Sprintf("isbn = $%d", i+2))
-		args = append(args, isbn)
+	if elems, err = parseRow(src.([]byte), []byte{','}); err != nil {
+		return
 	}
-	return db.Exec(fmt.Sprintf(wishlistPut, strings.Join(where, " OR ")), args...)
-}
 
-func (db *DB) WishList(limit, offset, user int) ([]*utils.Book, int, error) {
-	return db.bookList(queryBookList{
-		queryBook{wishList, []interface{}{limit, offset, user},
-			func(b *Book, a *Author) []interface{} {
-				return []interface{}{
-					&b.Id, &b.Isbn, &b.title, &b.description, &b.price, &b.number,
-					&b.serie, &a.id, &a.name, &b.tags,
-				}
-			},
-		},
-		countWishList, []interface{}{user},
-	})
-}
+	if len(elems) != 2 {
+		return fmt.Errorf("element is not a valid wishlist")
+	}
 
-func (db *DB) WishListLink(user int) (uuid string, err error) {
-	err = db.QueryRow(wishLink, user).Scan(&uuid)
+	w.name.String = string(elems[0])
+	w.uuid.String = string(elems[1])
 	return
 }
 
-func (db *DB) WishListU(limit, offset int, uuid string) ([]*utils.Book, int, error) {
-	return db.bookList(queryBookList{
-		queryBook{wishListU, []interface{}{limit, offset, uuid},
-			func(b *Book, a *Author) []interface{} {
-				return []interface{}{
-					&b.Id, &b.Isbn, &b.title, &b.description, &b.price, &b.number,
-					&b.serie, &a.id, &a.name, &b.tags,
-				}
-			},
-		},
-		countWishListU, []interface{}{uuid},
-	})
+type Wishlists struct {
+	Wishlists []Wishlist
+	Valid     bool
+}
+
+// You are responsible for wishlists ids to be consecutives
+func (w Wishlists) ToStructs(partial bool) (wishlists utils.Wishlists) {
+	var last utils.Wishlist
+
+	for _, wishlist := range w.Wishlists {
+		if last.Id != 0 && wishlist.id.Int64 == last.Id {
+			*last.Books = append(*last.Books, wishlist.book.ToStructs(partial))
+		} else {
+			last = utils.Wishlist{
+				wishlist.id.Int64, wishlist.name.String, wishlist.uuid.String,
+				wishlist.user.String, nil}
+			if wishlist.book.id.Valid {
+				last.Books = &utils.Books{wishlist.book.ToStructs(partial)}
+			}
+			wishlists = append(wishlists, last)
+		}
+	}
+	return
+}
+
+func (w Wishlists) ToWishlists(partial bool) *utils.Wishlists {
+	if !w.Valid {
+		return nil
+	}
+	wishlists := w.ToStructs(partial)
+	if wishlists == nil {
+		return &utils.Wishlists{}
+	}
+	return &wishlists
+}
+
+func (w Wishlists) AbsLinks(fn func(string, ...interface{}) string) map[string]string {
+	links := make(map[string]string)
+	for _, wishlist := range w.Wishlists {
+		links[wishlist.uuid.String] = fn("wishlist", wishlist.uuid.String)
+	}
+	return links
+}
+
+func (w *Wishlists) Scan(src interface{}) error {
+	w.Valid = true
+	if bytes.Equal(src.([]byte), []byte(`{"(,)"}`)) {
+		return nil
+	}
+	return pq.Array(&w.Wishlists).Scan(src)
 }

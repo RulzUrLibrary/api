@@ -63,7 +63,7 @@ func (db *DB) AuthGoogle(email string) (*utils.User, error) {
 	return user, db.QueryRow(authGoogle, email).Scan(&user.Id)
 }
 
-func (db *DB) PasswordChange(new, old string, user int) (int, error) {
+func (db *DB) PasswordChange(new, old string, user int) (int64, error) {
 	return db.Exec(passwordChange, new, old, user)
 }
 
@@ -84,7 +84,7 @@ func (db *DB) NewUser(email, password string) (*utils.User, string, error) {
 	return user, activate.String, err
 }
 
-func (db *DB) DeleteUser(user *utils.User) (int, error) {
+func (db *DB) DeleteUser(user *utils.User) (int64, error) {
 	return db.Exec(deleteUser, user.Id)
 }
 

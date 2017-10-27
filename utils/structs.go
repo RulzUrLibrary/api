@@ -51,15 +51,16 @@ type User struct {
 }
 
 type Book struct {
-	Isbn        string   `json:"isbn"`
-	Thumbnail   string   `json:"thumbnail,omitempty"`
-	Title       string   `json:"title,omitempty"`
-	Description string   `json:"description,omitempty"`
-	Price       float32  `json:"price,omitempty"`
-	Number      int      `json:"number,omitempty"`
-	Serie       string   `json:"serie,omitempty"`
-	Tags        *Tags    `json:"tags,omitempty"`
-	Authors     *Authors `json:"authors,omitempty"`
+	Isbn        string     `json:"isbn"`
+	Thumbnail   string     `json:"thumbnail,omitempty"`
+	Title       string     `json:"title,omitempty"`
+	Description string     `json:"description,omitempty"`
+	Price       float32    `json:"price,omitempty"`
+	Number      int        `json:"number,omitempty"`
+	Serie       string     `json:"serie,omitempty"`
+	Owned       *bool      `json:"owned,omitempty"` // tricking golang json encoding
+	Authors     *Authors   `json:"authors,omitempty"`
+	Wishlists   *Wishlists `json:"wishlists,omitempty"`
 }
 
 func (b Book) TitleDisplay() string {
@@ -73,14 +74,10 @@ func (b Book) TitleDisplay() string {
 }
 
 func (b Book) InCollection() bool {
-	return b.Tags.In("collection")
+	return b.Owned != nil && *b.Owned
 }
 
-func (b Book) InWishlist() bool {
-	return b.Tags.In("wishlist")
-}
-
-type Books []*Book
+type Books []Book
 
 func (b Books) owned() (nb int) {
 	for _, book := range b {
@@ -100,49 +97,32 @@ func (b Books) Ratio() float64 {
 }
 
 type Serie struct {
-	Id          int      `json:"id,omitempty"`
+	Id          int64    `json:"id,omitempty"`
 	Name        string   `json:"name,omitempty"`
 	Description string   `json:"description,omitempty"`
 	Thumbnail   string   `json:"thumbnail,omitempty"`
 	Title       string   `json:"title,omitempty"`
 	Isbn        string   `json:"isbn,omitempty"`
-	Tags        *Tags    `json:"tags,omitempty"`
+	Owned       *bool    `json:"owned,omitempty"` // tricking golang json encoding
 	Authors     *Authors `json:"authors,omitempty"`
-	Volumes     Books    `json:"volumes,omitempty"`
-}
-
-type Tags []string
-
-func (t *Tags) In(obj string) bool {
-	if t == nil {
-		return false
-	}
-	for _, o := range *t {
-		if o == obj {
-			return true
-		}
-	}
-	return false
+	Volumes     *Books   `json:"volumes,omitempty"`
 }
 
 func (s Serie) Thumb() string {
-	if len(s.Volumes) > 0 {
-		return "/thumbs/" + s.Volumes[0].Isbn + ".jpg"
-	} else {
+	if s.Volumes == nil || len(*s.Volumes) == 0 {
 		return "/thumbs/" + s.Isbn + ".jpg"
 	}
+	return "/thumbs/" + (*s.Volumes)[0].Isbn + ".jpg"
 }
 
-func (s Serie) InWishlist() bool {
-	return s.Tags.In("wishlist")
-}
+type Series []Serie
 
 type Author struct {
-	Id   int    `json:"-"`
+	Id   uint64 `json:"-"`
 	Name string `json:"name"`
 }
 
-type Authors []*Author
+type Authors []Author
 
 func (a Authors) String() string {
 	var names []string
@@ -151,6 +131,16 @@ func (a Authors) String() string {
 	}
 	return strings.Join(names, ", ")
 }
+
+type Wishlist struct {
+	Id    int64  `json:"-"`
+	Name  string `json:"name"`
+	Uuid  string `json:"uuid,omitempty"`
+	User  string `json:"user,omitempty"`
+	Books *Books `json:"books,omitempty"`
+}
+
+type Wishlists []Wishlist
 
 func init() {
 	gob.Register(&User{})

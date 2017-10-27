@@ -140,8 +140,8 @@
   "menu_books": {
     "other": "Livres"
   },
-  "menu_wishlist": {
-    "other": "Liste de souhaits"
+  "menu_wishlists": {
+    "other": "Listes de souhaits"
   },
   "old_password_required": {
     "other": "vous devez saisir le mot de passe actuel"
@@ -212,8 +212,8 @@
   "title_user": {
     "other": "Mon compte"
   },
-  "title_wishlist": {
-    "other": "Votre liste de souhaits"
+  "title_wishlists": {
+    "other": "Vos listes de souhaits"
   },
   "user_password_change": {
     "other": "Changer de mot de passe"

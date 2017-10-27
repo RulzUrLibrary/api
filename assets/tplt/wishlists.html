@@ -1,0 +1,51 @@
+{{extends "base.html"}}
+{{import "menu.html"}}
+{{import "pagination.html"}}
+
+{{block header()}} {{yield menu(active="wishlists")}} {{end}}
+{{block page_title()}}{{T("title_wishlists")}}{{end}}
+
+{{block body()}}
+<div class="columns">
+  <div class="column col-4 col-md-12 mb-2 col-mx-auto">
+    <a href="{{url("tags")}}" class="btn btn-primary btn-block">{{T("wishlist_create")}}</a>
+  </div>
+</div>
+
+<div class="columns">
+  <div class="column col-12">
+    {{yield pagination(obj=.pagination,base=context.Request().URL)}}
+    {{range wishlist := .wishlists}}
+      {{uuid := wishlist.Uuid}}
+    <div class="columns mb-2 mt-2 pt-2">
+      <div class="column col-12 mb-2">
+        <a href="{{url("wishlist", uuid)}}"><h3>{{wishlist.Name}}</h3></a>
+        {{if wishlist.Books}}
+        <ul>
+          {{range book := wishlist.Books}}
+          <li>{{book.TitleDisplay()}}</li>
+          {{end}}
+        </ul>
+        {{else}}
+        {{T("wishlists_no_book")}}
+        {{end}}
+      </div>
+      <div class="column col-6 col-lg-12 mb-2">
+        <div class="form-group">
+          <label class="form-label" for="{{uuid}}">{{T("share_link_msg")}}:</label>
+          <input style="border: none; padding:0; background-color:transparent"
+                 class="text-primary column col-12"
+                 value="{{.links[uuid]}}" type="text" id="{{uuid}}" disabled/>
+        </div>
+        <button class="btn btn-primary" onclick="copy(this, '{{uuid}}')">
+          {{T("share_link_copy")}}
+        </button>
+        <a href="{{url("wishlist", wishlist.Uuid)}}"
+           class="btn btn-primary btn-link">{{T("wishlist_see_details")}}</a>
+      </div>
+    </div>
+    {{end}}
+    {{yield pagination(obj=.pagination,base=context.Request().URL)}}
+  </div>
+</div>
+{{end}}

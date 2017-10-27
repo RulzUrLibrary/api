@@ -1,13 +1,14 @@
 package app
 
 import (
+	"github.com/rulzurlibrary/api/ext/db"
 	"github.com/rulzurlibrary/api/utils"
 	"net/http"
 	"strings"
 )
 
 func WEBIndex(c *Context) (err error) {
-	var books []*utils.Book
+	var books db.Books
 	var pattern string
 	var query = struct {
 		Pattern string `query:"search"`
@@ -35,5 +36,7 @@ func WEBIndex(c *Context) (err error) {
 	if err != nil {
 		return
 	}
-	return c.Render(http.StatusOK, "index.html", dict{"books": books, "pagination": query.Pagination})
+	return c.Render(http.StatusOK, "index.html", dict{
+		"books": books.ToStructs(false), "pagination": query.Pagination,
+	})
 }

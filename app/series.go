@@ -8,31 +8,32 @@ import (
 	"strconv"
 )
 
-func SerieGet(c *Context) (*utils.Serie, error) {
-	var serie *db.Serie
-
+func SerieGet(c *Context) (books db.Books, err error) {
 	id, err := strconv.Atoi(c.Param("id"))
-	user, ok := c.Get("user").(*utils.User)
 	if err != nil {
 		return nil, echo.NewHTTPError(
 			http.StatusBadRequest, "serie 'id' must be an integer",
 		)
 	}
+
+	user, ok := c.Get("user").(*utils.User)
 	if ok {
-		serie, err = c.App.Database.SerieGetU(id, user.Id)
+		books, err = c.App.Database.SerieGetU(id, user.Id)
 	} else {
-		serie, err = c.App.Database.SerieGet(id)
+		books, err = c.App.Database.SerieGet(id)
 	}
-	switch err {
-	case nil:
-		return serie.ToStructs(false), nil
-	case utils.ErrNotFound:
-		return nil, echo.NewHTTPError(http.StatusNotFound, "serie "+c.Param("id")+" not found")
+	if err != nil {
+		return
 	}
-	return nil, err
+	if len(books) == 0 {
+		return nil, echo.NewHTTPError(
+			http.StatusNotFound, "serie "+c.Param("id")+" not found",
+		)
+	}
+	return books, nil
 }
 
-func SerieList(c *Context, limit, offset int) (*db.Series, int, error) {
+func SerieList(c *Context, limit, offset int) (db.Books, int64, error) {
 	user, ok := c.Get("user").(*utils.User)
 
 	if ok {

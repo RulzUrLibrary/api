@@ -140,8 +140,8 @@
   "menu_books": {
     "other": "Books"
   },
-  "menu_wishlist": {
-    "other": "Wishlist"
+  "menu_wishlists": {
+    "other": "Wishlists"
   },
   "old_password_required": {
     "other": "current password is required"

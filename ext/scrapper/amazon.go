@@ -121,7 +121,7 @@ func getDescription(node *html.Node) string {
 func getAuthors(authors []*html.Node) *utils.Authors {
 	authorList := utils.Authors{}
 	for _, author := range authors {
-		authorList = append(authorList, &utils.Author{Name: getAuthor(getText(author))})
+		authorList = append(authorList, utils.Author{Name: getAuthor(getText(author))})
 	}
 	return &authorList
 }

@@ -1,25 +1,49 @@
 package db
 
 import (
-	"database/sql"
+	"bytes"
+	"fmt"
+	"github.com/lib/pq"
 	"github.com/rulzurlibrary/api/utils"
+	"strconv"
 )
 
-type Author struct {
-	id   sql.NullInt64
-	name sql.NullString
-}
-type Authors []Author
+type Author utils.Author
 
-func (a Authors) ToStructs() *utils.Authors {
-	authors := utils.Authors{}
-	ids := map[int64]bool{}
+func (a *Author) Scan(src interface{}) (err error) {
+	var elems [][]byte
 
-	for _, author := range a {
-		if _, ok := ids[author.id.Int64]; !ok && author.id.Valid {
-			ids[author.id.Int64] = true
-			authors = append(authors, &utils.Author{Name: author.name.String})
-		}
+	if elems, err = parseRow(src.([]byte), []byte{','}); err != nil {
+		return
 	}
-	return &authors
+
+	if len(elems) != 2 {
+		return fmt.Errorf("element is not a valid author")
+	}
+	if a.Id, err = strconv.ParseUint(string(elems[0]), 10, 64); err != nil {
+		return
+	}
+
+	a.Name = string(elems[1])
+	return
+}
+
+type Authors struct {
+	*utils.Authors
+}
+
+func (a *Authors) Scan(src interface{}) error {
+	authors := []Author{}
+	if bytes.Equal(src.([]byte), []byte(`{"(,)"}`)) {
+		a.Authors = &utils.Authors{}
+		return nil
+	}
+	if err := pq.Array(&authors).Scan(src); err != nil {
+		return err
+	}
+	a.Authors = &utils.Authors{}
+	for _, author := range authors {
+		*a.Authors = append(*a.Authors, utils.Author(author))
+	}
+	return nil
 }

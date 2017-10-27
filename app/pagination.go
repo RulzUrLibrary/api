@@ -8,14 +8,14 @@ import (
 const DEFAULT_LIMIT = 10
 
 type Meta struct {
-	Limit  int `query:"limit" json:"limit" validate:"gt=0,lte=50"`
-	Offset int `query:"offset" json:"offset" validate:"gte=0"`
-	Count  int `json:"count,omitempty"`
+	Limit  int   `query:"limit" json:"limit" validate:"gt=0,lte=50"`
+	Offset int   `query:"offset" json:"offset" validate:"gte=0"`
+	Count  int64 `json:"count,omitempty"`
 }
 
 type Pagination struct {
-	Page  int `query:"page" validate:"gt=0"`
-	Count int `query:"-"`
+	Page  int   `query:"page" validate:"gt=0"`
+	Count int64 `query:"-"`
 }
 
 func NewMeta() Meta {

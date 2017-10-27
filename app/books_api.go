@@ -1,6 +1,7 @@
 package app
 
 import (
+	"github.com/rulzurlibrary/api/ext/db"
 	"github.com/rulzurlibrary/api/utils"
 	"net/http"
 )
@@ -33,7 +34,7 @@ func APIBookPost(c *Context) error {
 }
 
 func APIBookList(c *Context) (err error) {
-	var books []*utils.Book
+	var books db.Books
 	var s = struct {
 		Pattern string `query:"search"`
 		Meta
@@ -46,17 +47,22 @@ func APIBookList(c *Context) (err error) {
 		return
 	}
 	if s.Pattern == "" {
-		books, s.Count, err = BookList(c, s.Limit, s.Offset)
+		user, ok := c.Get("user").(*utils.User)
+		if ok {
+			books, s.Count, err = c.App.Database.BookListU(s.Limit, s.Offset, user.Id)
+		} else {
+			books, s.Count, err = c.App.Database.BookList(s.Limit, s.Offset)
+		}
 		if err != nil {
 			return err
 		}
-		return c.JSON(http.StatusOK, dict{"_meta": s.Meta, "books": books})
+		return c.JSON(http.StatusOK, dict{"_meta": s.Meta, "books": books.ToStructs(true)})
 	} else {
 		books, err = c.App.Database.BookSearch(s.Pattern, s.Limit, s.Offset)
 		if err != nil {
 			return err
 		}
-		return c.JSON(http.StatusOK, dict{"_meta": s.Meta, "books": books})
+		return c.JSON(http.StatusOK, dict{"_meta": s.Meta, "books": books.ToStructs(true)})
 	}
 }
 
@@ -66,7 +72,7 @@ func APIBookPut(c *Context) error {
 		return err
 	}
 	return c.JSON(http.StatusOK, struct {
-		Count int `json:"added"`
+		Count int64 `json:"added"`
 	}{count})
 }
 
@@ -76,6 +82,6 @@ func APIBookDelete(c *Context) (err error) {
 		return err
 	}
 	return c.JSON(http.StatusOK, struct {
-		Count int `json:"deleted"`
+		Count int64 `json:"deleted"`
 	}{count})
 }

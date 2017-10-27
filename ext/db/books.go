@@ -1,31 +1,39 @@
 package db
 
 import (
+	"database/sql"
 	"fmt"
 	"github.com/rulzurlibrary/api/utils"
 	"strings"
 )
 
 const SelectBook = `
-SELECT b.id, b.isbn, b.title, b.description, b.price, b.num, s.name, a.id, a.name
+SELECT b.id, b.isbn, b.title, b.description, b.price, b.num, s.name,
+	array_agg(DISTINCT ROW(a.id, a.name))
 FROM books b
 INNER JOIN series s ON (b.fk_serie = s.id)
 LEFT OUTER JOIN book_authors ba ON (b.id = ba.fk_book)
 LEFT OUTER JOIN authors a ON (ba.fk_author = a.id)
-WHERE b.isbn = $1`
+WHERE b.isbn = $1
+GROUP BY b.id, s.name`
 
 const SelectBookU = `
-SELECT b.id, b.isbn, b.title, b.description, b.price, b.num, s.name, a.id,
-	a.name, tags
+SELECT b.id, b.isbn, b.title, b.description, b.price, b.num, s.name,
+  c.fk_book IS NOT NULL, array_agg(DISTINCT ROW(a.id, a.name)),
+	array_agg(distinct row(w.name, w.uuid))
 FROM books b
 INNER JOIN series s ON (b.fk_serie = s.id)
-LEFT OUTER JOIN collections ON (b.id = fk_book AND fk_user = $2)
+LEFT OUTER JOIN collections c ON (b.id = fk_book AND fk_user = $2)
 LEFT OUTER JOIN book_authors ba ON (b.id = ba.fk_book)
 LEFT OUTER JOIN authors a ON (ba.fk_author = a.id)
-WHERE b.isbn = $1`
+LEFT OUTER JOIN wishlists_books wb on (b.id = wb.fk_book)
+LEFT OUTER JOIN wishlists w on (w.id = wb.fk_wishlist)
+WHERE b.isbn = $1
+GROUP BY b.id, s.name, c.fk_book`
 
 const SelectBooks = `
-SELECT b.id, b.isbn, b.title, b.description, b.price, b.num, s.name, a.id, a.name
+SELECT b.id, b.isbn, b.title, b.description, b.price, b.num, s.name,
+	array_agg(DISTINCT ROW(a.id, a.name))
 FROM (
 	SELECT id, isbn, title, description, price, fk_serie, num
 	FROM books ORDER BY id DESC LIMIT $1 OFFSET $2
@@ -33,13 +41,14 @@ FROM (
 LEFT OUTER JOIN book_authors ba ON (b.id = ba.fk_book)
 LEFT OUTER JOIN authors a ON (ba.fk_author = a.id)
 LEFT OUTER JOIN series s ON (b.fk_serie = s.id)
+GROUP BY b.id, b.isbn, b.title, b.description, b.price, b,num, s.name
 ORDER BY b.id DESC`
 
 const SelectBooksU = `
-SELECT b.id, b.isbn, b.title, b.description, b.price, b.num, s.name, a.id,
-	a.name, tags
+SELECT b.id, b.isbn, b.title, b.description, b.price, b.num, s.name,
+  b.fk_book IS NOT NULL, array_agg(DISTINCT ROW(a.id, a.name))
 FROM (
-	SELECT id, isbn, title, description, price, fk_serie, num, tags
+	SELECT id, isbn, title, description, price, fk_serie, num, fk_book
 	FROM books, collections
 	WHERE fk_book = id AND fk_user = $3
 	ORDER BY num ASC, id DESC LIMIT $1 OFFSET $2
@@ -47,6 +56,7 @@ FROM (
 LEFT OUTER JOIN book_authors ba ON (b.id = ba.fk_book)
 LEFT OUTER JOIN authors a ON (ba.fk_author = a.id)
 LEFT OUTER JOIN series s ON (b.fk_serie = s.id)
+GROUP BY b.id, b.isbn, b.title, b.description, b.price, b,num, s.name, b.fk_book
 ORDER BY b.num ASC, b.id DESC`
 
 const CountBooks = `
@@ -100,7 +110,8 @@ const CountCollection = `
 SELECT COUNT(id) FROM books, collections WHERE fk_user = $1 AND fk_book = id`
 
 const SearchBooks = `
-SELECT b.id, b.isbn, b.title, b.description, b.price, b.num, s.name, a.id, a.name
+SELECT b.id, b.isbn, b.title, b.description, b.price, b.num, s.name,
+	array_agg(DISTINCT ROW(a.id, a.name))
 FROM (
   SELECT id, isbn, num, title, description, price, fk_serie,
     ts_rank_cd(tsv, query) AS rank
@@ -112,6 +123,7 @@ FROM (
 LEFT OUTER JOIN book_authors ba ON (b.id = ba.fk_book)
 LEFT OUTER JOIN authors a ON (ba.fk_author = a.id)
 LEFT OUTER JOIN series s ON (b.fk_serie = s.id)
+GROUP BY b.id, b.isbn, b.title, b.description, b.price, b.num, s.name
 ORDER BY num NULLS FIRST`
 
 const InsertCollection = `
@@ -122,100 +134,53 @@ const DeleteCollection = `
 DELETE FROM collections USING books b
 WHERE fk_user = $1 AND b.id = fk_book AND (%s)`
 
-type queryBook struct {
-	query   string
-	args    []interface{}
-	getArgs func(*Book, *Author) []interface{}
-}
-
-type queryBookList struct {
-	queryBook
-	queryList     string
-	queryListArgs []interface{}
-}
-
-func dedupBooks(db *DB, qb queryBook) (*Books, error) {
-	books := NewBooks()
-	rows, err := db.Query(qb.query, qb.args...)
-
-	if err != nil {
-		return nil, err
+func (db *DB) BookGet(id string) (book Book, err error) {
+	err = db.QueryRow(SelectBook, id).Scan(
+		&book.id, &book.isbn, &book.title, &book.description, &book.price,
+		&book.number, &book.serie, &book.authors,
+	)
+	if err == sql.ErrNoRows {
+		err = utils.ErrNotFound
 	}
+	return
 
-	for rows.Next() {
-		var book Book
-		var author Author
-
-		if err := rows.Scan(qb.getArgs(&book, &author)...); err != nil {
-			return nil, err
-		}
-
-		if b := books.Get(book.Id); b != nil {
-			b.authors = append(b.authors, author)
-		} else {
-			book.authors = Authors{author}
-			books.Add(&book)
-		}
-	}
-	return books, nil
 }
 
-func (db *DB) BookGet(id string) (*Book, error) {
-	return db.bookGet(queryBook{
-		SelectBook, []interface{}{id},
-		func(b *Book, a *Author) []interface{} {
-			return []interface{}{
-				&b.Id, &b.Isbn, &b.title, &b.description, &b.price, &b.number,
-				&b.serie, &a.id, &a.name,
-			}
-		},
-	})
-}
-
-func (db *DB) BookGetU(id string, user int) (*Book, error) {
-	return db.bookGet(queryBook{
-		SelectBookU, []interface{}{id, user},
-		func(b *Book, a *Author) []interface{} {
-			return []interface{}{
-				&b.Id, &b.Isbn, &b.title, &b.description, &b.price, &b.number,
-				&b.serie, &a.id, &a.name, &b.tags,
-			}
-		},
-	})
-}
-
-func (db *DB) bookGet(qb queryBook) (*Book, error) {
-	books, err := dedupBooks(db, qb)
-	if err != nil {
-		return nil, err
+func (db *DB) BookGetU(id string, user int) (book Book, err error) {
+	err = db.QueryRow(SelectBookU, id, user).Scan(
+		&book.id, &book.isbn, &book.title, &book.description, &book.price,
+		&book.number, &book.serie, &book.owned, &book.authors, &book.wishlists,
+	)
+	if err == sql.ErrNoRows {
+		err = utils.ErrNotFound
 	}
-	book := books.First()
-	if book == nil {
-		return nil, utils.ErrNotFound
-	}
-
-	return book, nil
+	return
 }
 
 func (db *DB) BookSave(book *utils.Book) error {
-	args := []interface{}{
+
+	args := list{
 		book.Isbn, toInterfaceS(book.Title), book.Description, book.Price,
 		toInterfaceI(book.Number), nil,
 	}
 
-	return db.Transaction(func(tx *Tx) (err error) {
+	return db.Transaction(func(tx *sql.Tx) (err error) {
 		var idBook, idAuthor int
-		args[5], err = tx.Insert(InsertSerie, toInterfaceS(book.Serie))
+		var insert = func(query string, args ...interface{}) (id int, err error) {
+			err = tx.QueryRow(query, args...).Scan(&id)
+			return
+		}
+		args[5], err = insert(InsertSerie, toInterfaceS(book.Serie))
 		if err != nil {
 			return
 		}
 
-		if idBook, err = tx.Insert(InsertBook, args...); err != nil {
+		if idBook, err = insert(InsertBook, args...); err != nil {
 			return
 		}
 
 		for _, author := range *book.Authors {
-			if idAuthor, err = tx.Insert(InsertAuthor, author.Name); err != nil {
+			if idAuthor, err = insert(InsertAuthor, author.Name); err != nil {
 				return
 			}
 
@@ -227,66 +192,33 @@ func (db *DB) BookSave(book *utils.Book) error {
 	})
 }
 
-func (db *DB) BookList(limit, offset int) ([]*utils.Book, int, error) {
-	return db.bookList(queryBookList{
-		queryBook{
-			SelectBooks, []interface{}{limit, offset},
-			func(b *Book, a *Author) []interface{} {
-				return []interface{}{
-					&b.Id, &b.Isbn, &b.title, &b.description, &b.price, &b.number,
-					&b.serie, &a.id, &a.name,
-				}
-			},
-		},
-		CountBooks, []interface{}{},
+func (db *DB) BookList(limit, offset int) (books Books, count int64, err error) {
+	return db.queryList(queryList{
+		query{SelectBooks, list{limit, offset}, func(b *Book) list {
+			return list{&b.id, &b.isbn, &b.title, &b.description, &b.price,
+				&b.number, &b.serie, &b.authors}
+		}}, CountBooks, list{},
 	})
 }
 
-func (db *DB) BookListU(limit, offset, user int) ([]*utils.Book, int, error) {
-	return db.bookList(queryBookList{
-		queryBook{
-			SelectBooksU, []interface{}{limit, offset, user},
-			func(b *Book, a *Author) []interface{} {
-				return []interface{}{
-					&b.Id, &b.Isbn, &b.title, &b.description, &b.price, &b.number,
-					&b.serie, &a.id, &a.name, &b.tags,
-				}
-			},
-		},
-		CountBooksU, []interface{}{user},
+func (db *DB) BookListU(limit, offset, user int) (books Books, count int64, err error) {
+	return db.queryList(queryList{
+		query{SelectBooksU, list{limit, offset, user}, func(b *Book) list {
+			return list{&b.id, &b.isbn, &b.title, &b.description, &b.price,
+				&b.number, &b.serie, &b.owned, &b.authors}
+		}}, CountBooksU, list{user},
 	})
 }
 
-func (db *DB) BookSearch(pattern string, limit, offset int) ([]*utils.Book, error) {
-	books, err := dedupBooks(db, queryBook{
-		SearchBooks, []interface{}{limit, offset, pattern},
-		func(b *Book, a *Author) []interface{} {
-			return []interface{}{
-				&b.Id, &b.Isbn, &b.title, &b.description, &b.price, &b.number,
-				&b.serie, &a.id, &a.name,
-			}
-		},
-	})
-	if err != nil {
-		return nil, err
-	}
-	return books.ToStructs(false), nil
+func (db *DB) BookSearch(pattern string, limit, offset int) (books Books, err error) {
+	return db.query(query{SearchBooks, list{limit, offset, pattern}, func(b *Book) list {
+		return list{&b.id, &b.isbn, &b.title, &b.description, &b.price,
+			&b.number, &b.serie, &b.authors}
+	}})
 }
 
-func (db *DB) bookList(qbl queryBookList) ([]*utils.Book, int, error) {
-	count, err := db.Count(qbl.queryList, qbl.queryListArgs...)
-	if err != nil {
-		return nil, 0, err
-	}
-	books, err := dedupBooks(db, qbl.queryBook)
-	if err != nil {
-		return nil, 0, err
-	}
-	return books.ToStructs(false), count, nil
-}
-
-func (db *DB) BookDelete(user int, books ...string) (int, error) {
-	var args = []interface{}{user}
+func (db *DB) BookDelete(user int, books ...string) (int64, error) {
+	var args = list{user}
 	var where = []string{}
 
 	for i, isbn := range books {
@@ -297,8 +229,8 @@ func (db *DB) BookDelete(user int, books ...string) (int, error) {
 	return db.Exec(fmt.Sprintf(DeleteCollection, strings.Join(where, " OR ")), args...)
 }
 
-func (db *DB) BookPut(user int, books ...string) (int, error) {
-	var args = []interface{}{user}
+func (db *DB) BookPut(user int, books ...string) (int64, error) {
+	var args = list{user}
 	var where = []string{}
 
 	for i, isbn := range books {

@@ -2,22 +2,22 @@
 {{import "menu.html"}}
 {{import "pagination.html"}}
 
-{{block header()}} {{yield menu(active="wishlist")}} {{end}}
-{{block page_title()}}{{T("title_wishlist")}}{{end}}
+{{block header()}} {{yield menu(active="wishlists")}} {{end}}
+{{block page_title()}}{{.wishlist.Name}}{{end}}
 
 {{block body()}}
+{{if !isset(user) || .wishlist.User != user.Email}}
 <div class="columns">
-  <div class="column col-4 col-md-12 mb-2 col-mx-auto">
-    <form class="column col-md-6 col-sm-12" method="POST">
-      <input name="X-CSRF-Token" type="hidden" value="{{context.Get("csrf")}}"/>
-      <input class="btn btn-primary btn-block" type="submit" value="{{T("wishlist_share")}}"/>
-    </form>
+  <div class="column col-12">
+    <p class="empty"><b>{{T("shared_msg")}}</b><p>
   </div>
 </div>
+{{end}}
 <div class="columns">
   <div class="column col-12 mb-2">
     {{yield pagination(obj=.pagination,base=context.Request().URL)}}
-    {{range book := .books}}
+    {{if .wishlist.Books}}
+    {{range book := .wishlist.Books}}
     <a class="tile column col-12 rounded" href="{{url("book", book.Isbn)}}">
       <div class="tile-icon">
         <figure class="figure">
@@ -32,6 +32,9 @@
         </div>
       </div>
     </a>
+    {{end}}
+    {{else}}
+    <h3 class="text-center">{{T("wishlist_no_book")}}</h3>
     {{end}}
     {{yield pagination(obj=.pagination,base=context.Request().URL)}}
   </div>

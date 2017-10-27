@@ -1,12 +1,15 @@
 package db
 
 import (
+	"bytes"
 	"database/sql"
 	"encoding/json"
 	"fmt"
 	"github.com/labstack/echo"
 	_ "github.com/lib/pq"
 )
+
+type list = []interface{}
 
 type Configuration struct {
 	Name     string
@@ -52,22 +55,17 @@ func (db *DB) Exists(from, where string, args ...interface{}) (ok bool, err erro
 	return
 }
 
-func (db *DB) Count(query string, args ...interface{}) (count int, err error) {
+func (db *DB) Count(query string, args ...interface{}) (count int64, err error) {
 	err = db.QueryRow(query, args...).Scan(&count)
 	return
 }
 
-func (db *DB) Exec(query string, args ...interface{}) (int, error) {
-	db.Logger.Debug(query)
+func (db *DB) Exec(query string, args ...interface{}) (int64, error) {
 	res, err := db.DB.Exec(query, args...)
 	if err != nil {
 		return 0, err
 	}
-	count, err := res.RowsAffected()
-	if err != nil {
-		return 0, err
-	}
-	return int(count), nil
+	return res.RowsAffected()
 }
 
 func toInterfaceS(s string) interface{} {
@@ -84,24 +82,12 @@ func toInterfaceI(i int) interface{} {
 	return i
 }
 
-type Tx struct {
-	*sql.Tx
-}
-
-func (tx *Tx) Insert(query string, args ...interface{}) (id int, err error) {
-	//if glog.V(2) {
-	//	glog.Infoln(append([]interface{}{query}, args...)...)
-	//}
-	err = tx.QueryRow(query, args...).Scan(&id)
-	return
-}
-
-func (db *DB) Transaction(clojure func(*Tx) error) error {
+func (db *DB) Transaction(clojure func(*sql.Tx) error) error {
 	tx, err := db.Begin()
 	if err != nil {
 		return err
 	}
-	err = clojure(&Tx{tx})
+	err = clojure(tx)
 	if err != nil {
 		return err
 	}
@@ -114,4 +100,151 @@ func (db *DB) Transaction(clojure func(*Tx) error) error {
 		return err
 	}
 	return err
+}
+
+type query struct {
+	query   string
+	args    []interface{}
+	getArgs func(*Book) []interface{}
+}
+
+func (db *DB) query(qs query) (books Books, err error) {
+	rows, err := db.Query(qs.query, qs.args...)
+	if err != nil {
+		return nil, err
+	}
+
+	for rows.Next() {
+		var book Book
+		if err = rows.Scan(qs.getArgs(&book)...); err != nil {
+			return nil, err
+		}
+		books = append(books, book)
+	}
+	return
+}
+
+type queryList struct {
+	query
+	queryList     string
+	queryListArgs []interface{}
+}
+
+func (db *DB) queryList(ql queryList) (Books, int64, error) {
+	count, err := db.Count(ql.queryList, ql.queryListArgs...)
+	if err != nil {
+		return nil, 0, err
+	}
+	series, err := db.query(ql.query)
+	if err != nil {
+		return nil, 0, err
+	}
+	return series, count, nil
+}
+
+// Come from https://github.com/lib/pq/blob/b609790bd85edf8e9ab7e0f8912750a786177bcf/array.go#L642
+func parseRow(src, del []byte) (elems [][]byte, err error) {
+	var depth, i int
+	var dims []int
+
+	if len(src) < 1 || src[0] != '(' {
+		return nil, fmt.Errorf("pq: unable to parse array; expected %q at offset %d", '(', 0)
+	}
+
+Open:
+	for i < len(src) {
+		switch src[i] {
+		case '(':
+			depth++
+			i++
+		case ')':
+			elems = make([][]byte, 0)
+			goto Close
+		default:
+			break Open
+		}
+	}
+	dims = make([]int, i)
+
+Element:
+	for i < len(src) {
+		switch src[i] {
+		case '(':
+			if depth == len(dims) {
+				break Element
+			}
+			depth++
+			dims[depth-1] = 0
+			i++
+		case '"':
+			var elem = []byte{}
+			var escape bool
+			for i++; i < len(src); i++ {
+				if escape {
+					elem = append(elem, src[i])
+					escape = false
+				} else {
+					switch src[i] {
+					default:
+						elem = append(elem, src[i])
+					case '\\':
+						escape = true
+					case '"':
+						elems = append(elems, elem)
+						i++
+						break Element
+					}
+				}
+			}
+		default:
+			for start := i; i < len(src); i++ {
+				if bytes.HasPrefix(src[i:], del) || src[i] == ')' {
+					elem := src[start:i]
+					if len(elem) == 0 {
+						return make([][]byte, 0), nil
+					}
+					if bytes.Equal(elem, []byte("NULL")) {
+						elem = nil
+					}
+					elems = append(elems, elem)
+					break Element
+				}
+			}
+		}
+	}
+
+	for i < len(src) {
+		if bytes.HasPrefix(src[i:], del) && depth > 0 {
+			dims[depth-1]++
+			i += len(del)
+			goto Element
+		} else if src[i] == ')' && depth > 0 {
+			dims[depth-1]++
+			depth--
+			i++
+		} else {
+			return nil, fmt.Errorf("pq: unable to parse array; unexpected %q at offset %d", src[i], i)
+		}
+	}
+
+Close:
+	for i < len(src) {
+		if src[i] == ')' && depth > 0 {
+			depth--
+			i++
+		} else {
+			return nil, fmt.Errorf("pq: unable to parse array; unexpected %q at offset %d", src[i], i)
+		}
+	}
+	if depth > 0 {
+		err = fmt.Errorf("pq: unable to parse array; expected %q at offset %d", ')', i)
+	}
+	if err == nil {
+		for _, d := range dims {
+			if (len(elems) % d) != 0 {
+				err = fmt.Errorf("pq: multidimensional arrays must have elements with matching dimensions")
+			}
+		}
+	}
+	return
 }
