@@ -8,8 +8,13 @@
 {{block body()}}
 <div class="colums">
   <div class="col-8 col-md-12 col-mx-auto">
-    <p>{{T("share_link_msg")}}: <div class="text-primary">{{.link}}</div></p>
-    <p><b>{{T("disclaimer")}}:</b>{{T("share_link_disclaimer")}}</p>
+    <div class="form-group">
+      <label class="form-label" for="link">{{T("share_link_msg")}}:</label>
+      <input class="text-primary column col-12"
+             type="text" id="link" value="{{.link}}" style="border: none; padding:0"/>
+    </div>
+    <button class="btn btn-primary" onclick="copy('link')">{{T("share_link_copy")}}</button>
+    <p class="mt-2 pt-2"><b>{{T("disclaimer")}}:</b>{{T("share_link_disclaimer")}}</p>
   </div>
 </div>
 {{end}}

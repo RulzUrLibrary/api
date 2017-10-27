@@ -176,6 +176,9 @@
   "sent_reset_mail_title": {
     "other": "Email sent!"
   },
+  "share_link_copy": {
+    "other": "Copy the share link"
+  },
   "share_link_disclaimer": {
     "other": "Your friends will be able to see your wishlist, but not able to edit it. Do not forget to keep your collection and wishlist up to date ;)."
   },

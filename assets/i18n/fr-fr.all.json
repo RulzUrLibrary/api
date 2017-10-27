@@ -176,6 +176,9 @@
   "sent_reset_mail_title": {
     "other": "Email envoyé!"
   },
+  "share_link_copy": {
+    "other": "Copier le lien"
+  },
   "share_link_disclaimer": {
     "other": "Vos amis pourront consulter votre liste de souhait mais ne pourront pas l'éditer. Pensez à maintenir votre liste de souhait et collection à jour ;)."
   },
