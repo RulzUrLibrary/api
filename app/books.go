@@ -51,6 +51,12 @@ func BookPost(c *Context, isbn string) (book utils.Book, ok bool, err error) {
 	// request additional informations
 	switch book, err = c.App.Scrapper.Amazon(isbn); err {
 	case nil:
+		var notation utils.Notation
+		notation, err = c.App.Scrapper.SensCritique(book.TitleDisplay())
+		if err != nil {
+			return
+		}
+		*book.Notations = append(*book.Notations, notation)
 		err = db.BookSave(&book)
 		return
 	case utils.ErrCaptcha:

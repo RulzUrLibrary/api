@@ -1,6 +1,7 @@
 package app
 
 import (
+	"fmt"
 	"github.com/labstack/echo"
 	"github.com/rulzurlibrary/api/ext/db"
 	"github.com/rulzurlibrary/api/utils"
@@ -33,6 +34,7 @@ func WEBBookGet(c *Context) error {
 	if book, err := BookGet(c); err != nil {
 		return err
 	} else {
+		fmt.Printf("%#v", book)
 		return c.Render(http.StatusOK, "book.html", dict{"book": book})
 	}
 }

@@ -44,6 +44,22 @@
     </form>
   </div>
   {{end}}
+  <div class="column col-12">
+    <div class="divider"></div>
+  </div>
+  <div class="column col-12">
+    <h3>{{T("book_notations")}}</h3>
+    {{if .book.Notations}}
+    <ul>
+      {{range notation := .book.Notations}}
+      <li>
+        <a href="{{notation.Link}}" target="_blank">{{notation.Provider}}: {{notation.DisplayNote()}}</a>
+      </li>
+      {{end}}
+    </ul>
+    {{end}}
+  </div>
+
 <div class="column col-12">
     <div class="divider"></div>
   </div>

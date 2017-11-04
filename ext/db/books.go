@@ -9,9 +9,11 @@ import (
 
 const SelectBook = `
 SELECT b.id, b.isbn, b.title, b.description, b.price, b.num, s.name,
-	array_agg(DISTINCT ROW(a.id, a.name))
+	array_agg(DISTINCT ROW(a.id, a.name)),
+	array_agg(DISTINCT ROW(n.provider, n.note, n.link))
 FROM books b
 INNER JOIN series s ON (b.fk_serie = s.id)
+LEFT OUTER JOIN notations n on (n.fk_book = b.id)
 LEFT OUTER JOIN book_authors ba ON (b.id = ba.fk_book)
 LEFT OUTER JOIN authors a ON (ba.fk_author = a.id)
 WHERE b.isbn = $1
@@ -20,7 +22,8 @@ GROUP BY b.id, s.name`
 const SelectBookU = `
 SELECT b.id, b.isbn, b.title, b.description, b.price, b.num, s.name,
   c.fk_book IS NOT NULL, array_agg(DISTINCT ROW(a.id, a.name)),
-	array_agg(distinct row(w.name, w.uuid))
+	array_agg(DISTINCT ROW(w.name, w.uuid)),
+  array_agg(DISTINCT ROW(n.provider, n.note, n.link))
 FROM books b
 INNER JOIN series s ON (b.fk_serie = s.id)
 LEFT OUTER JOIN collections c ON (b.id = fk_book AND fk_user = $2)
@@ -28,6 +31,7 @@ LEFT OUTER JOIN book_authors ba ON (b.id = ba.fk_book)
 LEFT OUTER JOIN authors a ON (ba.fk_author = a.id)
 LEFT OUTER JOIN wishlists_books wb on (b.id = wb.fk_book)
 LEFT OUTER JOIN wishlists w on (w.id = wb.fk_wishlist)
+LEFT OUTER JOIN notations n on (n.fk_book = b.id)
 WHERE b.isbn = $1
 GROUP BY b.id, s.name, c.fk_book`
 
@@ -81,6 +85,9 @@ SELECT id FROM i UNION ALL SELECT id FROM s`
 const InsertBookAuthor = `
 INSERT INTO book_authors (fk_book, fk_author)
 VALUES ($1, $2)`
+
+const InsertBookNotation = `
+INSERT INTO notations (fk_book, provider, note, link) VALUES ($1, $2, $3, $4)`
 
 const InsertSerie = `
 WITH s AS (
@@ -137,7 +144,7 @@ WHERE fk_user = $1 AND b.id = fk_book AND (%s)`
 func (db *DB) BookGet(id string) (book Book, err error) {
 	err = db.QueryRow(SelectBook, id).Scan(
 		&book.id, &book.isbn, &book.title, &book.description, &book.price,
-		&book.number, &book.serie, &book.authors,
+		&book.number, &book.serie, &book.authors, &book.notations,
 	)
 	if err == sql.ErrNoRows {
 		err = utils.ErrNotFound
@@ -150,6 +157,7 @@ func (db *DB) BookGetU(id string, user int) (book Book, err error) {
 	err = db.QueryRow(SelectBookU, id, user).Scan(
 		&book.id, &book.isbn, &book.title, &book.description, &book.price,
 		&book.number, &book.serie, &book.owned, &book.authors, &book.wishlists,
+		&book.notations,
 	)
 	if err == sql.ErrNoRows {
 		err = utils.ErrNotFound
@@ -185,6 +193,12 @@ func (db *DB) BookSave(book *utils.Book) error {
 			}
 
 			if _, err = tx.Exec(InsertBookAuthor, idBook, idAuthor); err != nil {
+				return
+			}
+		}
+		for _, notation := range *book.Notations {
+			a := list{idBook, notation.Provider, notation.Note, notation.Link}
+			if _, err = tx.Exec(InsertBookNotation, a...); err != nil {
 				return
 			}
 		}

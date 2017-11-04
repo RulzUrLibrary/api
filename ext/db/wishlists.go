@@ -85,6 +85,17 @@ func dedupWishlists(db *DB, qs queryWishlist) (wishlists Wishlists, err error) {
 	return
 }
 
+func (db *DB) wishlists(qwl queryWishlists) (w Wishlists, c int64, e error) {
+	if c, e = db.Count(qwl.queryList, qwl.queryListArgs...); e != nil {
+		return
+	}
+
+	if w, e = dedupWishlists(db, qwl.queryWishlist); e != nil {
+		return
+	}
+	return
+}
+
 func (db *DB) WishlistPut(user int, book string, wishlists ...string) (int64, error) {
 	var args = list{user, book}
 	var where = []string{}
@@ -127,17 +138,6 @@ func (db *DB) WishlistsN(user int) (Wishlists, error) {
 			return list{&w.id, &w.name, &w.uuid}
 		},
 	})
-}
-
-func (db *DB) wishlists(qwl queryWishlists) (w Wishlists, c int64, e error) {
-	if c, e = db.Count(qwl.queryList, qwl.queryListArgs...); e != nil {
-		return
-	}
-
-	if w, e = dedupWishlists(db, qwl.queryWishlist); e != nil {
-		return
-	}
-	return
 }
 
 func (db *DB) WishPost(name string, user int) error {

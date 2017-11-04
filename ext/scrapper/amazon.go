@@ -2,7 +2,6 @@ package scrapper
 
 import (
 	"github.com/andybalholm/cascadia"
-	"github.com/golang/glog"
 	"github.com/rulzurlibrary/api/utils"
 	"golang.org/x/net/html"
 	"net/url"
@@ -11,7 +10,9 @@ import (
 	"strings"
 )
 
-const amazon = "http://amazon.fr"
+const AMAZON_NAME = "Amazon"
+const AMAZON_URL = "https://amazon.fr"
+const AMAZON_MAX_NOTATION = 5
 
 var (
 	matchIndexForm   = cascadia.MustCompile("form")
@@ -20,6 +21,7 @@ var (
 	matchPrice       = cascadia.MustCompile(".swatchElement.selected .a-color-price")
 	matchDescription = cascadia.MustCompile("#bookDescription_feature_div noscript")
 	matchThumb       = cascadia.MustCompile("#imgBlkFront")
+	matchNotation    = cascadia.MustCompile(".a-icon-star")
 	matchAuthors     = []cascadia.Selector{
 		cascadia.MustCompile(".contributorNameID"),
 		cascadia.MustCompile(".author a"),
@@ -103,7 +105,7 @@ func getPrice(node *html.Node) float32 {
 
 	value, err := strconv.ParseFloat(price, 32)
 	if err != nil {
-		glog.Errorf("%s", err)
+		//glog.Errorf("%s", err)
 	}
 
 	return float32(value)
@@ -112,7 +114,7 @@ func getPrice(node *html.Node) float32 {
 func getDescription(node *html.Node) string {
 	doc, err := html.Parse(strings.NewReader(getText(node)))
 	if err != nil {
-		glog.Errorf("%s", err)
+		//glog.Errorf("%s", err)
 	}
 	return getText(cascadia.MustCompile("div").MatchFirst(doc))
 
@@ -124,6 +126,19 @@ func getAuthors(authors []*html.Node) *utils.Authors {
 		authorList = append(authorList, utils.Author{Name: getAuthor(getText(author))})
 	}
 	return &authorList
+}
+
+func getNotation(node *html.Node, url string) *utils.Notations {
+	text := getText(node)
+	if len(text) < 3 {
+		return nil
+	}
+	res, err := strconv.ParseFloat(text[0:3], 32)
+	if err != nil {
+		//Log error
+		return nil
+	}
+	return &utils.Notations{utils.Notation{AMAZON_NAME, float32(res), AMAZON_MAX_NOTATION, url}}
 }
 
 func (s *Scrapper) AmazonParseIndex(_url string, isbn string) (string, error) {
@@ -170,6 +185,7 @@ func (s *Scrapper) AmazonParseInfo(_url string, isbn string) (book utils.Book, e
 	var price *html.Node
 	var description *html.Node
 	var thumbnail *html.Node
+	var notation *html.Node
 	var authors []*html.Node
 
 	var parsingFn = func(doc *html.Node) error {
@@ -177,6 +193,7 @@ func (s *Scrapper) AmazonParseInfo(_url string, isbn string) (book utils.Book, e
 		price = matchPrice.MatchFirst(doc)
 		description = matchDescription.MatchFirst(doc)
 		thumbnail = matchThumb.MatchFirst(doc)
+		notation = matchNotation.MatchFirst(doc)
 		for _, matcher := range matchAuthors {
 			authors = matcher.MatchAll(doc)
 			if len(authors) != 0 {
@@ -198,6 +215,7 @@ func (s *Scrapper) AmazonParseInfo(_url string, isbn string) (book utils.Book, e
 	book.Title, book.Serie, book.Number = getTitle(getText(title))
 	book.Price = getPrice(price)
 	book.Description = getDescription(description)
+	book.Notations = getNotation(notation, _url)
 	book.Authors = getAuthors(authors)
 
 	if book.Title == "" && book.Serie == "" {
@@ -209,7 +227,7 @@ func (s *Scrapper) AmazonParseInfo(_url string, isbn string) (book utils.Book, e
 
 func (s *Scrapper) Amazon(isbn string) (_ utils.Book, err error) {
 	var url string
-	if url, err = s.AmazonParseIndex(amazon, isbn); err != nil {
+	if url, err = s.AmazonParseIndex(AMAZON_URL, isbn); err != nil {
 		return
 	}
 	if url, err = s.AmazonParseSearch(url); err != nil {

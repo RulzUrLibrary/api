@@ -1,6 +1,7 @@
 package app
 
 import (
+	"fmt"
 	"github.com/rulzurlibrary/api/ext/db"
 	"github.com/rulzurlibrary/api/utils"
 	"net/http"
@@ -11,6 +12,7 @@ func APIBookGet(c *Context) error {
 	if err != nil {
 		return err
 	}
+	fmt.Printf("%#v\n", book)
 	return c.JSON(http.StatusOK, book)
 }
 

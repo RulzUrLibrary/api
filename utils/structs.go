@@ -3,6 +3,7 @@ package utils
 import (
 	"encoding/gob"
 	"fmt"
+	"strconv"
 	"strings"
 )
 
@@ -61,6 +62,7 @@ type Book struct {
 	Owned       *bool      `json:"owned,omitempty"` // tricking golang json encoding
 	Authors     *Authors   `json:"authors,omitempty"`
 	Wishlists   *Wishlists `json:"wishlists,omitempty"`
+	Notations   *Notations `json:"notations,omitempty"`
 }
 
 func (b Book) TitleDisplay() string {
@@ -141,6 +143,19 @@ type Wishlist struct {
 }
 
 type Wishlists []Wishlist
+
+type Notation struct {
+	Provider string  `json:"provider"`
+	Note     float32 `json:"note"`
+	Max      int     `json:"max"`
+	Link     string  `json:"link"`
+}
+
+func (n Notation) DisplayNote() string {
+	return fmt.Sprintf("%s / %d", strconv.FormatFloat(float64(n.Note), 'f', -1, 32), n.Max)
+}
+
+type Notations []Notation
 
 func init() {
 	gob.Register(&User{})

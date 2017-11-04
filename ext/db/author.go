@@ -1,12 +1,13 @@
 package db
 
 import (
-	"bytes"
 	"fmt"
 	"github.com/lib/pq"
 	"github.com/rulzurlibrary/api/utils"
 	"strconv"
 )
+
+const sizeAuthor = 2
 
 type Author utils.Author
 
@@ -17,7 +18,7 @@ func (a *Author) Scan(src interface{}) (err error) {
 		return
 	}
 
-	if len(elems) != 2 {
+	if len(elems) != sizeAuthor {
 		return fmt.Errorf("element is not a valid author")
 	}
 	if a.Id, err = strconv.ParseUint(string(elems[0]), 10, 64); err != nil {
@@ -34,7 +35,7 @@ type Authors struct {
 
 func (a *Authors) Scan(src interface{}) error {
 	authors := []Author{}
-	if bytes.Equal(src.([]byte), []byte(`{"(,)"}`)) {
+	if emptyArray(sizeAuthor, src) {
 		a.Authors = &utils.Authors{}
 		return nil
 	}

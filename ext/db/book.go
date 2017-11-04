@@ -17,6 +17,7 @@ type Book struct {
 	owned       sql.NullBool
 	authors     Authors
 	wishlists   Wishlists
+	notations   Notations
 }
 
 func (b Book) ToStructs(partial bool) (book utils.Book) {
@@ -31,6 +32,7 @@ func (b Book) ToStructs(partial bool) (book utils.Book) {
 		book.Description = b.description.String
 		book.Thumbnail = "/thumbs/" + b.isbn.String + ".jpg"
 		book.Authors = b.authors.Authors
+		book.Notations = b.notations.Notations
 	}
 
 	if b.owned.Valid {

@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/labstack/echo"
 	_ "github.com/lib/pq"
+	"strings"
 )
 
 type list = []interface{}
@@ -140,6 +141,10 @@ func (db *DB) queryList(ql queryList) (Books, int64, error) {
 		return nil, 0, err
 	}
 	return series, count, nil
+}
+
+func emptyArray(size int, src interface{}) bool {
+	return bytes.Equal(src.([]byte), []byte(fmt.Sprintf(`{"(%s)"}`, strings.Repeat(",", size-1))))
 }
 
 // Come from https://github.com/lib/pq/blob/b609790bd85edf8e9ab7e0f8912750a786177bcf/array.go#L642
