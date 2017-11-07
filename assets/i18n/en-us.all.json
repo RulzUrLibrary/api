@@ -284,6 +284,9 @@
   "wishlist_form_submit": {
     "other": "Create wishlist"
   },
+  "wishlist_no_book": {
+    "other": "There's no books in this wishlist"
+  },
   "wishlist_see_details": {
     "other": "See this wishlist details"
   },

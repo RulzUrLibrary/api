@@ -284,6 +284,9 @@
   "wishlist_form_submit": {
     "other": "Créer la liste de souhaits"
   },
+  "wishlist_no_book": {
+    "other": "Vous n'avez pas de livre dans cette liste de souhaits"
+  },
   "wishlist_see_details": {
     "other": "Voir les détails de cette liste de souhaits"
   },
