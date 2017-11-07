@@ -3,15 +3,14 @@
 {{import "pagination.html"}}
 
 {{block header()}} {{yield menu(active="wishlists")}} {{end}}
-{{block page_title()}}{{T("title_wishlists")}}{{end}}
+{{block page_title()}}{{T("wishlist_form")}}{{end}}
 
 {{block body()}}
 {{form := .["form"]}}
 {{error_name := .["errors"]["name"]}}
 
 <div class="columns">
-  <div class="column col-6 col-md-12">
-    <h2>{{T("wishlist_form")}}</h2>
+  <div class="column col-6 col-md-12 col-mx-auto">
     <form method="POST">
       <div class="form-group{{if isset(error_name)}} has-error{{end}}">
         <label class="form-label" for="name">{{T("wishlist_form_name")}}</label>

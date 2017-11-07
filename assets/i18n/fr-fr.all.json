@@ -14,6 +14,9 @@
   "auth_form_password_placeholder": {
     "other": "Mot de passe"
   },
+  "book_authors": {
+    "other": "Auteurs"
+  },
   "book_collection_added": {
     "other": "le livre a été ajouté à votre collection"
   },
@@ -29,6 +32,9 @@
   "book_details": {
     "other": "Détails"
   },
+  "book_notations": {
+    "other": "Notes"
+  },
   "book_wishlist_added": {
     "other": "le livre a été ajouté à votre liste de souhaits"
   },
@@ -40,6 +46,9 @@
   },
   "book_wishlist_removed": {
     "other": "le livre a été retiré de votre liste de souhaits"
+  },
+  "book_wishlists": {
+    "other": "Liste de souhaits"
   },
   "cancel": {
     "other": "Annuler"
@@ -212,8 +221,14 @@
   "title_user": {
     "other": "Mon compte"
   },
+  "title_wishlist": {
+    "other": "Liste de souhait"
+  },
   "title_wishlists": {
     "other": "Vos listes de souhaits"
+  },
+  "title_wishlists_add": {
+    "other": "Ajouter le livre à(aux) liste(s) de souhaits"
   },
   "user_password_change": {
     "other": "Changer de mot de passe"
@@ -242,10 +257,49 @@
   "wishlist_add": {
     "other": "ajouter à ma liste de souhaits"
   },
+  "wishlist_add_success": {
+    "other": "le livre a été ajouté à(aux) liste(s) de souhaits"
+  },
+  "wishlist_add_warning": {
+    "other": "le livre est déjà dans la(les) liste(s) de souhaits"
+  },
+  "wishlist_create": {
+    "other": "Créer une nouvelle liste de souhaits"
+  },
+  "wishlist_created": {
+    "other": "La liste de souhait a été créée"
+  },
   "wishlist_del": {
     "other": "retirer de ma liste de souhaits"
   },
+  "wishlist_form": {
+    "other": "Créer une nouvelle liste de souhaits"
+  },
+  "wishlist_form_name": {
+    "other": "Nom de la nouvelle liste de souhaits"
+  },
+  "wishlist_form_name_placeholder": {
+    "other": "Nom de la nouvelle liste de souhaits"
+  },
+  "wishlist_form_submit": {
+    "other": "Créer la liste de souhaits"
+  },
+  "wishlist_see_details": {
+    "other": "Voir les détails de cette liste de souhaits"
+  },
   "wishlist_share": {
     "other": "Partager la liste de souhaits"
+  },
+  "wishlists_add_cancel": {
+    "other": "Annuler"
+  },
+  "wishlists_add_label": {
+    "other": "Listes de souhaits:"
+  },
+  "wishlists_add_submit": {
+    "other": "Ajouter à(aux) liste(s) de souhaits"
+  },
+  "wishlists_no_book": {
+    "other": "Vous n'avez pas de livre dans cette liste de souhaits"
   }
 }

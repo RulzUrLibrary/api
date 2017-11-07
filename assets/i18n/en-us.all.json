@@ -14,6 +14,9 @@
   "auth_form_password_placeholder": {
     "other": "Password"
   },
+  "book_authors": {
+    "other": "Authors"
+  },
   "book_collection_added": {
     "other": "book added to collection"
   },
@@ -29,6 +32,9 @@
   "book_details": {
     "other": "Details"
   },
+  "book_notations": {
+    "other": "External reviews"
+  },
   "book_wishlist_added": {
     "other": "book added to wishlist"
   },
@@ -39,7 +45,10 @@
     "other": "book was already out of the wishlist"
   },
   "book_wishlist_removed": {
-    "other": "book removed from collection"
+    "other": "book removed from wishlist"
+  },
+  "book_wishlists": {
+    "other": "Wishlists"
   },
   "cancel": {
     "other": "Cancel"
@@ -215,6 +224,12 @@
   "title_wishlist": {
     "other": "Wishlist"
   },
+  "title_wishlists": {
+    "other": "Your wishlists"
+  },
+  "title_wishlists_add": {
+    "other": "Add book to wishlist(s)"
+  },
   "user_password_change": {
     "other": "Password change"
   },
@@ -242,10 +257,49 @@
   "wishlist_add": {
     "other": "add to wishlist"
   },
+  "wishlist_add_success": {
+    "other": "book added to wishlist(s)"
+  },
+  "wishlist_add_warning": {
+    "other": "book was already in wishlist(s)"
+  },
+  "wishlist_create": {
+    "other": "Create a new wishlist"
+  },
+  "wishlist_created": {
+    "other": "Wishlist created"
+  },
   "wishlist_del": {
     "other": "remove from wishlist"
   },
+  "wishlist_form": {
+    "other": "Create a new wishlist"
+  },
+  "wishlist_form_name": {
+    "other": "Name of newly created wishlist"
+  },
+  "wishlist_form_name_placeholder": {
+    "other": "Name of newly created wishlist"
+  },
+  "wishlist_form_submit": {
+    "other": "Create wishlist"
+  },
+  "wishlist_see_details": {
+    "other": "See this wishlist details"
+  },
   "wishlist_share": {
     "other": "Share your wishlist"
+  },
+  "wishlists_add_cancel": {
+    "other": "Cancel"
+  },
+  "wishlists_add_label": {
+    "other": "Available wishlists:"
+  },
+  "wishlists_add_submit": {
+    "other": "Add to wishlists"
+  },
+  "wishlists_no_book": {
+    "other": "There's no books in this wishlist"
   }
 }
