@@ -12,6 +12,13 @@
     <p class="empty"><b>{{T("shared_msg")}}</b><p>
   </div>
 </div>
+{{else}}
+<div class="columns pb-2 mb-2">
+  <form class="column col-4 col-md-12 col-mx-auto" method="POST">
+    <input name="X-CSRF-Token" type="hidden" value="{{context.Get("csrf")}}"/>
+    <input type="submit" class="btn btn-primary btn-block" value="{{T("wishlist_delete_submit")}}"/>
+  </form>
+</div>
 {{end}}
 <div class="columns">
   <div class="column col-12 mb-2">
@@ -34,7 +41,7 @@
     </a>
     {{end}}
     {{else}}
-    <h3 class="text-center">{{T("wishlist_no_book")}}</h3>
+    <h3 class="text-center" style="padding: 200px 0 200px 0">{{T("wishlist_no_book")}}</h3>
     {{end}}
     {{yield pagination(obj=.pagination,base=context.Request().URL)}}
   </div>

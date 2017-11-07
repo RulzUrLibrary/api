@@ -55,6 +55,8 @@ const wishDelete = `
 DELETE FROM wishlists_books USING wishlists w, books b
 WHERE fk_wishlist = w.id AND fk_user = $1 AND fk_book = b.id AND b.isbn = $2 AND (%s)`
 
+const wishlistDelete = `DELETE FROM wishlists WHERE fk_user = $1 AND (%s)`
+
 type queryWishlist struct {
 	query   string
 	args    list
@@ -160,4 +162,15 @@ func (db *DB) WishDelete(user int, book string, uuids ...string) (int64, error) 
 		args = append(args, uuid)
 	}
 	return db.Exec(fmt.Sprintf(wishDelete, strings.Join(where, " OR ")), args...)
+}
+
+func (db *DB) WishlistDelete(user int, uuids ...string) (int64, error) {
+	var args = list{user}
+	var where = []string{}
+
+	for i, uuid := range uuids {
+		where = append(where, fmt.Sprintf("uuid = $%d", i+2))
+		args = append(args, uuid)
+	}
+	return db.Exec(fmt.Sprintf(wishlistDelete, strings.Join(where, " OR ")), args...)
 }

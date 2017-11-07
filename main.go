@@ -61,6 +61,7 @@ func main() {
 	rulz.Web.POST("/tags/", rulz.Handler(app.WEBTag), app.Protected)
 
 	rulz.Web.GET("/wishlist/:id", rulz.Handler(app.WEBWishListGet)).Name = "wishlist"
+	rulz.Web.POST("/wishlist/:id", rulz.Handler(app.WEBWishListPost), app.Protected)
 
 	rulz.Web.GET("/books/:isbn", rulz.Handler(app.WEBBookGet)).Name = "book"
 	rulz.Web.POST("/books/:isbn", rulz.Handler(app.WEBBookPost))

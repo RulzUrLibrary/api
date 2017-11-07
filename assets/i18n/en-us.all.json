@@ -272,6 +272,15 @@
   "wishlist_del": {
     "other": "remove from wishlist"
   },
+  "wishlist_delete_submit": {
+    "other": "Delete wishlist"
+  },
+  "wishlist_delete_success": {
+    "other": "Wishlist deleted"
+  },
+  "wishlist_delete_warning": {
+    "other": "Wishlist was already deleted"
+  },
   "wishlist_form": {
     "other": "Create a new wishlist"
   },

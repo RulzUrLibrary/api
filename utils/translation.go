@@ -25,4 +25,6 @@ const (
 	WISHLIST_CREATED            = "wishlist_created"
 	WISHLIST_ADD_WARNING        = "wishlist_add_warning"
 	WISHLIST_ADD_SUCCESS        = "wishlist_add_success"
+	WISHLIST_DELETE_WARNING     = "wishlist_delete_warning"
+	WISHLIST_DELETE_SUCCESS     = "wishlist_delete_success"
 )

@@ -92,6 +92,24 @@ func WEBWishListGet(c *Context) (err error) {
 	})
 }
 
+func WEBWishListPost(c *Context) (err error) {
+	var uuid = c.Param("id")
+	var user = c.Get("user").(*utils.User)
+
+	count, err := c.App.Database.WishlistDelete(user.Id, uuid)
+	if err != nil {
+		return err
+	}
+	flash := utils.Flash{utils.FlashWarning, utils.WISHLIST_DELETE_WARNING}
+	if count > 0 {
+		flash = utils.Flash{utils.FlashSuccess, utils.WISHLIST_DELETE_SUCCESS}
+	}
+	if err := c.Flashes(flash); err != nil {
+		return err
+	}
+	return c.Redirect(http.StatusSeeOther, c.Reverse("wishlists"))
+}
+
 func WEBWishlistAdd(c *Context) error {
 	isbn := c.Param("isbn")
 	user := c.Get("user").(*utils.User)

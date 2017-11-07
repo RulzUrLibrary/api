@@ -272,6 +272,15 @@
   "wishlist_del": {
     "other": "retirer de ma liste de souhaits"
   },
+  "wishlist_delete_submit": {
+    "other": "Supprimer la liste de souhaits"
+  },
+  "wishlist_delete_success": {
+    "other": "La liste de souhaits a été supprimé"
+  },
+  "wishlist_delete_warning": {
+    "other": "La liste de souhaits a déjà été supprimé"
+  },
   "wishlist_form": {
     "other": "Créer une nouvelle liste de souhaits"
   },
