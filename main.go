@@ -17,6 +17,8 @@ func main() {
 	rulz.Api.Use(app.ContentType)
 	rulz.Api.Use(middleware.CORS())
 
+	rulz.Api.Static("/thumbs", rulz.Configuration.Paths.Thumbs)
+
 	rulz.Api.GET("/books/:isbn", rulz.Handler(app.APIBookGet), rulz.BasicAuth(false))
 	rulz.Api.GET("/books/", rulz.Handler(app.APIBookList), rulz.BasicAuth(false))
 
