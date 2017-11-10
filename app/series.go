@@ -11,7 +11,7 @@ import (
 func SerieGet(c *Context) (books db.Books, err error) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		return nil, echo.NewHTTPError(
+		return db.Books{}, echo.NewHTTPError(
 			http.StatusBadRequest, "serie 'id' must be an integer",
 		)
 	}
@@ -25,8 +25,8 @@ func SerieGet(c *Context) (books db.Books, err error) {
 	if err != nil {
 		return
 	}
-	if len(books) == 0 {
-		return nil, echo.NewHTTPError(
+	if len(books.Books) == 0 {
+		return db.Books{}, echo.NewHTTPError(
 			http.StatusNotFound, "serie "+c.Param("id")+" not found",
 		)
 	}

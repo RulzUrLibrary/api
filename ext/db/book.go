@@ -62,19 +62,29 @@ func (b Book) ToSerie(partial bool) (serie utils.Serie) {
 	return
 }
 
-type Books []Book
+type Books struct {
+	Books []*Book
+}
 
-func (b Books) ToStructs(partial bool) (books utils.Books) {
-	for _, book := range b {
+func (b *Books) ToStructs(partial bool) (books utils.Books) {
+	for _, book := range b.Books {
 		books = append(books, book.ToStructs(partial))
 	}
 	return books
 }
 
-func (b Books) ToSeries(partial bool) (series utils.Series) {
+func (b *Books) InsertBook(fn func(b *Book) list) func() list {
+	return func() list {
+		var book Book
+		b.Books = append(b.Books, &book)
+		return fn(&book)
+	}
+}
+
+func (b *Books) ToSeries(partial bool) (series utils.Series) {
 	var last utils.Serie
 
-	for _, book := range b {
+	for _, book := range b.Books {
 		if book.serie_id.Int64 == last.Id {
 			book.serie.String = "" // we are dumping series, no need to keep this
 			*last.Volumes = append(*last.Volumes, book.ToStructs(partial))

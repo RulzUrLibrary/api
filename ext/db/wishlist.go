@@ -33,12 +33,20 @@ func (w *Wishlist) Scan(src interface{}) (err error) {
 }
 
 type Wishlists struct {
-	Wishlists []Wishlist
+	Wishlists []*Wishlist
 	Valid     bool
 }
 
+func (w *Wishlists) InsertWishlist(fn func(*Wishlist) list) func() list {
+	return func() list {
+		var wishlist Wishlist
+		w.Wishlists = append(w.Wishlists, &wishlist)
+		return fn(&wishlist)
+	}
+}
+
 // You are responsible for wishlists ids to be consecutives
-func (w Wishlists) ToStructs(partial bool) (wishlists utils.Wishlists) {
+func (w *Wishlists) ToStructs(partial bool) (wishlists utils.Wishlists) {
 	var last utils.Wishlist
 
 	for _, wishlist := range w.Wishlists {
@@ -57,7 +65,7 @@ func (w Wishlists) ToStructs(partial bool) (wishlists utils.Wishlists) {
 	return
 }
 
-func (w Wishlists) ToWishlists(partial bool) *utils.Wishlists {
+func (w *Wishlists) ToWishlists(partial bool) *utils.Wishlists {
 	if !w.Valid {
 		return nil
 	}
@@ -68,7 +76,7 @@ func (w Wishlists) ToWishlists(partial bool) *utils.Wishlists {
 	return &wishlists
 }
 
-func (w Wishlists) AbsLinks(fn func(string, ...interface{}) string) map[string]string {
+func (w *Wishlists) AbsLinks(fn func(string, ...interface{}) string) map[string]string {
 	links := make(map[string]string)
 	for _, wishlist := range w.Wishlists {
 		links[wishlist.uuid.String] = fn("wishlist", wishlist.uuid.String)

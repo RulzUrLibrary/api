@@ -103,44 +103,30 @@ func (db *DB) Transaction(clojure func(*sql.Tx) error) error {
 	return err
 }
 
-type query struct {
-	query   string
-	args    []interface{}
-	getArgs func(*Book) []interface{}
-}
-
-func (db *DB) query(qs query) (books Books, err error) {
-	rows, err := db.Query(qs.query, qs.args...)
+func (db *DB) query(query string, args list, scan func() list) error {
+	rows, err := db.Query(query, args...)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	for rows.Next() {
-		var book Book
-		if err = rows.Scan(qs.getArgs(&book)...); err != nil {
-			return nil, err
+		if err := rows.Scan(scan()...); err != nil {
+			return err
 		}
-		books = append(books, book)
 	}
-	return
+	return err
 }
 
-type queryList struct {
-	query
-	queryList     string
-	queryListArgs []interface{}
-}
+func (db *DB) queryList(query string, args list, scan func() list, queryC string, argsC list) (int64, error) {
+	count, err := db.Count(queryC, argsC...)
+	if err != nil {
+		return 0, err
+	}
 
-func (db *DB) queryList(ql queryList) (Books, int64, error) {
-	count, err := db.Count(ql.queryList, ql.queryListArgs...)
-	if err != nil {
-		return nil, 0, err
+	if err := db.query(query, args, scan); err != nil {
+		return 0, err
 	}
-	series, err := db.query(ql.query)
-	if err != nil {
-		return nil, 0, err
-	}
-	return series, count, nil
+	return count, nil
 }
 
 func emptyArray(size int, src interface{}) bool {

@@ -207,28 +207,24 @@ func (db *DB) BookSave(book *utils.Book) error {
 }
 
 func (db *DB) BookList(limit, offset int) (books Books, count int64, err error) {
-	return db.queryList(queryList{
-		query{SelectBooks, list{limit, offset}, func(b *Book) list {
-			return list{&b.id, &b.isbn, &b.title, &b.description, &b.price,
-				&b.number, &b.serie, &b.authors}
-		}}, CountBooks, list{},
-	})
+	count, err = db.queryList(SelectBooks, list{limit, offset}, books.InsertBook(func(b *Book) list {
+		return list{&b.id, &b.isbn, &b.title, &b.description, &b.price, &b.number, &b.serie, &b.authors}
+	}), CountBooks, list{})
+	return
 }
 
 func (db *DB) BookListU(limit, offset, user int) (books Books, count int64, err error) {
-	return db.queryList(queryList{
-		query{SelectBooksU, list{limit, offset, user}, func(b *Book) list {
-			return list{&b.id, &b.isbn, &b.title, &b.description, &b.price,
-				&b.number, &b.serie, &b.owned, &b.authors}
-		}}, CountBooksU, list{user},
-	})
+	count, err = db.queryList(SelectBooksU, list{limit, offset, user}, books.InsertBook(func(b *Book) list {
+		return list{&b.id, &b.isbn, &b.title, &b.description, &b.price, &b.number, &b.serie, &b.owned, &b.authors}
+	}), CountBooksU, list{user})
+	return
 }
 
 func (db *DB) BookSearch(pattern string, limit, offset int) (books Books, err error) {
-	return db.query(query{SearchBooks, list{limit, offset, pattern}, func(b *Book) list {
-		return list{&b.id, &b.isbn, &b.title, &b.description, &b.price,
-			&b.number, &b.serie, &b.authors}
-	}})
+	err = db.query(SearchBooks, list{limit, offset, pattern}, books.InsertBook(func(b *Book) list {
+		return list{&b.id, &b.isbn, &b.title, &b.description, &b.price, &b.number, &b.serie, &b.authors}
+	}))
+	return
 }
 
 func (db *DB) BookDelete(user int, books ...string) (int64, error) {

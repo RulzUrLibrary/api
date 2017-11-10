@@ -57,47 +57,6 @@ WHERE fk_wishlist = w.id AND fk_user = $1 AND fk_book = b.id AND b.isbn = $2 AND
 
 const wishlistDelete = `DELETE FROM wishlists WHERE fk_user = $1 AND (%s)`
 
-type queryWishlist struct {
-	query   string
-	args    list
-	getArgs func(*Wishlist) list
-}
-
-type queryWishlists struct {
-	queryWishlist
-	queryList     string
-	queryListArgs list
-}
-
-func dedupWishlists(db *DB, qs queryWishlist) (wishlists Wishlists, err error) {
-	rows, err := db.Query(qs.query, qs.args...)
-
-	if err != nil {
-		return
-	}
-
-	for rows.Next() {
-		var wishlist Wishlist
-
-		if err = rows.Scan(qs.getArgs(&wishlist)...); err != nil {
-			return
-		}
-		wishlists.Wishlists = append(wishlists.Wishlists, wishlist)
-	}
-	return
-}
-
-func (db *DB) wishlists(qwl queryWishlists) (w Wishlists, c int64, e error) {
-	if c, e = db.Count(qwl.queryList, qwl.queryListArgs...); e != nil {
-		return
-	}
-
-	if w, e = dedupWishlists(db, qwl.queryWishlist); e != nil {
-		return
-	}
-	return
-}
-
 func (db *DB) WishlistPut(user int, book string, wishlists ...string) (int64, error) {
 	var args = list{user, book}
 	var where = []string{}
@@ -109,37 +68,28 @@ func (db *DB) WishlistPut(user int, book string, wishlists ...string) (int64, er
 	return db.Exec(fmt.Sprintf(wishlistPut, strings.Join(where, " OR ")), args...)
 }
 
-func (db *DB) Wishlist(limit, offset int, uuid string) (Wishlists, int64, error) {
-	return db.wishlists(queryWishlists{
-		queryWishlist{wishlist, list{limit, offset, uuid}, func(w *Wishlist) list {
-			return list{
-				&w.id, &w.name, &w.uuid, &w.user, &w.book.id, &w.book.isbn, &w.book.title,
-				&w.book.price, &w.book.number, &w.book.serie, &w.book.authors,
-			}
-		},
-		}, countWishlist, list{uuid},
-	})
+func (db *DB) Wishlist(limit, offset int, uuid string) (w Wishlists, c int64, e error) {
+	c, e = db.queryList(wishlist, list{limit, offset, uuid}, w.InsertWishlist(func(w *Wishlist) list {
+		return list{&w.id, &w.name, &w.uuid, &w.user, &w.book.id, &w.book.isbn, &w.book.title,
+			&w.book.price, &w.book.number, &w.book.serie, &w.book.authors,
+		}
+	}), countWishlist, list{uuid})
+	return
 }
 
-func (db *DB) Wishlists(limit, offset, user int) (Wishlists, int64, error) {
-	return db.wishlists(queryWishlists{
-		queryWishlist{wishlists, list{limit, offset, user},
-			func(w *Wishlist) list {
-				return list{
-					&w.id, &w.name, &w.uuid, &w.book.id, &w.book.isbn, &w.book.title,
-					&w.book.price, &w.book.number, &w.book.serie, &w.book.authors,
-				}
-			},
-		}, countWishlists, list{user},
-	})
+func (db *DB) Wishlists(limit, offset, user int) (w Wishlists, c int64, e error) {
+	c, e = db.queryList(wishlists, list{limit, offset, user}, w.InsertWishlist(func(w *Wishlist) list {
+		return list{&w.id, &w.name, &w.uuid, &w.book.id, &w.book.isbn, &w.book.title,
+			&w.book.price, &w.book.number, &w.book.serie, &w.book.authors}
+	}), countWishlists, list{user})
+	return
 }
 
-func (db *DB) WishlistsN(user int) (Wishlists, error) {
-	return dedupWishlists(db, queryWishlist{
-		wishlistsN, list{user}, func(w *Wishlist) list {
-			return list{&w.id, &w.name, &w.uuid}
-		},
-	})
+func (db *DB) WishlistsN(user int) (w Wishlists, e error) {
+	e = db.query(wishlistsN, list{user}, w.InsertWishlist(func(w *Wishlist) list {
+		return list{&w.id, &w.name, &w.uuid}
+	}))
+	return
 }
 
 func (db *DB) WishPost(name string, user int) error {
