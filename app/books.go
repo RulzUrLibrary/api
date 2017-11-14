@@ -52,7 +52,7 @@ func BookPost(c *Context, isbn string) (book utils.Book, ok bool, err error) {
 	switch book, err = c.App.Scrapper.Amazon(isbn); err {
 	case nil:
 		var notation utils.Notation
-		notation, err = c.App.Scrapper.SensCritique(book.TitleDisplay())
+		notation, err = c.App.Scrapper.SensCritique(book.TitleDisplaySC())
 		if err != nil {
 			return
 		}

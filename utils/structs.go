@@ -75,6 +75,14 @@ func (b Book) TitleDisplay() string {
 	}
 }
 
+func (b Book) TitleDisplaySC() string {
+	if b.Serie == "" {
+		return b.Title
+	} else {
+		return fmt.Sprintf("%s tome %d", b.Serie, b.Number)
+	}
+}
+
 func (b Book) InCollection() bool {
 	return b.Owned != nil && *b.Owned
 }
