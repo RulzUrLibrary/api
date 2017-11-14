@@ -33,6 +33,8 @@ var tests = []testPairs{
 	{"FullMetal Alchemist - tome 08 (8)", Result{"", "FullMetal Alchemist", 8}},
 	{"Fullmetal Alchemist, Tome 12", Result{"", "Fullmetal Alchemist", 12}},
 	{"Lanfeust Odyssey T08 - Tseu-Hi la gardienne", Result{"Tseu-Hi la gardienne", "Lanfeust Odyssey", 8}},
+	{"Dune – Tome 1", Result{"", "Dune", 1}},
+	{"Dune (1)", Result{"", "Dune", 1}},
 }
 
 func TestGetTitle(t *testing.T) {

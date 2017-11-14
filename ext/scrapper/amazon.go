@@ -27,7 +27,7 @@ var (
 		cascadia.MustCompile(".author a"),
 	}
 	regexpTitle = regexp.MustCompile(
-		`(.*?)\s*(?:-|,)*\s*(?i:Vol\.|volume|tome|t)\s*(\d+)\s*(?:-|,|\:)*\s*(.*[a-zA-Z].*)?`,
+		`(.*?)\s*(?:-|,|–)*\s*(?i:Vol\.|volume|tome|t|\()\s*(\d+)\s*(?:-|,|\:)*\s*(.*[a-zA-Z].*)?`,
 	)
 	// small alias
 	ParseTitle = getTitle
