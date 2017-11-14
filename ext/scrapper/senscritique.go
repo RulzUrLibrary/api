@@ -18,6 +18,9 @@ var (
 )
 
 func getLink(node *html.Node) string {
+	if node == nil {
+		return ""
+	}
 	link, ok := getAttrs(node)["href"]
 	if ok {
 		link = SENSCRITIQUE_URL + link
