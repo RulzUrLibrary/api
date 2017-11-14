@@ -1,85 +1,43 @@
 package main
 
 import (
-	"github.com/labstack/echo/middleware"
+	"github.com/labstack/gommon/log"
 	"github.com/rulzurlibrary/api/app"
+	"github.com/rulzurlibrary/api/ext/db"
 )
 
+const (
+	PREFIX    = "rulz"
+	PREFIX_DB = "rulzdb"
+)
+
+var (
+	level = log.WARN
+)
+
+func Logger(prefix string, level log.Lvl) *log.Logger {
+	logger := log.New(prefix)
+	logger.SetLevel(level)
+	return logger
+}
+
 func main() {
-	rulz := app.New()
+	config, err := app.ParseConfig()
+	logger := log.New(PREFIX)
 
-	// Middleware
-	rulz.Use(middleware.Logger())
-	rulz.Use(middleware.Recover())
-	rulz.Use(middleware.Secure())
+	if err != nil {
+		logger.Fatal(err)
+	}
 
-	/* --------------------------------- API --------------------------------- */
-	rulz.Api.Use(app.ContentType)
-	rulz.Api.Use(middleware.CORS())
+	if config.Debug {
+		level = log.DEBUG
+	}
+	logger.SetLevel(level)
 
-	rulz.Api.Static("/thumbs", rulz.Configuration.Paths.Thumbs)
-
-	rulz.Api.GET("/books/:isbn", rulz.Handler(app.APIBookGet), rulz.BasicAuth(false))
-	rulz.Api.GET("/books/", rulz.Handler(app.APIBookList), rulz.BasicAuth(false))
-
-	rulz.Api.POST("/books/", rulz.Handler(app.APIBookPost))
-	rulz.Api.PUT("/books/", rulz.Handler(app.APIBookPut), rulz.BasicAuth(true))
-	rulz.Api.DELETE("/books/", rulz.Handler(app.APIBookDelete), rulz.BasicAuth(true))
-
-	rulz.Api.GET("/series/:id", rulz.Handler(app.APISerieGet), rulz.BasicAuth(false))
-	rulz.Api.GET("/series/", rulz.Handler(app.APISerieList), rulz.BasicAuth(false))
-
-	/* --------------------------------- WEB --------------------------------- */
-	rulz.Web.Use(app.CookieAuth(rulz.Configuration.Dev))
-	rulz.Web.Use(app.I18n(rulz.Configuration.I18n))
-	rulz.Web.Use(middleware.CSRFWithConfig(middleware.CSRFConfig{
-		TokenLookup: "form:X-CSRF-Token",
-	}))
-
-	rulz.Web.Static("/static", rulz.Configuration.Paths.Static)
-	rulz.Web.Static("/thumbs", rulz.Configuration.Paths.Thumbs)
-
-	rulz.Web.GET("/", rulz.Handler(app.WEBIndex)).Name = "index"
-
-	rulz.Web.GET("/user", rulz.Handler(app.WEBUserGet), app.Protected).Name = "user"
-	rulz.Web.GET("/user/activate/:id", rulz.Handler(app.WEBUserActivate)).Name = "activate"
-
-	rulz.Web.POST("/user/change", rulz.Handler(app.WEBUserChange), app.Protected).Name = "change"
-
-	rulz.Web.GET("/user/reset", rulz.Handler(app.WEBUserResetGet)).Name = "reset"
-	rulz.Web.POST("/user/reset", rulz.Handler(app.WEBUserResetPost))
-
-	rulz.Web.GET("/user/reset/:id", rulz.Handler(app.WEBUserReinit)).Name = "reinit"
-	rulz.Web.POST("/user/reset/:id", rulz.Handler(app.WEBUserReinit))
-
-	rulz.Web.POST("/user/logout", rulz.Handler(app.WEBUserLogout), app.Protected).Name = "logout"
-	rulz.Web.POST("/user/lang", rulz.Handler(app.WEBUserLang)).Name = "lang"
-
-	rulz.Web.GET("/books/", rulz.Handler(app.WEBBookList), app.Protected).Name = "books"
-
-	rulz.Web.GET("/wishlists/", rulz.Handler(app.WEBWishlist), app.Protected).Name = "wishlists"
-
-	rulz.Web.GET("/tags/", rulz.Handler(app.WEBTag), app.Protected).Name = "tags"
-	rulz.Web.POST("/tags/", rulz.Handler(app.WEBTag), app.Protected)
-
-	rulz.Web.GET("/wishlist/:id", rulz.Handler(app.WEBWishListGet)).Name = "wishlist"
-	rulz.Web.POST("/wishlist/:id", rulz.Handler(app.WEBWishListPost), app.Protected)
-
-	rulz.Web.GET("/books/:isbn", rulz.Handler(app.WEBBookGet)).Name = "book"
-	rulz.Web.POST("/books/:isbn", rulz.Handler(app.WEBBookPost))
-
-	rulz.Web.GET("/books/:isbn/wishlist", rulz.Handler(app.WEBWishlistAdd), app.Protected).Name = "share"
-	rulz.Web.POST("/books/:isbn/wishlist", rulz.Handler(app.WEBWishlistPost), app.Protected)
-
-	// TODO: find a better way to identify series
-	rulz.Web.GET("/series/:id", rulz.Handler(app.WEBSerieGet), app.Protected).Name = "serie"
-	rulz.Web.POST("/series/:id", rulz.Handler(app.WEBSeriePost), app.Protected)
-
-	rulz.Web.GET("/auth", rulz.Handler(app.WEBAuthGet)).Name = "auth"
-	rulz.Web.POST("/auth", rulz.Handler(app.WEBAuthPost))
-
-	rulz.Web.GET("/auth/new", rulz.Handler(app.WEBUserNewGet)).Name = "new"
-	rulz.Web.POST("/auth/new", rulz.Handler(app.WEBUserNewPost))
+	rulz := app.New(
+		db.New(Logger(PREFIX_DB, level), config.Database),
+		config,
+	)
 
 	// Start application
 	rulz.Logger.Fatal(rulz.Start())

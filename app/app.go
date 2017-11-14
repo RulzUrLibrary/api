@@ -119,8 +119,7 @@ func HTTPErrorHandler(err error, c echo.Context) {
 	}
 }
 
-func New() *Application {
-	var err error
+func New(db *db.DB, config Configuration) *Application {
 	var app = &Application{Echo: echo.New(), Api: echo.New(), Web: echo.New()}
 
 	app.Any("/*", func(c echo.Context) (err error) {
@@ -134,29 +133,101 @@ func New() *Application {
 		return
 	})
 
-	app.Configuration, err = ParseConfig()
-	if err != nil {
-		app.Logger.Fatal(err)
-	}
-
-	app.Api.Debug = app.Configuration.Debug
+	app.Configuration = config
+	app.Api.Debug = config.Debug
 	app.Api.Validator = validator.New()
 
-	app.Web.Debug = app.Configuration.Debug
+	app.Web.Debug = config.Debug
 	app.Web.Validator = validator.New()
 	app.Web.HTTPErrorHandler = HTTPErrorHandler
-	app.Web.Renderer = view.New(app.Web, app.Configuration.View)
+	app.Web.Renderer = view.New(app.Web, config.View)
 
-	app.Debug = app.Configuration.Debug
-	app.Scrapper = scrapper.New(app.Logger, app.Configuration.Paths.Thumbs)
-	app.Database = db.New(app.Logger, app.Configuration.Database)
+	app.Debug = config.Debug
+	app.Scrapper = scrapper.New(app.Logger, config.Paths.Thumbs)
+	app.Database = db
 	app.Auth = auth.New(app.Logger, app.Database)
-	app.Smtp = smtp.New(app.Logger, app.Configuration.Smtp)
+	app.Smtp = smtp.New(app.Logger, config.Smtp)
 
 	if !app.Configuration.Dev {
 		app.HideBanner = true
 	}
+	app.routes()
 	return app
+}
+
+func (app *Application) routes() {
+	// Middleware
+	app.Use(middleware.Logger())
+	app.Use(middleware.Recover())
+	app.Use(middleware.Secure())
+
+	/* --------------------------------- API --------------------------------- */
+	app.Api.Use(ContentType)
+	app.Api.Use(middleware.CORS())
+
+	app.Api.Static("/thumbs", app.Configuration.Paths.Thumbs)
+
+	app.Api.GET("/books/:isbn", app.Handler(APIBookGet), app.BasicAuth(false))
+	app.Api.GET("/books/", app.Handler(APIBookList), app.BasicAuth(false))
+
+	app.Api.POST("/books/", app.Handler(APIBookPost))
+	app.Api.PUT("/books/", app.Handler(APIBookPut), app.BasicAuth(true))
+	app.Api.DELETE("/books/", app.Handler(APIBookDelete), app.BasicAuth(true))
+
+	app.Api.GET("/series/:id", app.Handler(APISerieGet), app.BasicAuth(false))
+	app.Api.GET("/series/", app.Handler(APISerieList), app.BasicAuth(false))
+
+	/* --------------------------------- WEB --------------------------------- */
+	app.Web.Use(CookieAuth(app.Configuration.Dev))
+	app.Web.Use(I18n(app.Configuration.I18n))
+	app.Web.Use(middleware.CSRFWithConfig(middleware.CSRFConfig{
+		TokenLookup: "form:X-CSRF-Token",
+	}))
+
+	app.Web.Static("/static", app.Configuration.Paths.Static)
+	app.Web.Static("/thumbs", app.Configuration.Paths.Thumbs)
+
+	app.Web.GET("/", app.Handler(WEBIndex)).Name = "index"
+
+	app.Web.GET("/user", app.Handler(WEBUserGet), Protected).Name = "user"
+	app.Web.GET("/user/activate/:id", app.Handler(WEBUserActivate)).Name = "activate"
+
+	app.Web.POST("/user/change", app.Handler(WEBUserChange), Protected).Name = "change"
+
+	app.Web.GET("/user/reset", app.Handler(WEBUserResetGet)).Name = "reset"
+	app.Web.POST("/user/reset", app.Handler(WEBUserResetPost))
+
+	app.Web.GET("/user/reset/:id", app.Handler(WEBUserReinit)).Name = "reinit"
+	app.Web.POST("/user/reset/:id", app.Handler(WEBUserReinit))
+
+	app.Web.POST("/user/logout", app.Handler(WEBUserLogout), Protected).Name = "logout"
+	app.Web.POST("/user/lang", app.Handler(WEBUserLang)).Name = "lang"
+
+	app.Web.GET("/books/", app.Handler(WEBBookList), Protected).Name = "books"
+
+	app.Web.GET("/wishlists/", app.Handler(WEBWishlist), Protected).Name = "wishlists"
+
+	app.Web.GET("/tags/", app.Handler(WEBTag), Protected).Name = "tags"
+	app.Web.POST("/tags/", app.Handler(WEBTag), Protected)
+
+	app.Web.GET("/wishlist/:id", app.Handler(WEBWishListGet)).Name = "wishlist"
+	app.Web.POST("/wishlist/:id", app.Handler(WEBWishListPost), Protected)
+
+	app.Web.GET("/books/:isbn", app.Handler(WEBBookGet)).Name = "book"
+	app.Web.POST("/books/:isbn", app.Handler(WEBBookPost))
+
+	app.Web.GET("/books/:isbn/wishlist", app.Handler(WEBWishlistAdd), Protected).Name = "share"
+	app.Web.POST("/books/:isbn/wishlist", app.Handler(WEBWishlistPost), Protected)
+
+	// TODO: find a better way to identify series
+	app.Web.GET("/series/:id", app.Handler(WEBSerieGet), Protected).Name = "serie"
+	app.Web.POST("/series/:id", app.Handler(WEBSeriePost), Protected)
+
+	app.Web.GET("/auth", app.Handler(WEBAuthGet)).Name = "auth"
+	app.Web.POST("/auth", app.Handler(WEBAuthPost))
+
+	app.Web.GET("/auth/new", app.Handler(WEBUserNewGet)).Name = "new"
+	app.Web.POST("/auth/new", app.Handler(WEBUserNewPost))
 }
 
 func (app *Application) Start() error {
@@ -175,7 +246,6 @@ func (app *Application) Start() error {
 		}()
 		return app.Echo.StartTLS(":443", cert, key)
 	} else {
-
 		return app.Echo.Start(fmt.Sprintf("%s:%d", host, port))
 	}
 }
