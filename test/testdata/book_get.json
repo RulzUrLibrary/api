@@ -5,6 +5,13 @@
   "price": 9.99,
   "number": 1,
   "serie": "Dune",
-  "authors": [],
+  "authors": [
+    {
+      "name": "Frank Herbert"
+    },
+    {
+      "name": "Michel Demuth"
+    }
+  ],
   "notations": []
 }

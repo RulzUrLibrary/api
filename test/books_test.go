@@ -11,7 +11,7 @@ func TestBookGet(t *testing.T) {
 	resp := httptest.NewRecorder()
 	books := sqlmock.NewRows([]string{"", "", "", "", "", "", "", "", ""})
 	books.AddRow(1, "9782266155489", nil, "Some description", 9.99,
-		1, "Dune", []byte(`{"(,)"}`), []byte(`{"(,,)"}`),
+		1, "Dune", []byte(`{"(1,\"Frank Herbert\")","(2,\"Michel Demuth\")"}`), []byte(`{"(,,)"}`),
 	)
 	mock.ExpectQuery("SELECT").WithArgs("9782266155489").WillReturnRows(books)
 
