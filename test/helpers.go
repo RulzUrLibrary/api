@@ -16,6 +16,8 @@ func helperBodyCompare(t *testing.T, resp *http.Response, name string) {
 	}
 	expected := helperLoadBytes(t, name)
 	if !bytes.Equal(body, expected) {
+		t.Log(body)
+		t.Log(expected)
 		t.Errorf("compare body failed against %s:\n%s", name, body)
 	}
 }
