@@ -9,17 +9,14 @@ import (
 	"github.com/rulzurlibrary/api/ext/db"
 	"github.com/rulzurlibrary/api/ext/scrapper"
 	"github.com/rulzurlibrary/api/ext/smtp"
-	"github.com/rulzurlibrary/api/ext/validator"
-	"github.com/rulzurlibrary/api/ext/view"
 	"github.com/rulzurlibrary/api/utils"
 	"net/http"
 	"strings"
 )
 
-type dict = utils.Dict
-
-// aliases
 var ErrNotFound = echo.ErrNotFound
+
+type dict = utils.Dict
 
 func dynamic(c *Context, from, where, param string) error {
 	ok, err := c.App.Database.Exists(from, where, param)
@@ -119,48 +116,46 @@ func HTTPErrorHandler(err error, c echo.Context) {
 	}
 }
 
-func New(db *db.DB, config Configuration) *Application {
+func New(init Initializer) *Application {
 	var app = &Application{Echo: echo.New(), Api: echo.New(), Web: echo.New()}
 
-	app.Any("/*", func(c echo.Context) (err error) {
-		req := c.Request()
-		res := c.Response()
-		if strings.HasPrefix(req.Host, "api.") {
-			app.Api.ServeHTTP(res, req)
-		} else {
-			app.Web.ServeHTTP(res, req)
-		}
-		return
-	})
+	app.Configuration = init.Config()
 
-	app.Configuration = config
-	app.Api.Debug = config.Debug
-	app.Api.Validator = validator.New()
+	app.Debug = app.Configuration.Debug
+	app.Api.Debug = app.Configuration.Debug
+	app.Web.Debug = app.Configuration.Debug
 
-	app.Web.Debug = config.Debug
-	app.Web.Validator = validator.New()
+	app.Logger = init.Logger(PREFIX)
+	app.Api.Logger = init.Logger(PREFIX)
+	app.Web.Logger = init.Logger(PREFIX)
+
+	app.Api.Validator = init.Validator()
+	app.Web.Validator = init.Validator()
+
 	app.Web.HTTPErrorHandler = HTTPErrorHandler
-	app.Web.Renderer = view.New(app.Web, config.View)
+	app.Web.Renderer = init.View(app)
 
-	app.Debug = config.Debug
-	app.Scrapper = scrapper.New(app.Logger, config.Paths.Thumbs)
-	app.Database = db
-	app.Auth = auth.New(app.Logger, app.Database)
-	app.Smtp = smtp.New(app.Logger, config.Smtp)
+	app.Scrapper = init.Scrapper()
+	app.Database, app.Auth = init.DB()
+	app.Smtp = init.Smtp()
 
 	if !app.Configuration.Dev {
 		app.HideBanner = true
 	}
-	app.routes()
-	return app
-}
 
-func (app *Application) routes() {
 	// Middleware
 	app.Use(middleware.Logger())
 	app.Use(middleware.Recover())
 	app.Use(middleware.Secure())
 
+	app.Any("/*", func(c echo.Context) (err error) {
+		if strings.HasPrefix(c.Request().Host, "api.") {
+			app.Api.ServeHTTP(c.Response(), c.Request())
+		} else {
+			app.Web.ServeHTTP(c.Response(), c.Request())
+		}
+		return
+	})
 	/* --------------------------------- API --------------------------------- */
 	app.Api.Use(ContentType)
 	app.Api.Use(middleware.CORS())
@@ -228,6 +223,8 @@ func (app *Application) routes() {
 
 	app.Web.GET("/auth/new", app.Handler(WEBUserNewGet)).Name = "new"
 	app.Web.POST("/auth/new", app.Handler(WEBUserNewPost))
+
+	return app
 }
 
 func (app *Application) Start() error {
