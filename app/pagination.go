@@ -1,7 +1,7 @@
 package app
 
 import (
-	"github.com/rulzurlibrary/api/utils"
+	"github.com/RulzUrLibrary/api/utils"
 	"strconv"
 )
 

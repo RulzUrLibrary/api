@@ -1,7 +1,7 @@
 package app
 
 import (
-	"github.com/rulzurlibrary/api/ext/db"
+	"github.com/RulzUrLibrary/api/ext/db"
 	"net/http"
 )
 

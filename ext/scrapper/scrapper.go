@@ -2,7 +2,7 @@ package scrapper
 
 import (
 	"encoding/base64"
-	"github.com/rulzurlibrary/api/utils"
+	"github.com/RulzUrLibrary/api/utils"
 	"github.com/labstack/echo"
 	"golang.org/x/net/html"
 	"io"

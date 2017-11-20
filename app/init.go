@@ -2,12 +2,12 @@ package app
 
 import (
 	"github.com/labstack/gommon/log"
-	"github.com/rulzurlibrary/api/ext/auth"
-	"github.com/rulzurlibrary/api/ext/db"
-	"github.com/rulzurlibrary/api/ext/scrapper"
-	"github.com/rulzurlibrary/api/ext/smtp"
-	"github.com/rulzurlibrary/api/ext/validator"
-	"github.com/rulzurlibrary/api/ext/view"
+	"github.com/RulzUrLibrary/api/ext/auth"
+	"github.com/RulzUrLibrary/api/ext/db"
+	"github.com/RulzUrLibrary/api/ext/scrapper"
+	"github.com/RulzUrLibrary/api/ext/smtp"
+	"github.com/RulzUrLibrary/api/ext/validator"
+	"github.com/RulzUrLibrary/api/ext/view"
 )
 
 const (

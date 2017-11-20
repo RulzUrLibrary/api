@@ -1,8 +1,8 @@
 package app
 
 import (
-	"github.com/rulzurlibrary/api/ext/validator"
-	"github.com/rulzurlibrary/api/utils"
+	"github.com/RulzUrLibrary/api/ext/validator"
+	"github.com/RulzUrLibrary/api/utils"
 	"net/http"
 )
 

@@ -1,7 +1,7 @@
 package validator
 
 import (
-	"github.com/rulzurlibrary/api/utils"
+	"github.com/RulzUrLibrary/api/utils"
 	validate "gopkg.in/go-playground/validator.v9"
 	"reflect"
 	"strings"

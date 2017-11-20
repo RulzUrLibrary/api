@@ -2,7 +2,7 @@ package scrapper
 
 import (
 	"github.com/andybalholm/cascadia"
-	"github.com/rulzurlibrary/api/utils"
+	"github.com/RulzUrLibrary/api/utils"
 	"golang.org/x/net/html"
 	"net/url"
 	"regexp"

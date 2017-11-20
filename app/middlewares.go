@@ -4,8 +4,8 @@ import (
 	"github.com/gorilla/securecookie"
 	"github.com/gorilla/sessions"
 	"github.com/labstack/echo"
-	"github.com/rulzurlibrary/api/ext/i18n"
-	"github.com/rulzurlibrary/api/utils"
+	"github.com/RulzUrLibrary/api/ext/i18n"
+	"github.com/RulzUrLibrary/api/utils"
 	"net/http"
 	"net/url"
 )
