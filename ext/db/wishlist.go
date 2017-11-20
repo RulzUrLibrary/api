@@ -89,5 +89,13 @@ func (w *Wishlists) Scan(src interface{}) error {
 	if bytes.Equal(src.([]byte), []byte(`{"(,)"}`)) {
 		return nil
 	}
-	return pq.Array(&w.Wishlists).Scan(src)
+	wishlists := []Wishlist{}
+	if err := pq.Array(&wishlists).Scan(src); err != nil {
+		return err
+	}
+	for _, wishlist := range wishlists {
+		copy := Wishlist(wishlist)
+		w.Wishlists = append(w.Wishlists, &copy)
+	}
+	return nil
 }

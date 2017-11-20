@@ -172,6 +172,8 @@ func New(init Initializer) *Application {
 	app.Api.GET("/series/:id", app.Handler(APISerieGet), app.BasicAuth(false))
 	app.Api.GET("/series/", app.Handler(APISerieList), app.BasicAuth(false))
 
+	app.Api.GET("/wishlists/", app.Handler(APIWishlist), app.BasicAuth(true))
+
 	/* --------------------------------- WEB --------------------------------- */
 	app.Web.Use(CookieAuth(app.Configuration.Dev))
 	app.Web.Use(I18n(app.Configuration.I18n))
