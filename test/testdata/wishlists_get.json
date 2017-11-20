@@ -1,0 +1,39 @@
+{
+  "_meta": {
+    "limit": 10,
+    "offset": 0,
+    "count": 20
+  },
+  "wishlists": [
+    {
+      "name": "wishlist_1",
+      "uuid": "uuid_1",
+      "books": [
+        {
+          "isbn": "book_1_isbn",
+          "title": "book_1_title",
+          "price": 1.11,
+          "number": 1,
+          "serie": "book_1_serie"
+        },
+        {
+          "isbn": "book_2_isbn",
+          "price": 1.11,
+          "number": 1,
+          "serie": "book_2_serie"
+        }
+      ]
+    },
+    {
+      "name": "wishlist_2",
+      "uuid": "uuid_2",
+      "books": [
+        {
+          "isbn": "book_3_isbn",
+          "title": "book_3_title",
+          "price": 1.11
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "isbn": "9782266155489",
+  "thumbnail": "/thumbs/9782266155489.jpg",
+  "description": "Some description",
+  "price": 9.99,
+  "number": 1,
+  "serie": "Dune",
+  "owned": false,
+  "authors": [
+    {
+      "name": "Frank Herbert"
+    },
+    {
+      "name": "Michel Demuth"
+    }
+  ],
+  "wishlists": [
+    {
+      "name": "wishlist_1",
+      "uuid": "uuid_1"
+    },
+    {
+      "name": "wishlist_2",
+      "uuid": "uuid_2"
+    }
+  ],
+  "notations": []
+}

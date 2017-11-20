@@ -5,6 +5,7 @@ import (
 	"github.com/rulzurlibrary/api/app"
 	"github.com/rulzurlibrary/api/ext/auth"
 	"github.com/rulzurlibrary/api/ext/db"
+	"github.com/rulzurlibrary/api/utils"
 	fakeDB "gopkg.in/DATA-DOG/go-sqlmock.v1"
 	"io"
 	"net/http"
@@ -16,9 +17,18 @@ var (
 	mock fakeDB.Sqlmock
 )
 
-type TestInitializer struct {
-	*app.DefaultInitializer
+type (
+	MockCache       struct{}
+	TestInitializer struct {
+		*app.DefaultInitializer
+	}
+)
+
+func (mc MockCache) Get(_ string) (*utils.User, bool) {
+	return &utils.User{}, false // nothing can get out from the cache
 }
+
+func (mc MockCache) Set(_ string, _ *utils.User) {}
 
 func NewTestInitializer() *TestInitializer {
 	return &TestInitializer{
@@ -39,7 +49,7 @@ func (ti *TestInitializer) DB() (*db.DB, *auth.Auth) {
 	mock = mocker
 
 	database := &db.DB{fake, ti.Logger(app.PREFIX_DB)}
-	auth := auth.New(ti.Logger(app.PREFIX_AUTH), database)
+	auth := auth.New(ti.Logger(app.PREFIX_AUTH), database, MockCache{})
 	return database, auth
 }
 
