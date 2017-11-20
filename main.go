@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/rulzurlibrary/api/app"
+	"github.com/RulzUrLibrary/api/app"
 )
 
 func main() {

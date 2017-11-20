@@ -3,8 +3,8 @@ package smtp
 import (
 	"bytes"
 	"github.com/labstack/echo"
-	"github.com/rulzurlibrary/api/ext/i18n"
-	"github.com/rulzurlibrary/api/utils"
+	"github.com/RulzUrLibrary/api/ext/i18n"
+	"github.com/RulzUrLibrary/api/utils"
 )
 
 func (s *Smtp) mail(c echo.Context, subject, dest, tplt string, data utils.Dict) error {

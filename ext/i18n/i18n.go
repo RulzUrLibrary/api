@@ -3,7 +3,7 @@ package i18n
 import (
 	"github.com/labstack/echo"
 	"github.com/nicksnyder/go-i18n/i18n"
-	"github.com/rulzurlibrary/api/utils"
+	"github.com/RulzUrLibrary/api/utils"
 	"path/filepath"
 )
 

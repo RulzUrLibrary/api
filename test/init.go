@@ -2,10 +2,10 @@ package test
 
 import (
 	"github.com/labstack/gommon/log"
-	"github.com/rulzurlibrary/api/app"
-	"github.com/rulzurlibrary/api/ext/auth"
-	"github.com/rulzurlibrary/api/ext/db"
-	"github.com/rulzurlibrary/api/utils"
+	"github.com/RulzUrLibrary/api/app"
+	"github.com/RulzUrLibrary/api/ext/auth"
+	"github.com/RulzUrLibrary/api/ext/db"
+	"github.com/RulzUrLibrary/api/utils"
 	fakeDB "gopkg.in/DATA-DOG/go-sqlmock.v1"
 	"io"
 	"net/http"

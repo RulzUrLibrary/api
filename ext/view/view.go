@@ -5,7 +5,7 @@ import (
 	"github.com/CloudyKit/jet"
 	"github.com/gorilla/sessions"
 	"github.com/labstack/echo"
-	"github.com/rulzurlibrary/api/ext/i18n"
+	"github.com/RulzUrLibrary/api/ext/i18n"
 	"io"
 	"net/url"
 	"reflect"

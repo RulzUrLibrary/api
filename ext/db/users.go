@@ -2,7 +2,7 @@ package db
 
 import (
 	"database/sql"
-	"github.com/rulzurlibrary/api/utils"
+	"github.com/RulzUrLibrary/api/utils"
 )
 
 const authUser = `

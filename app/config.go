@@ -2,10 +2,10 @@ package app
 
 import (
 	"github.com/BurntSushi/toml"
-	"github.com/rulzurlibrary/api/ext/db"
-	"github.com/rulzurlibrary/api/ext/i18n"
-	"github.com/rulzurlibrary/api/ext/smtp"
-	"github.com/rulzurlibrary/api/ext/view"
+	"github.com/RulzUrLibrary/api/ext/db"
+	"github.com/RulzUrLibrary/api/ext/i18n"
+	"github.com/RulzUrLibrary/api/ext/smtp"
+	"github.com/RulzUrLibrary/api/ext/view"
 	"os"
 	"path"
 	"path/filepath"

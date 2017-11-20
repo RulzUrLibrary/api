@@ -2,9 +2,9 @@ package auth
 
 import (
 	"github.com/labstack/echo"
-	"github.com/rulzurlibrary/api/ext/db"
-	"github.com/rulzurlibrary/api/ext/google"
-	"github.com/rulzurlibrary/api/utils"
+	"github.com/RulzUrLibrary/api/ext/db"
+	"github.com/RulzUrLibrary/api/ext/google"
+	"github.com/RulzUrLibrary/api/utils"
 )
 
 type Cache interface {
