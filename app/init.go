@@ -13,6 +13,7 @@ import (
 const (
 	PREFIX          = "rulz"
 	PREFIX_DB       = "rulz_db"
+	PREFIX_CACHE    = "rulz_cache"
 	PREFIX_AUTH     = "rulz_auth"
 	PREFIX_SMTP     = "rulz_smtp"
 	PREFIX_SCRAPPER = "rulz_scrapper"
@@ -75,6 +76,6 @@ func (di *DefaultInitializer) Config() Configuration {
 
 func (di *DefaultInitializer) DB() (*db.DB, *auth.Auth) {
 	database := db.New(di.Logger(PREFIX_DB), di.Configuration.Database)
-	auth := auth.New(di.Logger(PREFIX_AUTH), database)
+	auth := auth.New(di.Logger(PREFIX_AUTH), database, auth.NewDefaultCache(di.Logger(PREFIX_CACHE)))
 	return database, auth
 }
