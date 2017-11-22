@@ -1,8 +1,8 @@
 package scrapper
 
 import (
-	"github.com/andybalholm/cascadia"
 	"github.com/RulzUrLibrary/api/utils"
+	"github.com/andybalholm/cascadia"
 	"golang.org/x/net/html"
 	"net/url"
 	"regexp"
@@ -16,7 +16,7 @@ const AMAZON_MAX_NOTATION = 5
 
 var (
 	matchIndexForm   = cascadia.MustCompile("form")
-	matchSearchLink  = cascadia.MustCompile("#result_0 a.s-access-detail-page")
+	matchSearchLink  = cascadia.MustCompile("#result_0 a")
 	matchTitle       = cascadia.MustCompile("#productTitle")
 	matchPrice       = cascadia.MustCompile(".swatchElement.selected .a-color-price")
 	matchDescription = cascadia.MustCompile("#bookDescription_feature_div noscript")
@@ -170,10 +170,10 @@ func (s *Scrapper) AmazonParseSearch(_url string) (href string, err error) {
 	err = s.Parse(_url, func(doc *html.Node) error {
 		for _, link := range matchSearchLink.MatchAll(doc) {
 			href = getAttrs(link)["href"]
-			if strings.Contains(href, "ebook") {
-				continue
+			s.logger.Debugf(href)
+			if !strings.Contains(href, "ebook") && strings.Contains(href, "keywords") {
+				return nil
 			}
-			return nil
 		}
 		return utils.ErrNoProduct
 	})
@@ -206,8 +206,7 @@ func (s *Scrapper) AmazonParseInfo(_url string, isbn string) (book utils.Book, e
 		return nil
 	}
 
-	err = s.Parse(_url, parsingFn)
-	if err != nil {
+	if err = s.Parse(_url, parsingFn); err != nil {
 		return
 	}
 
