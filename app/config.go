@@ -23,17 +23,15 @@ type Configuration struct {
 	View     view.Configuration
 	I18n     i18n.Configuration
 	Paths    struct {
-		Static  string
-		Thumbs  string
-		Cert    string
-		Key     string
-		Favicon string
+		Static   string
+		Thumbs   string
+		TLSCache string
+		Favicon  string
 	}
 }
 
 func ParseConfig() (config Configuration, err error) {
 	var base string
-	var letsencrypt = path.Join("/", "etc", "letsencrypt", "live", "rulz.xyz")
 
 	// get the abs
 	// which will try to find the 'filename' from current workind dir too.
@@ -56,8 +54,7 @@ func ParseConfig() (config Configuration, err error) {
 	}
 
 	// setup various paths
-	config.Paths.Cert = path.Join(letsencrypt, "fullchain.pem")
-	config.Paths.Key = path.Join(letsencrypt, "privkey.pem")
+	config.Paths.TLSCache = path.Join(base, "cache")
 	config.Paths.Static = path.Join(base, "static")
 	config.Paths.Thumbs = path.Join(base, "thumbs")
 

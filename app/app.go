@@ -2,14 +2,15 @@ package app
 
 import (
 	"fmt"
-	"github.com/gorilla/sessions"
-	"github.com/labstack/echo"
-	"github.com/labstack/echo/middleware"
 	"github.com/RulzUrLibrary/api/ext/auth"
 	"github.com/RulzUrLibrary/api/ext/db"
 	"github.com/RulzUrLibrary/api/ext/scrapper"
 	"github.com/RulzUrLibrary/api/ext/smtp"
 	"github.com/RulzUrLibrary/api/utils"
+	"github.com/gorilla/sessions"
+	"github.com/labstack/echo"
+	"github.com/labstack/echo/middleware"
+	"golang.org/x/crypto/acme/autocert"
 	"net/http"
 	"strings"
 )
@@ -234,8 +235,6 @@ func (app *Application) Start() error {
 	port := app.Configuration.Port
 
 	if !app.Configuration.Dev {
-		key := app.Configuration.Paths.Key
-		cert := app.Configuration.Paths.Cert
 		go func() {
 			e := echo.New()
 			e.Pre(middleware.HTTPSRedirectWithConfig(middleware.RedirectConfig{
@@ -243,7 +242,8 @@ func (app *Application) Start() error {
 			}))
 			e.Start(":80")
 		}()
-		return app.Echo.StartTLS(":443", cert, key)
+		app.Echo.AutoTLSManager.Cache = autocert.DirCache(app.Configuration.Paths.TLSCache)
+		return app.Echo.StartAutoTLS(":443")
 	} else {
 		return app.Echo.Start(fmt.Sprintf("%s:%d", host, port))
 	}
