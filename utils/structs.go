@@ -150,7 +150,22 @@ type Wishlist struct {
 	Books *Books `json:"books,omitempty"`
 }
 
+func (w Wishlist) EmptyBooks() Wishlist {
+	if w.Books == nil {
+		w.Books = &Books{}
+	}
+	return w
+}
+
 type Wishlists []Wishlist
+
+func (w Wishlists) EmptyBooks() Wishlists {
+	wishlists := make(Wishlists, len(w))
+	for i, wishlist := range w {
+		wishlists[i] = wishlist.EmptyBooks()
+	}
+	return wishlists
+}
 
 type Notation struct {
 	Provider string  `json:"provider"`

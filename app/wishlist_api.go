@@ -22,5 +22,5 @@ func APIWishlist(c *Context) (err error) {
 	if err != nil {
 		return
 	}
-	return c.JSON(http.StatusOK, dict{"_meta": meta, "wishlists": wishlists.ToStructs(true)})
+	return c.JSON(http.StatusOK, dict{"_meta": meta, "wishlists": wishlists.ToStructs(true).EmptyBooks()})
 }

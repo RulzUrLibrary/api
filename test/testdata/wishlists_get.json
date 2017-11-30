@@ -34,6 +34,11 @@
           "price": 1.11
         }
       ]
+    },
+    {
+      "name": "wishlist_3",
+      "uuid": "uuid_3",
+      "books": []
     }
   ]
 }

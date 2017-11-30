@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"database/sql"
 	"fmt"
-	"github.com/lib/pq"
 	"github.com/RulzUrLibrary/api/utils"
+	"github.com/lib/pq"
 )
 
 type Wishlist struct {

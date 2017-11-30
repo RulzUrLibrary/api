@@ -74,6 +74,8 @@ func TestWishlistsGet(t *testing.T) {
 		1.11, 1, "book_2_serie", []byte(`{"(,)"}`))
 	wishlists.AddRow(2, "wishlist_2", "uuid_2", 3, "book_3_isbn", "book_3_title",
 		1.11, nil, nil, []byte(`{"(,)"}`))
+	wishlists.AddRow(3, "wishlist_3", "uuid_3", nil, nil, nil,
+		nil, nil, nil, []byte(`{"(,)"}`))
 
 	mock.ExpectQuery("SELECT").WithArgs(10, 0, 1).WillReturnRows(wishlists)
 
