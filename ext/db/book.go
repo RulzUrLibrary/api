@@ -66,9 +66,11 @@ type Books struct {
 	Books []*Book
 }
 
-func (b *Books) ToStructs(partial bool) (books utils.Books) {
-	for _, book := range b.Books {
-		books = append(books, book.ToStructs(partial))
+func (b *Books) ToStructs(partial bool) utils.Books {
+	// https://apoorvam.github.io/golang/json/marshal/slice/empty/null/2017/01/19/golang-json-marshalling.html
+	books := make(utils.Books, len(b.Books))
+	for i, book := range b.Books {
+		books[i] = book.ToStructs(partial)
 	}
 	return books
 }

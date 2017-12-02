@@ -1,0 +1,15 @@
+{
+  "_meta": {
+    "limit": 10,
+    "offset": 0,
+    "count": -1
+  },
+  "books": [
+    {
+      "isbn": "1234567890",
+      "price": 9.99,
+      "number": 1,
+      "serie": "Foo"
+    }
+  ]
+}
