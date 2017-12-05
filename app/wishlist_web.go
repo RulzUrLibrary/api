@@ -1,7 +1,6 @@
 package app
 
 import (
-	"github.com/labstack/echo"
 	"github.com/RulzUrLibrary/api/ext/db"
 	"github.com/RulzUrLibrary/api/ext/validator"
 	"github.com/RulzUrLibrary/api/utils"
@@ -108,48 +107,4 @@ func WEBWishListPost(c *Context) (err error) {
 		return err
 	}
 	return c.Redirect(http.StatusSeeOther, c.Reverse("wishlists"))
-}
-
-func WEBWishlistAdd(c *Context) error {
-	isbn := c.Param("isbn")
-	user := c.Get("user").(*utils.User)
-
-	book, err := c.App.Database.BookGet(isbn)
-	if err != nil {
-		return err
-	}
-	wishlists, err := c.App.Database.WishlistsN(user.Id)
-	switch err {
-	case nil:
-	case utils.ErrNotFound:
-		return echo.NewHTTPError(http.StatusNotFound, "book "+isbn+" not found")
-	default:
-		return err
-	}
-
-	return c.Render(http.StatusOK, "add.html",
-		dict{"book": book.ToStructs(false), "wishlists": wishlists.ToStructs(true)})
-}
-
-func WEBWishlistPost(c *Context) error {
-	isbn := c.Param("isbn")
-	user := c.Get("user").(*utils.User)
-	wishlists := []string{""}
-
-	if _wishlists, ok := c.Request().Form["wishlists"]; ok {
-		wishlists = _wishlists
-	}
-
-	count, err := c.App.Database.WishlistPut(user.Id, isbn, wishlists...)
-	if err != nil {
-		return err
-	}
-	flash := utils.Flash{utils.FlashWarning, utils.WISHLIST_ADD_WARNING}
-	if count > 0 {
-		flash = utils.Flash{utils.FlashSuccess, utils.WISHLIST_ADD_SUCCESS}
-	}
-	if err := c.Flashes(flash); err != nil {
-		return err
-	}
-	return c.Redirect(http.StatusSeeOther, c.Reverse("book", isbn))
 }

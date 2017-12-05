@@ -17,35 +17,11 @@
   "book_authors": {
     "other": "Authors"
   },
-  "book_collection_added": {
-    "other": "book added to collection"
-  },
-  "book_collection_already_added": {
-    "other": "book was already in the collection"
-  },
-  "book_collection_already_removed": {
-    "other": "book was already out of the collection"
-  },
-  "book_collection_removed": {
-    "other": "book removed from collection"
-  },
   "book_details": {
     "other": "Details"
   },
   "book_notations": {
     "other": "External reviews"
-  },
-  "book_wishlist_added": {
-    "other": "book added to wishlist"
-  },
-  "book_wishlist_already_added": {
-    "other": "book was already in the wishlist"
-  },
-  "book_wishlist_already_removed": {
-    "other": "book was already out of the wishlist"
-  },
-  "book_wishlist_removed": {
-    "other": "book removed from wishlist"
   },
   "book_wishlists": {
     "other": "Wishlists"
@@ -58,6 +34,12 @@
   },
   "collection_del": {
     "other": "remove from collection"
+  },
+  "collection_update_failure": {
+    "other": "Collection update failed"
+  },
+  "collection_update_success": {
+    "other": "Collection updated"
   },
   "confirm_password": {
     "other": "Confirm password"
@@ -302,16 +284,16 @@
   "wishlist_share": {
     "other": "Share your wishlist"
   },
-  "wishlists_add_cancel": {
-    "other": "Cancel"
+  "wishlist_update_failure": {
+    "other": "Wishlists update failed"
   },
-  "wishlists_add_label": {
-    "other": "Available wishlists:"
-  },
-  "wishlists_add_submit": {
-    "other": "Add to wishlists"
+  "wishlist_update_success": {
+    "other": "Wishlists updated"
   },
   "wishlists_no_book": {
     "other": "There's no books in this wishlist"
+  },
+  "wishlists_update_submit": {
+    "other": "Update wishlists"
   }
 }

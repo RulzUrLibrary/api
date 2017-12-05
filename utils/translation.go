@@ -23,8 +23,6 @@ const (
 	WISHLIST_NAME_REQUIRED      = "wishlist_name_required"
 	WISHLIST_NAME_ALREADY_TAKEN = "wishlist_name_already_taken"
 	WISHLIST_CREATED            = "wishlist_created"
-	WISHLIST_ADD_WARNING        = "wishlist_add_warning"
-	WISHLIST_ADD_SUCCESS        = "wishlist_add_success"
 	WISHLIST_DELETE_WARNING     = "wishlist_delete_warning"
 	WISHLIST_DELETE_SUCCESS     = "wishlist_delete_success"
 )

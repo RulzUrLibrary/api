@@ -83,12 +83,22 @@ func toInterfaceI(i int) interface{} {
 	return i
 }
 
-func (db *DB) Transaction(clojure func(*sql.Tx) error) error {
+type Tx struct{ *sql.Tx }
+
+func (tx *Tx) Exec(query string, args ...interface{}) (int64, error) {
+	res, err := tx.Tx.Exec(query, args...)
+	if err != nil {
+		return 0, err
+	}
+	return res.RowsAffected()
+}
+
+func (db *DB) Transaction(clojure func(*Tx) error) error {
 	tx, err := db.Begin()
 	if err != nil {
 		return err
 	}
-	err = clojure(tx)
+	err = clojure(&Tx{tx})
 	if err != nil {
 		return err
 	}

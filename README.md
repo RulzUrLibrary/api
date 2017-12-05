@@ -10,3 +10,5 @@ Utils
 -----
 
 Parsing log: `go run main.go | while read line; do grep '^{' <<< "$line" | jq '.'; done`
+
+Running specific test: `go test ./test -v -run TestWishlistsUpdate` (beware this is a regex)

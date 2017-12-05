@@ -143,11 +143,12 @@ func (a Authors) String() string {
 }
 
 type Wishlist struct {
-	Id    int64  `json:"-"`
-	Name  string `json:"name"`
-	Uuid  string `json:"uuid,omitempty"`
-	User  string `json:"user,omitempty"`
-	Books *Books `json:"books,omitempty"`
+	Id      int64  `json:"-"`
+	Checked bool   `json:"-"`
+	Name    string `json:"name"`
+	Uuid    string `json:"uuid,omitempty"`
+	User    string `json:"user,omitempty"`
+	Books   *Books `json:"books,omitempty"`
 }
 
 func (w Wishlist) EmptyBooks() Wishlist {
@@ -165,6 +166,22 @@ func (w Wishlists) EmptyBooks() Wishlists {
 		wishlists[i] = wishlist.EmptyBooks()
 	}
 	return wishlists
+}
+
+func (w Wishlists) Populate(book Book) *Wishlists {
+	if book.Wishlists == nil || len(*book.Wishlists) == 0 {
+		return &w
+	}
+
+	wishlists := make(map[string]*Wishlist, len(w))
+	for i, wishlist := range w {
+		wishlists[wishlist.Uuid] = &w[i]
+	}
+	for _, wishlist := range *book.Wishlists {
+		wishlists[wishlist.Uuid].Checked = true
+	}
+
+	return &w
 }
 
 type Notation struct {

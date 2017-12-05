@@ -1,11 +1,11 @@
 package test
 
 import (
-	"github.com/labstack/gommon/log"
 	"github.com/RulzUrLibrary/api/app"
 	"github.com/RulzUrLibrary/api/ext/auth"
 	"github.com/RulzUrLibrary/api/ext/db"
 	"github.com/RulzUrLibrary/api/utils"
+	"github.com/labstack/gommon/log"
 	fakeDB "gopkg.in/DATA-DOG/go-sqlmock.v1"
 	"io"
 	"net/http"
@@ -19,16 +19,19 @@ var (
 
 type (
 	MockCache       struct{}
+	MockResult      struct{}
 	TestInitializer struct {
 		*app.DefaultInitializer
 	}
 )
 
+func (mc MockCache) Set(_ string, _ *utils.User) {}
 func (mc MockCache) Get(_ string) (*utils.User, bool) {
 	return &utils.User{}, false // nothing can get out from the cache
 }
 
-func (mc MockCache) Set(_ string, _ *utils.User) {}
+func (mr MockResult) LastInsertId() (i int64, e error) { return }
+func (mr MockResult) RowsAffected() (i int64, e error) { return }
 
 func NewTestInitializer() *TestInitializer {
 	return &TestInitializer{

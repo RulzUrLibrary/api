@@ -54,7 +54,7 @@ func (w *Wishlists) ToStructs(partial bool) (wishlists utils.Wishlists) {
 			*last.Books = append(*last.Books, wishlist.book.ToStructs(partial))
 		} else {
 			last = utils.Wishlist{
-				wishlist.id.Int64, wishlist.name.String, wishlist.uuid.String,
+				wishlist.id.Int64, false, wishlist.name.String, wishlist.uuid.String,
 				wishlist.user.String, nil}
 			if wishlist.book.id.Valid {
 				last.Books = &utils.Books{wishlist.book.ToStructs(partial)}

@@ -51,9 +51,9 @@ SELECT w.id, w.name, w.uuid FROM wishlists w WHERE w.fk_user = $1`
 const wishInsert = `
 INSERT INTO wishlists (uuid, name, fk_user) VALUES (gen_random_uuid(), $1, $2)`
 
-const wishDelete = `
+const wishlistClean = `
 DELETE FROM wishlists_books USING wishlists w, books b
-WHERE fk_wishlist = w.id AND fk_user = $1 AND fk_book = b.id AND b.isbn = $2 AND (%s)`
+WHERE fk_wishlist = w.id AND fk_user = $1 AND fk_book = b.id AND b.isbn = $2`
 
 const wishlistDelete = `DELETE FROM wishlists WHERE fk_user = $1 AND (%s)`
 
@@ -103,17 +103,6 @@ func (db *DB) WishPost(name string, user int) error {
 	return nil
 }
 
-func (db *DB) WishDelete(user int, book string, uuids ...string) (int64, error) {
-	var args = list{user, book}
-	var where = []string{}
-
-	for i, uuid := range uuids {
-		where = append(where, fmt.Sprintf("uuid = $%d", i+3))
-		args = append(args, uuid)
-	}
-	return db.Exec(fmt.Sprintf(wishDelete, strings.Join(where, " OR ")), args...)
-}
-
 func (db *DB) WishlistDelete(user int, uuids ...string) (int64, error) {
 	var args = list{user}
 	var where = []string{}
@@ -123,4 +112,26 @@ func (db *DB) WishlistDelete(user int, uuids ...string) (int64, error) {
 		args = append(args, uuid)
 	}
 	return db.Exec(fmt.Sprintf(wishlistDelete, strings.Join(where, " OR ")), args...)
+}
+
+func (db *DB) WishlistUpdate(user int, book string, uuids ...string) error {
+	return db.Transaction(func(tx *Tx) error {
+		if _, err := tx.Exec(wishlistClean, user, book); err != nil {
+			return err
+		}
+		if len(uuids) == 0 {
+			return nil
+		}
+		args := list{user, book}
+		where := []string{}
+
+		for i, uuid := range uuids {
+			where = append(where, fmt.Sprintf("w.uuid = $%d", i+3))
+			args = append(args, uuid)
+		}
+		if _, err := tx.Exec(fmt.Sprintf(wishlistPut, strings.Join(where, " OR ")), args...); err != nil {
+			return err
+		}
+		return nil
+	})
 }

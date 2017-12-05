@@ -24,3 +24,22 @@ func APIWishlist(c *Context) (err error) {
 	}
 	return c.JSON(http.StatusOK, dict{"_meta": meta, "wishlists": wishlists.ToStructs(true).EmptyBooks()})
 }
+
+func APIWishlistPost(c *Context) error {
+	isbn := c.Param("isbn")
+	user := c.Get("user").(*utils.User)
+	request := struct {
+		Wishlists []string `json:"wishlists"`
+	}{}
+
+	if err := c.Bind(&request); err != nil {
+		return err
+	}
+
+	if err := c.App.Database.WishlistUpdate(user.Id, isbn, request.Wishlists...); err != nil {
+		return err
+	}
+
+	c.Response().WriteHeader(http.StatusNoContent)
+	return nil
+}

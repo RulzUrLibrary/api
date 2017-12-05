@@ -10,8 +10,31 @@
   <div class="column col-12">
     <div class="divider"></div>
   </div>
+  {{if .book.Wishlists}}
+
   <div class="column col-12">
-  <h3>{{T("book_authors")}}</h3>
+    <h3>{{T("book_wishlists")}}</h3>
+    <form method="POST">
+      <div class="form-group">
+        {{range wishlist := .book.Wishlists}}
+        <label class="form-checkbox">
+          <input type="checkbox" name="wishlists" value="{{wishlist.Uuid}}" {{if wishlist.Checked}}checked{{end}}>
+          <i class="form-icon"></i>{{wishlist.Name}}
+        </label>
+        {{end}}
+      </div>
+      <div class="form-group">
+        <input name="X-CSRF-Token" type="hidden" value="{{context.Get("csrf")}}"/>
+        <input type="submit" class="btn btn-primary" value="{{T("wishlists_update_submit")}}"/>
+      </div>
+    </form>
+  </div>
+  <div class="column col-12">
+    <div class="divider"></div>
+  </div>
+  {{end}}
+  <div class="column col-12">
+    <h3>{{T("book_authors")}}</h3>
   </div>
   {{range author := .book.Authors}}
   <div class="column col-6">
@@ -25,23 +48,6 @@
       </div>
 
     </div>
-  </div>
-  {{end}}
-  {{if .book.Wishlists}}
-  <div class="column col-12">
-    <div class="divider"></div>
-  </div>
-  <div class="column col-12">
-    <h3>{{T("book_wishlists")}}</h3>
-    <form method="POST">
-    {{range wishlist := .book.Wishlists}}
-    <span class="chip">
-      {{wishlist.Name}}
-      <button type="submit" class="btn btn-clear" aria-label="Close" role="button" name="wish" value="{{wishlist.Uuid}}"></button>
-    </span>
-    {{end}}
-    <input name="X-CSRF-Token" type="hidden" value="{{context.Get("csrf")}}"/>
-    </form>
   </div>
   {{end}}
   <div class="column col-12">
@@ -59,28 +65,17 @@
     </ul>
     {{end}}
   </div>
-
-<div class="column col-12">
+  <div class="column col-12">
     <div class="divider"></div>
   </div>
-
   <div class="column col-12">
     <p class="text-justify"> {{.book.Description}} </p>
   </div>
   <form class="column col-md-6 col-sm-12" method="POST">
-    <input name="X-CSRF-Token" type="hidden" value="{{context.Get("csrf")}}"/>
-    {{if !.book.InCollection() }}
-    <input type="hidden" name="action" value="add"/>
-    <div class="btn-group">
-      <button class="btn btn-primary" type="submit">{{T("collection_add")|capitalize}}</button>
-      <a class="btn" href="{{url("share", .book.Isbn)}}">{{T("wishlist_add")|capitalize}}</a>
-    </div>
-    {{else}}
-    <input type="hidden" name="action" value="del"/>
-    {{if .book.InCollection()}}
-    <button class="btn" type="submit">{{T("collection_del")|capitalize}}</button>
-    {{end}}
-    {{end}}
+    <input type="hidden" name="X-CSRF-Token" value="{{context.Get("csrf")}}"/>
+    <input type="hidden" name="toggle" value="true"/>
+    <input value="{{.book.InCollection() ? T("collection_del"): T("collection_add") | capitalize}}"
+           type="submit" class="btn btn-primary" />
   </form>
 </div>
 {{end}}

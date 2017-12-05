@@ -163,8 +163,9 @@ func New(init Initializer) *Application {
 
 	app.Api.Static("/thumbs", app.Configuration.Paths.Thumbs)
 
-	app.Api.GET("/books/:isbn", app.Handler(APIBookGet), app.BasicAuth(false))
 	app.Api.GET("/books/", app.Handler(APIBookList), app.BasicAuth(false))
+	app.Api.GET("/books/:isbn", app.Handler(APIBookGet), app.BasicAuth(false))
+	app.Api.POST("/books/:isbn/wishlists/", app.Handler(APIWishlistPost), app.BasicAuth(true))
 
 	app.Api.POST("/books/", app.Handler(APIBookPost))
 	app.Api.PUT("/books/", app.Handler(APIBookPut), app.BasicAuth(true))
@@ -212,10 +213,7 @@ func New(init Initializer) *Application {
 	app.Web.POST("/wishlist/:id", app.Handler(WEBWishListPost), Protected)
 
 	app.Web.GET("/books/:isbn", app.Handler(WEBBookGet)).Name = "book"
-	app.Web.POST("/books/:isbn", app.Handler(WEBBookPost))
-
-	app.Web.GET("/books/:isbn/wishlist", app.Handler(WEBWishlistAdd), Protected).Name = "share"
-	app.Web.POST("/books/:isbn/wishlist", app.Handler(WEBWishlistPost), Protected)
+	app.Web.POST("/books/:isbn", app.Handler(WEBBookPost), Protected)
 
 	// TODO: find a better way to identify series
 	app.Web.GET("/series/:id", app.Handler(WEBSerieGet), Protected).Name = "serie"

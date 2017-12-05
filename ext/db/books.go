@@ -172,7 +172,7 @@ func (db *DB) BookSave(book *utils.Book) error {
 		toInterfaceI(book.Number), nil,
 	}
 
-	return db.Transaction(func(tx *sql.Tx) (err error) {
+	return db.Transaction(func(tx *Tx) (err error) {
 		var idBook, idAuthor int
 		var insert = func(query string, args ...interface{}) (id int, err error) {
 			err = tx.QueryRow(query, args...).Scan(&id)
@@ -248,4 +248,16 @@ func (db *DB) BookPut(user int, books ...string) (int64, error) {
 		args = append(args, isbn)
 	}
 	return db.Exec(fmt.Sprintf(InsertCollection, strings.Join(where, " OR ")), args...)
+}
+
+func (db *DB) CollectionToggle(user int, book string) error {
+	count, err := db.Exec(fmt.Sprintf(DeleteCollection, "b.isbn = $2"), user, book)
+	if err != nil {
+		return err
+	}
+	if count != 0 {
+		return nil
+	}
+	_, err = db.Exec(fmt.Sprintf(InsertCollection, "isbn = $2"), user, book)
+	return err
 }

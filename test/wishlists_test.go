@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"gopkg.in/DATA-DOG/go-sqlmock.v1"
 	"net/http/httptest"
+	"strings"
 	"testing"
 )
 
@@ -90,4 +91,39 @@ func TestWishlistsGet(t *testing.T) {
 		t.Errorf("expected status code 200 not met, got: %d", result.StatusCode)
 	}
 	helperBodyCompare(t, result, "wishlists_get.json")
+}
+
+func TestWishlistsUpdate(t *testing.T) {
+	req := NewRequestAPI("POST", "/books/1234567890/wishlists/",
+		strings.NewReader(`{"wishlists": ["uuid_1", "uuid_2"]}`))
+	req.SetBasicAuth("foo", "bar")
+	req.Header.Set("Content-Type", "application/json")
+
+	resp := httptest.NewRecorder()
+
+	users := sqlmock.NewRows([]string{"auth", "id"})
+	users.AddRow(true, 1)
+	mock.ExpectQuery("SELECT").WithArgs("foo", "bar").WillReturnRows(users)
+
+	mock.ExpectBegin()
+	mock.
+		ExpectExec("DELETE FROM wishlists_books").
+		WithArgs(1, "1234567890").
+		WillReturnResult(MockResult{})
+	mock.
+		ExpectExec("INSERT INTO wishlists_books").
+		WithArgs(1, "1234567890", "uuid_1", "uuid_2").
+		WillReturnResult(MockResult{})
+	mock.ExpectCommit()
+
+	rulz.ServeHTTP(resp, req)
+	result := resp.Result()
+
+	// we make sure that all expectations were met
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were unfulfilled expections: %s", err)
+	}
+	if result.StatusCode != 204 {
+		t.Errorf("expected status code 204 not met, got: %d", result.StatusCode)
+	}
 }

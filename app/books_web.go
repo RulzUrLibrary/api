@@ -1,8 +1,6 @@
 package app
 
 import (
-	"fmt"
-	"github.com/labstack/echo"
 	"github.com/RulzUrLibrary/api/ext/db"
 	"github.com/RulzUrLibrary/api/utils"
 	"net/http"
@@ -31,41 +29,45 @@ func WEBBookList(c *Context) (err error) {
 }
 
 func WEBBookGet(c *Context) error {
+	user, ok := c.Get("user").(*utils.User)
+	if !ok {
+		user = &utils.User{Id: 0}
+	}
 	if book, err := BookGet(c); err != nil {
 		return err
+	} else if wishlists, err := c.App.Database.WishlistsN(user.Id); err != nil {
+		return err
 	} else {
-		fmt.Printf("%#v", book)
+		book.Wishlists = wishlists.ToStructs(true).Populate(book)
 		return c.Render(http.StatusOK, "book.html", dict{"book": book})
 	}
 }
 
-func WEBBookPost(c *Context) (err error) {
+func WEBBookPost(c *Context) error {
 	var success, failure string
-	var count int64
 
-	if wish := c.FormValue("wish"); wish != "" {
-		success = "book_wishlist_removed"
-		failure = "book_wishlist_already_removed"
-		count, err = c.App.Database.WishDelete(c.Get("user").(*utils.User).Id,
-			c.Param("isbn"), wish)
-	} else if action := c.FormValue("action"); action == "del" {
-		success = "book_collection_removed"
-		failure = "book_collection_already_removed"
-		count, err = c.App.Database.BookDelete(c.Get("user").(*utils.User).Id,
-			c.Param("isbn"))
-	} else if action == "add" {
-		success = "book_collection_added"
-		failure = "book_collection_already_added"
-		count, err = c.App.Database.BookPut(c.Get("user").(*utils.User).Id,
-			c.Param("isbn"))
-	} else {
-		err = echo.NewHTTPError(http.StatusBadRequest, nil)
-	}
+	req := struct {
+		Wishlists []string `form:"wishlists"`
+		Toggle    bool     `form:"toggle"`
+	}{}
+	user := c.Get("user").(*utils.User)
+	isbn := c.Param("isbn")
+	err := c.Bind(&req)
+
 	if err != nil {
 		return err
 	}
+	if req.Toggle {
+		success = "collection_update_success"
+		failure = "collection_update_failure"
+		err = c.App.Database.CollectionToggle(user.Id, isbn)
+	} else {
+		success = "wishlist_update_success"
+		failure = "wishlist_update_failure"
+		err = c.App.Database.WishlistUpdate(user.Id, isbn, req.Wishlists...)
+	}
 
-	if count == 0 {
+	if err != nil {
 		err = c.Flashes(utils.Flash{utils.FlashWarning, failure})
 	} else {
 		err = c.Flashes(utils.Flash{utils.FlashSuccess, success})

@@ -17,35 +17,11 @@
   "book_authors": {
     "other": "Auteurs"
   },
-  "book_collection_added": {
-    "other": "le livre a été ajouté à votre collection"
-  },
-  "book_collection_already_added": {
-    "other": "le livre est déjà dans votre collection"
-  },
-  "book_collection_already_removed": {
-    "other": "le livre n'était pas dans votre collection"
-  },
-  "book_collection_removed": {
-    "other": "le livre a été retiré de votre collection"
-  },
   "book_details": {
     "other": "Détails"
   },
   "book_notations": {
     "other": "Notes"
-  },
-  "book_wishlist_added": {
-    "other": "le livre a été ajouté à votre liste de souhaits"
-  },
-  "book_wishlist_already_added": {
-    "other": "le livre est déjà dans votre liste de souhaits"
-  },
-  "book_wishlist_already_removed": {
-    "other": "le livre n'était pas dans votre liste de souhaits"
-  },
-  "book_wishlist_removed": {
-    "other": "le livre a été retiré de votre liste de souhaits"
   },
   "book_wishlists": {
     "other": "Liste de souhaits"
@@ -58,6 +34,12 @@
   },
   "collection_del": {
     "other": "retirer de ma collection"
+  },
+  "collection_update_failure": {
+    "other": "La mise à jour de la collection a échoué"
+  },
+  "collection_update_success": {
+    "other": "La collection a été mise à jour avec succès"
   },
   "confirm_password": {
     "other": "Confirmation du mot de passe"
@@ -302,16 +284,16 @@
   "wishlist_share": {
     "other": "Partager la liste de souhaits"
   },
-  "wishlists_add_cancel": {
-    "other": "Annuler"
+  "wishlist_update_failure": {
+    "other": "La mise à jour des listes de souhaits a échoué"
   },
-  "wishlists_add_label": {
-    "other": "Listes de souhaits:"
-  },
-  "wishlists_add_submit": {
-    "other": "Ajouter à(aux) liste(s) de souhaits"
+  "wishlist_update_success": {
+    "other": "Les listes de souhaits ont été mises à jour avec succès"
   },
   "wishlists_no_book": {
     "other": "Vous n'avez pas de livre dans cette liste de souhaits"
+  },
+  "wishlists_update_submit": {
+    "other": "Mettre à jour les listes de souhaits"
   }
 }
